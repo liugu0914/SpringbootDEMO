@@ -1,0 +1,5 @@
+#Springboot全局配置
+Spring:
+  profiles:
+    #开发环境:dev 生产环境:prod
+    active: dev

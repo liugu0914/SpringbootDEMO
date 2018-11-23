@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jiopeel.enter.dao.BaseDao">
+	<select id="getBaseList" resultType="com.jiopeel.enter.bean.Base">
+    	SELECT
+			t_login.pid,
+			t_login.loginnums,
+			t_login.password,
+			t_login.username,
+			t_login.addtime,
+			t_login.phone,
+			t_login.email,
+			t_login.rdmark
+		FROM t_login
+		WHERE 1=1
+		and t_login.rdmark!='d'
+	</select>
+</mapper>
