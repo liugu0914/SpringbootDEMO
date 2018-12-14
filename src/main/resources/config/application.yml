@@ -1,5 +1,8 @@
 #Springboot全局配置
 Spring:
+  devtools:
+    restart:
+      enabled: false
   profiles:
     #开发环境:dev 生产环境:prod
     active: dev

@@ -6,6 +6,8 @@ public class Base implements java.io.Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private int pid;
+
 	private String username;
 
 	private String loginnums;
@@ -14,7 +16,7 @@ public class Base implements java.io.Serializable {
 
 	private String email;
 
-	private char rdmark;
+	private char rdmark='a';
 
 	private int userid;
 
@@ -44,7 +46,7 @@ public class Base implements java.io.Serializable {
 
 	private Date rdtime;
 
-	private Date addtime;
+	private Date addtime=new Date();
 
 	private int number;
 
@@ -226,4 +228,16 @@ public class Base implements java.io.Serializable {
 		this.rdmark = rdmark;
 	}
 
+	public int getPid() {
+		return pid;
+	}
+
+	public void setPid(int pid) {
+		this.pid = pid;
+	}
+
+	@Override
+	public String toString() {
+		return "pid:"+this.getPid()+",username:"+this.getUsername()+",loginnums:"+this.getLoginnums();
+	}
 }
