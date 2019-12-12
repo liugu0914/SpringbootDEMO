@@ -20,10 +20,12 @@ public class ServerException extends RuntimeException {
 
     public ServerException(String mes, Throwable cause, boolean str, boolean str1) {
         super(mes, cause, str, str1);
+        this.message=mes;
     }
 
     public ServerException(String mes, Throwable cause) {
         super(mes, cause);
+        this.message=mes;
     }
 
     public ServerException(StateCode stateCode) {
@@ -34,10 +36,12 @@ public class ServerException extends RuntimeException {
 
     public ServerException(String mes) {
         super(mes);
+        this.message=mes;
     }
 
     public ServerException(Throwable cause) {
         super(cause);
+        this.message=cause.getMessage();
     }
 
     public Integer getCode() {
