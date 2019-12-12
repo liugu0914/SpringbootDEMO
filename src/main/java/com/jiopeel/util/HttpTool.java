@@ -9,8 +9,6 @@ import org.nutz.http.Sender;
 import org.nutz.http.sender.FilePostSender;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Streams;
-import org.nutz.log.Log;
-import org.nutz.log.Logs;
 
 import java.io.File;
 import java.io.FileOutputStream;
