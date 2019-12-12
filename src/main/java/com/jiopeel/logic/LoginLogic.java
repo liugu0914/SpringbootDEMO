@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.jiopeel.base.Base;
-import com.jiopeel.base.Constant;
+import com.jiopeel.constant.Constant;
 import com.jiopeel.bean.User;
 import com.jiopeel.config.exception.ServerException;
 
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-@Transactional
 public class LoginLogic {
 
     @Resource

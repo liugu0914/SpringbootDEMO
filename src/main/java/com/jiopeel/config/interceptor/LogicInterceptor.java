@@ -1,6 +1,6 @@
 package com.jiopeel.config.interceptor;
 
-import com.jiopeel.base.Constant;
+import com.jiopeel.constant.Constant;
 import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

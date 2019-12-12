@@ -1,5 +1,7 @@
 package com.jiopeel.util;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.ClassUtils;
@@ -267,5 +269,33 @@ public class BaseUtil {
      */
     public static String Dateformat(Long date) {
         return Dateformat("",new Date(date));
+    }
+
+    /**
+     * @Description :url转json
+     * @Param: date
+     * @Return: String
+     * @auhor:lyc
+     * @Date:2019/11/1 22:53
+     */
+    public static String Url2JSON(String paramStr){
+        String[] params = paramStr.split("&");
+        JSONObject obj = new JSONObject();
+        for (int i = 0; i < params.length; i++) {
+            String[] param = params[i].split("=");
+            if (param.length >= 2) {
+                String key = param[0];
+                String value = param[1];
+                for (int j = 2; j < param.length; j++) {
+                    value += "=" + param[j];
+                }
+                try {
+                    obj.put(key,value);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return obj.toString();
     }
 }

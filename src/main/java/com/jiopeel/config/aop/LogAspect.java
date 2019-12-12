@@ -52,8 +52,8 @@ public class LogAspect {
         String pid=user==null?"":String.valueOf(user.getId());
         String servletPath=request.getServletPath();
         log.info("********** User  : [{} : {}] | Method: {} | Seconds: {}s**********", username,pid,methodName, seconds);
-        log.info("********** URI   : {} **********", servletPath);
-        log.info("********** Result: {} **********", result);
+        log.info("********** URI   : [{}] **********", servletPath);
+        log.info("********** Result: [{}] **********", result);
         return result;
     }
 

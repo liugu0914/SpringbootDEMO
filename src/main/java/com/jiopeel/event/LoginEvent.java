@@ -46,15 +46,15 @@ public class LoginEvent {
      *
      * @return
      */
-    @ResponseBody
-    @RequestMapping(value = {"/loginout"}, method = RequestMethod.POST)
-    public void loginout(HttpServletRequest request) {
+    @RequestMapping(value = {"/loginout"}, method = RequestMethod.GET)
+    public String loginout(HttpServletRequest request) {
         if (request.getSession().getAttribute("token") != null)
             request.getSession().removeAttribute("token");
         if (request.getSession().getAttribute("user") != null)
             request.getSession().removeAttribute("user");
         if (request.getSession().getAttribute("access_token") != null)
             request.getSession().removeAttribute("access_token");
+        return  "redirect:/";
     }
 
     /**

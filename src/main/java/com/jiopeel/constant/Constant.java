@@ -1,4 +1,4 @@
-package com.jiopeel.base;
+package com.jiopeel.constant;
 
 public class Constant {
     /**
