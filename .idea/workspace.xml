@@ -2,8 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c8dc6911-4a72-486e-88a2-bfd216ad6076" name="Default Changelist" comment="update config">
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jiopeel/dao/BaseDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jiopeel/dao/BaseDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jiopeel/dao/login.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jiopeel/dao/login.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jiopeel/event/AuthEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jiopeel/event/AuthEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jiopeel/event/LoginEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jiopeel/event/LoginEvent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jiopeel/logic/AuthLogic.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/jiopeel/logic/AuthLogic.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -130,7 +134,7 @@
       <updated>1576031189599</updated>
       <workItem from="1576031192453" duration="7566000" />
       <workItem from="1576142043333" duration="7001000" />
-      <workItem from="1576153657820" duration="14019000" />
+      <workItem from="1576153657820" duration="15840000" />
     </task>
     <task id="LOCAL-00001" summary="remove logs">
       <created>1576154003835</created>
@@ -197,7 +201,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/jiopeel/logic/AuthLogic.java</url>
-          <line>90</line>
+          <line>101</line>
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

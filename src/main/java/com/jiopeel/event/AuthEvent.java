@@ -67,7 +67,7 @@ public class AuthEvent {
     @RequestMapping(value = {"/oauth/redirect/{granttype}"}, method = RequestMethod.GET)
     public String redirect(HttpServletRequest request, @PathVariable("granttype") String granttype) {
         UserGrant userGrant = logic.redirectType(request, granttype);
-        return "redirect:/" ;
+        return "redirect:/main" ;
     }
 
     /**

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -51,8 +52,18 @@ public class AuthLogic {
         }
         if (BaseUtil.empty(userGrant))
             throw new ServerException("信息有误，授权登陆失败！");
-        if (!dao.add("login.saveuserGrant", userGrant))
-            throw new ServerException("信息有误，授权登陆失败！");
+        UserGrant user_data = dao.queryOne("login.getuserGrant", userGrant);
+        if (BaseUtil.empty(user_data)) {
+            if (!dao.add("login.saveuserGrant", userGrant))
+                throw new ServerException("信息有误，授权登陆失败！");
+        }else {
+            user_data.updTime();
+            user_data.setImgurl(userGrant.getImgurl());
+            user_data.setNickname(userGrant.getNickname());
+            user_data.setPassword(userGrant.getPassword());
+            if (!dao.upd("login.upduserGrant", user_data))
+                throw new ServerException("信息有误，授权登陆失败！");
+        }
         return userGrant;
     }
 

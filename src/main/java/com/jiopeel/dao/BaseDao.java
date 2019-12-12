@@ -43,4 +43,13 @@ public abstract class BaseDao<T extends Bean> {
     public boolean add(String nameSpec) {
         return add(nameSpec,null);
     }
+
+    public boolean upd(String nameSpec, Object object) {
+        return getSqlSession().update(nameSpec, object) > 0;
+    }
+
+    public boolean upd(String nameSpec) {
+        return upd(nameSpec,null);
+    }
+
 }

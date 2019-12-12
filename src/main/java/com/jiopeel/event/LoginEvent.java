@@ -30,8 +30,8 @@ public class LoginEvent {
 
     @RequestMapping(value = {"/index"}, method = RequestMethod.GET)
     public String home(HttpServletRequest request,
-                       @RequestParam("client_id") String client_id,
-                       @RequestParam("redirect_uri") String redirect_uri,
+                       @RequestParam(value = "client_id",required = false) String client_id,
+                       @RequestParam(value = "redirect_uri",required = false) String redirect_uri,
                        Model model) {
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
