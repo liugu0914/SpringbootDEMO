@@ -7,11 +7,10 @@ import com.jiopeel.base.Base;
 import com.jiopeel.bean.User;
 import com.jiopeel.logic.LoginLogic;
 
+import com.jiopeel.util.BaseUtil;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Description :首页登陆
@@ -22,23 +21,36 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class LoginEvent {
 
     @Resource
-    LoginLogic logic;
+    private LoginLogic logic;
 
-    @RequestMapping(value = {"/index"}, method = RequestMethod.GET)
-    public String home(HttpServletRequest request) {
-        return "login";
+    @RequestMapping(value = {"/signin"}, method = RequestMethod.GET)
+    public String signin() {
+        return "redirect:/oauth";
     }
 
+    @RequestMapping(value = {"/index"}, method = RequestMethod.GET)
+    public String home(HttpServletRequest request,
+                       @RequestParam("client_id") String client_id,
+                       @RequestParam("redirect_uri") String redirect_uri,
+                       Model model) {
+        model.addAttribute("client_id", client_id);
+        model.addAttribute("redirect_uri", redirect_uri);
+        return "login";
+    }
 
     /**
      * 登陆
      *
      * @return
      */
-    @ResponseBody
     @RequestMapping(value = {"/login"}, method = RequestMethod.POST)
-    public Base login(HttpServletRequest request, @ModelAttribute User user) {
-        return logic.dologin(user, request);
+    public String login(HttpServletRequest request,
+                      @RequestParam("client_id") String client_id,
+                      @RequestParam("redirect_uri") String redirect_uri,
+                      @ModelAttribute User user) {
+        Base base= logic.dologin(user, request,client_id,redirect_uri);
+        //回调授权地址
+        return "redirect:"+redirect_uri+"?"+ BaseUtil.Object2Url(base);
     }
 
     /**
@@ -54,7 +66,7 @@ public class LoginEvent {
             request.getSession().removeAttribute("user");
         if (request.getSession().getAttribute("access_token") != null)
             request.getSession().removeAttribute("access_token");
-        return  "redirect:/";
+        return "redirect:/";
     }
 
     /**

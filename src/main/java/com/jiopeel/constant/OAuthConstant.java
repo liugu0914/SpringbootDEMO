@@ -3,9 +3,36 @@ package com.jiopeel.constant;
 public class OAuthConstant {
 
     /**
-     * 本地
+     * 本地回调地址
      */
     public final static String EDIRECT_URI = "http://localhost:8088/oauth/redirect";
+
+    /**
+     * 本地授权登陆地址
+     */
+    public final static String local_url = "http://localhost:8088/index?client_id=%s&redirect_uri=%s";
+
+    /**
+     *  本地 token获取地址
+     */
+    public final static String local_toekn = "http://localhost:8088/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s";
+
+
+    /**
+     *  本地 user获取地址
+     */
+    public final static String local_user = "http://localhost:8088/login/oauth/user?client_id=%s&client_secret=%s&code=%s";
+
+    /**
+     * 本地 Client id
+     */
+    public final static String local_client_id = "2NJBuBGlG52PthBp";
+
+    /**
+     * 本地 Client Secret
+     */
+    public final static String local_client_select = "GoN2CPwX5xfnn3mX3b4TcwbK9OuQPx7F";
+
 
     /**
      *  github token获取地址

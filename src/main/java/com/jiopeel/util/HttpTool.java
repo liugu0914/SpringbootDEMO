@@ -50,6 +50,31 @@ public class HttpTool {
         }
     }
 
+    public static String get(String url,String data) {
+        if (log.isDebugEnabled()) {
+            log.debug("Request url: {}, default timeout: {}", url, CONNECT_TIME_OUT);
+        }
+        try {
+            Request req = Request.create(url, METHOD.GET);
+            req.setEnc("UTF-8");
+            req.setData(data);
+            Response resp = Sender.create(req, CONNECT_TIME_OUT).send();
+            if (resp.isOK()) {
+                String content = resp.getContent("UTF-8");
+                if (log.isInfoEnabled()) {
+                    log.info("GET Request success. Response content: {}", content);
+                }
+                return content;
+            }
+
+            throw Lang.wrapThrow(new RuntimeException(String.format("Get request [{}] failed. status: {}",
+                    url,
+                    resp.getStatus())));
+        } catch (Exception e) {
+            throw Lang.wrapThrow(e);
+        }
+    }
+
     public static String post(String url, String body) {
         if (log.isDebugEnabled()) {
             log.debug("Request url: {}, post data: {}, default timeout: {}",

@@ -30,7 +30,7 @@ public class Bean implements Serializable {
         this.id = UUID.randomUUID().toString().replace("-", "");
     }
 
-    public void setTime() {
+    public void createTime() {
         this.ctime=new Date();
         this.updtime=new Date();
     }

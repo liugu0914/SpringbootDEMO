@@ -6,6 +6,11 @@
         select * from t_user where  t_user.id=#{_paramer}
     </select>
 
+    <insert id="saveuserGrant" parameterType="com.jiopeel.bean.UserGrant">
+        insert into t_user(id,username,email,ctime,updtime,account,password)
+         values (#{id},#{username},#{email},#{ctime},#{updtime},#{account},#{password})
+    </insert>
+
     <insert id="saveUser" parameterType="com.jiopeel.bean.User">
         insert into t_user(id,username,email,ctime,updtime,account,password)
          values (#{id},#{username},#{email},#{ctime},#{updtime},#{account},#{password})

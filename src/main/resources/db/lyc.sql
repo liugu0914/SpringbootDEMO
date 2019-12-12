@@ -29,3 +29,18 @@ CREATE TABLE `t_user` (
   `updtime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+DROP TABLE IF EXISTS `t_user_grant`;
+CREATE TABLE `t_user_grant` (
+  `id` varchar(32) NOT NULL,
+  `userid` varchar(32) DEFAULT NULL,
+  `granttype` varchar(255) DEFAULT NULL,
+  `onlyid` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `imgurl` varchar(255) DEFAULT NULL,
+  `nickname` varchar(255) DEFAULT NULL,
+  `ctime` datetime DEFAULT NULL,
+  `updtime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

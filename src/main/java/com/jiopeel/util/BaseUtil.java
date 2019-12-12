@@ -2,6 +2,7 @@ package com.jiopeel.util;
 
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.util.ClassUtils;
@@ -9,6 +10,7 @@ import org.springframework.util.ClassUtils;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+@Slf4j
 public class BaseUtil {
 
     protected static final Logger sys = LogManager.getLogger("sys");
@@ -173,7 +176,7 @@ public class BaseUtil {
      * @param buf
      * @return
      */
-    public static String parseByte2HexStr(byte buf[]) {
+    public static String parseByte2HexStr(byte[] buf) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < buf.length; i++) {
             String hex = Integer.toHexString(buf[i] & 0xFF);
@@ -215,10 +218,8 @@ public class BaseUtil {
     /**
      * 自动将字符串补位,后面加上空格
      *
-     * @param text
-     *            字符串
-     * @param coverLength
-     *            总长度
+     * @param text        字符串
+     * @param coverLength 总长度
      * @return
      */
     public static String cover(String text, int coverLength) {
@@ -241,10 +242,10 @@ public class BaseUtil {
      * @Date:2019/11/1 22:53
      */
     public static String Dateformat(String prefix, Date date) {
-        if(empty(prefix))
-            prefix="yyyy-MM-dd HH:mm:ss";
+        if (empty(prefix))
+            prefix = "yyyy-MM-dd HH:mm:ss";
         if (empty(date))
-            date=new Date();
+            date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat(prefix);
         return sdf.format(date);
     }
@@ -257,7 +258,7 @@ public class BaseUtil {
      * @Date:2019/11/1 22:53
      */
     public static String Dateformat(Date date) {
-        return Dateformat("",date);
+        return Dateformat("", date);
     }
 
     /**
@@ -268,7 +269,7 @@ public class BaseUtil {
      * @Date:2019/11/1 22:53
      */
     public static String Dateformat(Long date) {
-        return Dateformat("",new Date(date));
+        return Dateformat("", new Date(date));
     }
 
     /**
@@ -278,7 +279,7 @@ public class BaseUtil {
      * @auhor:lyc
      * @Date:2019/11/1 22:53
      */
-    public static String Url2JSON(String paramStr){
+    public static String Url2JSON(String paramStr) {
         String[] params = paramStr.split("&");
         JSONObject obj = new JSONObject();
         for (int i = 0; i < params.length; i++) {
@@ -290,12 +291,52 @@ public class BaseUtil {
                     value += "=" + param[j];
                 }
                 try {
-                    obj.put(key,value);
+                    obj.put(key, value);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
         return obj.toString();
+    }
+
+
+    /**
+     * 对象转url
+     *
+     * @param clazz
+     * @return
+     */
+    public static String Object2Url(Object clazz) {
+        // 遍历属性类、属性值
+        Field[] fields = clazz.getClass().getDeclaredFields();
+
+        StringBuilder requestURL = new StringBuilder();
+        try {
+            boolean flag = true;
+            String property, value;
+            for (int i = 0; i < fields.length; i++) {
+                Field field = fields[i];
+                // 允许访问私有变量
+                field.setAccessible(true);
+                // 属性名
+                property = field.getName();
+                // 属性值
+                value = field.get(clazz).toString();
+                if (empty(value))
+                    continue;
+                String params = property + "=" + value;
+                if (flag) {
+                    requestURL.append(params);
+                    flag = false;
+                } else {
+                    requestURL.append("&" + params);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("URL参数为：" + clazz.toString());
+        }
+        return requestURL.toString();
     }
 }
