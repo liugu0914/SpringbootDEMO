@@ -48,7 +48,7 @@ public class LoginEvent {
                       @RequestParam("client_id") String client_id,
                       @RequestParam("redirect_uri") String redirect_uri,
                       @ModelAttribute User user) {
-        Base base= logic.dologin(user, request,client_id,redirect_uri);
+        Base base= logic.dologin(user, request,client_id);
         //回调授权地址
         return "redirect:"+redirect_uri+"?"+ BaseUtil.Object2Url(base);
     }

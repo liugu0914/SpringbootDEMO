@@ -10,8 +10,14 @@ import com.jiopeel.base.StateCode;
 public class ServerException extends RuntimeException {
     private static final long serialVersionUID = -8892899092208135415L;
 
-    private Integer code;
+    /**
+     * 状态码
+     */
+    private Integer status;
 
+    /**
+     * 消息
+     */
     private String message;
 
     public ServerException() {
@@ -30,7 +36,7 @@ public class ServerException extends RuntimeException {
 
     public ServerException(StateCode stateCode) {
         super(stateCode.getMessage());
-        this.code = stateCode.getCode();
+        this.status = stateCode.getStatus();
         this.message = stateCode.getMessage();
     }
 
@@ -45,7 +51,7 @@ public class ServerException extends RuntimeException {
     }
 
     public Integer getCode() {
-        return code;
+        return status;
     }
 
     @Override

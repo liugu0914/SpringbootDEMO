@@ -13,7 +13,7 @@ import com.jiopeel.constant.Constant;
 import com.jiopeel.bean.User;
 import com.jiopeel.config.exception.ServerException;
 
-import com.jiopeel.constant.OAuthConstant;
+import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.dao.UserDao;
 import com.jiopeel.util.BaseUtil;
 import com.jiopeel.util.HttpTool;
@@ -55,12 +55,11 @@ public class LoginLogic {
      * @param tmpuser 页面登陆数据
      * @param request
      * @param client_id
-     * @param redirect_uri
      * @return Base
      * @Author lyc
      * @Date:2019/12/12 23:42
      */
-    public Base dologin(User tmpuser, HttpServletRequest request, String client_id, String redirect_uri) {
+    public Base dologin(User tmpuser, HttpServletRequest request, String client_id) {
         String password = tmpuser.getPassword();
         if (BaseUtil.empty(tmpuser))
             throw new ServerException("用户对象不能为空");
@@ -87,10 +86,10 @@ public class LoginLogic {
         session.setAttribute("access_token", pidaes);
         session.setAttribute("user", user);
         session.setAttribute("token", token);
-
-        if (!OAuthConstant.local_client_id.equals(client_id)){
+        session.setAttribute("code", BaseUtil.getUUID());
+        if (!OauthConstant.local_client_id.equals(client_id)){
             base.setResult(false);
-            base.setCode(StateCode.FAIL.getCode());
+            base.setStatus(StateCode.FAIL.getStatus());
             base.setMessage("client_id无法识别");
         }
         return base;

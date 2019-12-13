@@ -12,14 +12,14 @@ public enum StateCode {
     FAIL(-1, "失败");
     @Getter
     @Setter
-    private Integer code;
+    private Integer status;
 
     @Getter
     @Setter
     private String message;
 
-    StateCode(Integer code, String message) {
-        this.code = code;
+    StateCode(Integer status, String message) {
+        this.status = status;
         this.message = message;
     }
 

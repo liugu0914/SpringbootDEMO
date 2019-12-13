@@ -3,7 +3,8 @@ package com.jiopeel.logic;
 import com.alibaba.fastjson.JSONObject;
 import com.jiopeel.bean.UserGrant;
 import com.jiopeel.config.exception.ServerException;
-import com.jiopeel.constant.OAuthConstant;
+import com.jiopeel.constant.OauthConstant;
+import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.dao.UserDao;
 import com.jiopeel.dao.UserGrantDao;
 import com.jiopeel.util.BaseUtil;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class AuthLogic {
+public class OauthLogic {
 
     @Resource
     private UserGrantDao dao;
@@ -42,7 +43,7 @@ public class AuthLogic {
         switch (granttype) {
             case "github":
                 //组装Url
-                String user_url = String.format(OAuthConstant.GITHUB_USER, access_token);
+                String user_url = String.format(OauthConstant.GITHUB_USER, access_token);
                 //请求地址
                 String result = HttpTool.get(user_url);
                 userGrant = savebyGithub(result, access_token, granttype);
@@ -125,7 +126,7 @@ public class AuthLogic {
         String access_token = null;
         if (parameterMap.containsKey("code")) {
             String code = parameterMap.get("code")[0];
-            String url = String.format(OAuthConstant.GITHUB_TOKEN, OAuthConstant.GITHUB_CLIENT_ID, OAuthConstant.GITHUB_CLIENT_SECRET, code);
+            String url = String.format(OauthConstant.GITHUB_TOKEN, OauthConstant.GITHUB_CLIENT_ID, OauthConstant.GITHUB_CLIENT_SECRET, code);
             String res = HttpTool.get(url);
             res = BaseUtil.Url2JSON(res);
             JSONObject parse = (JSONObject) JSONObject.parse(res);

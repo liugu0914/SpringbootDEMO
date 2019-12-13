@@ -1,6 +1,6 @@
 package com.jiopeel.constant;
 
-public class OAuthConstant {
+public class OauthConstant {
 
     /**
      * 本地回调地址

@@ -2,9 +2,8 @@ package com.jiopeel.event;
 
 import com.jiopeel.bean.UserGrant;
 import com.jiopeel.config.exception.ServerException;
-import com.jiopeel.constant.Constant;
-import com.jiopeel.constant.OAuthConstant;
-import com.jiopeel.logic.AuthLogic;
+import com.jiopeel.constant.OauthConstant;
+import com.jiopeel.logic.OauthLogic;
 import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.Date;
 
 /**
  * @Description :授权登录
@@ -22,10 +19,10 @@ import java.util.Date;
  */
 @Slf4j
 @Controller
-public class AuthEvent {
+public class OauthEvent {
 
     @Resource
-    private AuthLogic logic;
+    private OauthLogic logic;
 
     /**
      * 不同授权类型不同登陆方式
@@ -42,10 +39,10 @@ public class AuthEvent {
             granttype = "local";
         switch (granttype) {
             case "github":
-                url = String.format(OAuthConstant.GITHUB_URL, OAuthConstant.GITHUB_CLIENT_ID, OAuthConstant.EDIRECT_URI + "/" + granttype);
+                url = String.format(OauthConstant.GITHUB_URL, OauthConstant.GITHUB_CLIENT_ID, OauthConstant.EDIRECT_URI + "/" + granttype);
                 break;
             case "local":
-                url = String.format(OAuthConstant.local_url, OAuthConstant.local_client_id, OAuthConstant.EDIRECT_URI + "/" + granttype);
+                url = String.format(OauthConstant.local_url, OauthConstant.local_client_id, OauthConstant.EDIRECT_URI + "/" + granttype);
                 break;
             default:
                 url="/";
@@ -59,7 +56,7 @@ public class AuthEvent {
      * 授权回调地址
      *
      * @param request
-     * @param granttype 授权类型 github
+     * @param granttype 授权类型
      * @return
      * @auhor:lyc
      * @Date:2019/12/12 22:08

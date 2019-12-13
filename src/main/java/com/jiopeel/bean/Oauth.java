@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @Date:2019/12/12 21:23
  */
 @Data
-public class Oath extends Bean implements Serializable {
+public class Oauth implements Serializable {
 
     private static final long serialVersionUID = -3540383839044057287L;
 

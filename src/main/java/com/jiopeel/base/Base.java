@@ -14,31 +14,31 @@ public class Base implements Serializable {
     }
 
     public Base(Integer code, String message) {
-        this.code = code;
+        this.status = code;
         this.message = message;
     }
 
     public Base(Integer code, String message, Object data) {
-        this.code = code;
+        this.status = code;
         this.message = message;
         this.data = data;
     }
 
     public Base(StateCode stateCode) {
-        this(stateCode.getCode(), stateCode.getMessage());
+        this(stateCode.getStatus(), stateCode.getMessage());
     }
 
     public Base(StateCode stateCode, Object data) {
-        this(stateCode.getCode(), stateCode.getMessage(), data);
+        this(stateCode.getStatus(), stateCode.getMessage(), data);
     }
 
     public void setStateCode(Integer code, String message) {
-        this.code = code;
+        this.status = code;
         this.message = message;
     }
 
     public void setStateCode(StateCode stateCode) {
-        this.setStateCode(stateCode.getCode(), stateCode.getMessage());
+        this.setStateCode(stateCode.getStatus(), stateCode.getMessage());
     }
 
     public static Base suc() {
@@ -46,11 +46,11 @@ public class Base implements Serializable {
     }
 
     public static Base suc(String msg) {
-        return new Base(StateCode.SUCCESS.getCode(), msg);
+        return new Base(StateCode.SUCCESS.getStatus(), msg);
     }
 
     public static Base suc(String msg, Object data) {
-        return new Base(StateCode.SUCCESS.getCode(), msg, data);
+        return new Base(StateCode.SUCCESS.getStatus(), msg, data);
     }
 
     public static Base fail() {
@@ -60,13 +60,13 @@ public class Base implements Serializable {
     }
 
     public static Base fail(String msg) {
-        Base base = new Base(StateCode.FAIL.getCode(), msg);
+        Base base = new Base(StateCode.FAIL.getStatus(), msg);
         base.setResult(false);
         return base;
     }
 
     public static Base fail(String msg, Object data) {
-        Base base = new Base(StateCode.FAIL.getCode(), msg, data);
+        Base base = new Base(StateCode.FAIL.getStatus(), msg, data);
         base.setResult(false);
         return base;
     }
@@ -84,7 +84,7 @@ public class Base implements Serializable {
     /**
      * 状态码
      */
-    private Integer code;
+    private Integer status;
 
     /**
      * 消息通知
