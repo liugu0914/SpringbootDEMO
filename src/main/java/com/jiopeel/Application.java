@@ -7,8 +7,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Slf4j
+@EnableTransactionManagement
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
 

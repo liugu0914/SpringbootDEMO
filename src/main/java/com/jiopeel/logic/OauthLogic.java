@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -126,8 +127,11 @@ public class OauthLogic {
         String access_token = null;
         if (parameterMap.containsKey("code")) {
             String code = parameterMap.get("code")[0];
-            String url = String.format(OauthConstant.GITHUB_TOKEN, OauthConstant.GITHUB_CLIENT_ID, OauthConstant.GITHUB_CLIENT_SECRET, code);
-            String res = HttpTool.get(url);
+            Map<String, Object> params=new HashMap<String, Object>();
+            params.put("client_id",OauthConstant.GITHUB_CLIENT_ID);
+            params.put("client_secret",OauthConstant.GITHUB_CLIENT_SECRET);
+            params.put("code",code);
+            String res = HttpTool.post(OauthConstant.GITHUB_TOKEN,params);
             res = BaseUtil.Url2JSON(res);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString("access_token");

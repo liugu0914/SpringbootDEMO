@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * @Description :授权登录
@@ -47,6 +49,11 @@ public class OauthEvent {
             default:
                 url="/";
                 break;
+        }
+        try {
+            url= URLEncoder.encode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return "redirect:" + url;
     }

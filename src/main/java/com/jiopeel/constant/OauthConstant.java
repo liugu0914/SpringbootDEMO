@@ -37,7 +37,7 @@ public class OauthConstant {
     /**
      *  github token获取地址
      */
-    public final static String GITHUB_TOKEN = "https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s";
+    public final static String GITHUB_TOKEN = "https://github.com/login/oauth/access_token";
 
     /**
      *  github user获取地址

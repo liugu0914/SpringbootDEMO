@@ -1,11 +1,8 @@
 package com.jiopeel.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.nutz.http.Http;
-import org.nutz.http.Request;
+import org.nutz.http.*;
 import org.nutz.http.Request.METHOD;
-import org.nutz.http.Response;
-import org.nutz.http.Sender;
 import org.nutz.http.sender.FilePostSender;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Streams;
@@ -42,7 +39,7 @@ public class HttpTool {
                 return content;
             }
 
-            throw Lang.wrapThrow(new RuntimeException(String.format("Get request [{}] failed. status: {}",
+            throw Lang.wrapThrow(new RuntimeException(String.format("Get request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
@@ -67,7 +64,7 @@ public class HttpTool {
                 return content;
             }
 
-            throw Lang.wrapThrow(new RuntimeException(String.format("Get request [{}] failed. status: {}",
+            throw Lang.wrapThrow(new RuntimeException(String.format("Get request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
@@ -97,7 +94,7 @@ public class HttpTool {
                 return content;
             }
 
-            throw Lang.wrapThrow(new RuntimeException(String.format("Post request [{}] failed. status: {}",
+            throw Lang.wrapThrow(new RuntimeException(String.format("Post request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
@@ -119,7 +116,7 @@ public class HttpTool {
                 return content;
             }
 
-            throw Lang.wrapThrow(new RuntimeException(String.format("Post request [{}] failed. status: {}",
+            throw Lang.wrapThrow(new RuntimeException(String.format("Post request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
@@ -144,7 +141,7 @@ public class HttpTool {
                 return content;
             }
 
-            throw Lang.wrapThrow(new RuntimeException(String.format("Upload file [{}] failed. status: {}",
+            throw Lang.wrapThrow(new RuntimeException(String.format("Upload file [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
@@ -186,7 +183,7 @@ public class HttpTool {
                 return tmpfile;
             }
 
-            throw Lang.wrapThrow(new RuntimeException(String.format("Download file [{}] failed. status: {}, content: {}",
+            throw Lang.wrapThrow(new RuntimeException(String.format("Download file [%s] failed. status: %d, content: %s",
                     url,
                     resp.getStatus(),
                     resp.getContent())));

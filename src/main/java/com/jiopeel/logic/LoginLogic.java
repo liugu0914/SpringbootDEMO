@@ -60,13 +60,15 @@ public class LoginLogic {
      * @Date:2019/12/12 23:42
      */
     public Base dologin(User tmpuser, HttpServletRequest request, String client_id) {
+        if (!OauthConstant.local_client_id.equals(client_id))
+            return  Base.fail("client_id无法识别");
         String password = tmpuser.getPassword();
         if (BaseUtil.empty(tmpuser))
             throw new ServerException("用户对象不能为空");
         if (BaseUtil.empty(tmpuser.getAccount()))
             throw new ServerException("账号不能为空");
         if (BaseUtil.empty(password))
-            throw new ServerException("账号不能为空");
+            throw new ServerException("密码不能为空");
         User user = dao.queryOne("login.getUserbyaccount", tmpuser);
         if (user == null)
             throw new ServerException("该账号不存在");
@@ -86,12 +88,6 @@ public class LoginLogic {
         session.setAttribute("access_token", pidaes);
         session.setAttribute("user", user);
         session.setAttribute("token", token);
-        session.setAttribute("code", BaseUtil.getUUID());
-        if (!OauthConstant.local_client_id.equals(client_id)){
-            base.setResult(false);
-            base.setStatus(StateCode.FAIL.getStatus());
-            base.setMessage("client_id无法识别");
-        }
         return base;
     }
 

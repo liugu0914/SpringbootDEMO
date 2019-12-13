@@ -5,23 +5,31 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.jiopeel.base.Base;
 import com.jiopeel.bean.User;
+import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.logic.LoginLogic;
 
 import com.jiopeel.util.BaseUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * @Description :首页登陆
  * @auhor:lyc
  * @Date:2019/10/30 23:53
  */
+@Slf4j
 @Controller
 public class LoginEvent {
 
     @Resource
     private LoginLogic logic;
+    @Resource
+    private  RedisUtil redisUtil;
 
     @RequestMapping(value = {"/signin"}, method = RequestMethod.GET)
     public String signin() {
@@ -33,6 +41,12 @@ public class LoginEvent {
                        @RequestParam(value = "client_id",required = false) String client_id,
                        @RequestParam(value = "redirect_uri",required = false) String redirect_uri,
                        Model model) {
+        String uuid=BaseUtil.getUUID();
+        log.info(uuid);
+        if (redisUtil.set(uuid,User.builder().password(uuid).build())){
+            User user = (User)redisUtil.get(uuid);
+            log.info(user.toString());
+        }
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
         return "login";
@@ -50,7 +64,13 @@ public class LoginEvent {
                       @ModelAttribute User user) {
         Base base= logic.dologin(user, request,client_id);
         //回调授权地址
-        return "redirect:"+redirect_uri+"?"+ BaseUtil.Object2Url(base);
+        String url=BaseUtil.Object2Url(base);
+        try {
+            url= URLEncoder.encode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "redirect:"+redirect_uri+"?"+ url;
     }
 
     /**
