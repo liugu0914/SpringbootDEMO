@@ -19,7 +19,7 @@ public class UserGrant extends Bean implements Serializable {
 
     @Tolerate
     public UserGrant() {
-
+        super();
     }
 
     /**

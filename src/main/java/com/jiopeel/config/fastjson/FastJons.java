@@ -1,4 +1,4 @@
-package com.jiopeel.config;
+package com.jiopeel.config.fastjson;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;

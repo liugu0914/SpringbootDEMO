@@ -1,61 +1,61 @@
 package com.jiopeel.config.exception;
 
 import com.jiopeel.base.StateCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @Description : 自定义服务异常处理器
  * @auhor:lyc
  * @Date:2019/10/30 23:03
  */
+@Slf4j
 public class ServerException extends RuntimeException {
     private static final long serialVersionUID = -8892899092208135415L;
 
     /**
      * 状态码
      */
+    @Getter
+    @Setter
     private Integer status;
 
     /**
      * 消息
      */
+    @Getter
+    @Setter
     private String message;
+
 
     public ServerException() {
         super();
     }
 
-    public ServerException(String mes, Throwable cause, boolean str, boolean str1) {
-        super(mes, cause, str, str1);
-        this.message=mes;
-    }
-
     public ServerException(String mes, Throwable cause) {
         super(mes, cause);
-        this.message=mes;
+        this.message = mes;
+        log.error(mes);
     }
+
 
     public ServerException(StateCode stateCode) {
         super(stateCode.getMessage());
         this.status = stateCode.getStatus();
         this.message = stateCode.getMessage();
+        log.error("status= {}, message= {}");
     }
 
     public ServerException(String mes) {
         super(mes);
-        this.message=mes;
+        this.message = mes;
+        log.error(mes);
     }
+
 
     public ServerException(Throwable cause) {
         super(cause);
-        this.message=cause.getMessage();
-    }
-
-    public Integer getCode() {
-        return status;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        log.error(cause.getMessage(),cause);
     }
 }

@@ -2,6 +2,27 @@ package com.jiopeel.constant;
 
 public class OauthConstant {
 
+
+    /**
+     * access_token
+     */
+    public final static String ACCESS_TOKEN = "access_token";
+
+    /**
+     * code
+     */
+    public final static String CODE = "code";
+
+    /**
+     * Client id
+     */
+    public final static String CLIENT_ID = "client_id";
+
+    /**
+     * Client secret
+     */
+    public final static String CLIENT_SECRET = "client_secret";
+
     /**
      * 本地回调地址
      */
@@ -15,13 +36,8 @@ public class OauthConstant {
     /**
      *  本地 token获取地址
      */
-    public final static String local_toekn = "http://localhost:8088/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s";
+    public final static String local_token = "http://localhost:8088/login/oauth/access_token";
 
-
-    /**
-     *  本地 user获取地址
-     */
-    public final static String local_user = "http://localhost:8088/login/oauth/user?client_id=%s&client_secret=%s&code=%s";
 
     /**
      * 本地 Client id
@@ -31,7 +47,7 @@ public class OauthConstant {
     /**
      * 本地 Client Secret
      */
-    public final static String local_client_select = "GoN2CPwX5xfnn3mX3b4TcwbK9OuQPx7F";
+    public final static String local_client_secret = "GoN2CPwX5xfnn3mX3b4TcwbK9OuQPx7F";
 
 
     /**

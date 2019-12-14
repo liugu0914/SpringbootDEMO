@@ -15,8 +15,17 @@ public class OauthToken implements Serializable {
 
     private static final long serialVersionUID = -3540383839044057287L;
 
+
+    public OauthToken() {
+    }
+
+    public OauthToken(String access_token, String refresh_token) {
+        this.access_token = access_token;
+        this.refresh_token = refresh_token;
+    }
+
     /**
-     *token
+     * token
      */
     private String access_token;
     /**
@@ -26,11 +35,11 @@ public class OauthToken implements Serializable {
     /**
      * token过期时间
      */
-    private Date expires_in;
+    private Long expiresIn;
     /**
      * 刷token过期时间
      */
-    private Date refreshExpiresIn;
+    private Long refreshExpiresIn;
     /**
      * 其他数据
      */

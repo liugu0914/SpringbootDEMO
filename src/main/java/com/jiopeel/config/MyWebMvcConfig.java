@@ -1,7 +1,7 @@
 package com.jiopeel.config;
 
-import com.jiopeel.config.interceptor.LogicInterceptor;
 
+import com.jiopeel.config.interceptor.OAuthInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -11,11 +11,11 @@ import org.springframework.web.servlet.config.annotation.*;
 public class MyWebMvcConfig implements WebMvcConfigurer {
 
     @Autowired
-    LogicInterceptor logicInterceptor;
+    OAuthInterceptor oAuthInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(logicInterceptor).addPathPatterns("/**")
+        registry.addInterceptor(oAuthInterceptor).addPathPatterns("/**")
                 .excludePathPatterns("/", "/index", "/register", "/login","/signin","/oauth/**")
                 .excludePathPatterns("/assets/**","/bootstrap/**","/img/**","/login/**");
     }

@@ -10,8 +10,10 @@ import org.springframework.util.ClassUtils;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -270,6 +272,23 @@ public class BaseUtil {
      */
     public static String Dateformat(Long date) {
         return Dateformat("", new Date(date));
+    }
+
+    /**
+     * @Description :url encode加密
+     * @Param: url
+     * @Return: String
+     * @auhor:lyc
+     * @Date:2019/11/1 22:53
+     */
+    public static String encodeURL(String url) {
+        String str="";
+        try {
+            str=URLEncoder.encode(url, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return str;
     }
 
     /**

@@ -10,9 +10,9 @@
 
     <property name="log_chartSet" value="UTF-8"/>
     <property name="log_pattern"
-              value="%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight([%-5level]) %green([%thread])  %boldMagenta(%logger{50}.%method:%L) : %cyan(%msg%n)"/>
+              value="%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight([%-5level]) %green([%thread])  %boldMagenta(%logger{50}.%method) : %cyan(%msg%n)"/>
     <property name="log_file_pattern"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread]  %logger{50}.%method:%L : %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread]  %logger{50}.%method : %msg%n"/>
 
     <!--输出到控制台-->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">

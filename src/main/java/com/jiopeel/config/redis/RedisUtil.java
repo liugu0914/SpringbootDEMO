@@ -28,13 +28,13 @@ public class RedisUtil {
     /**
      * 指定缓存失效时间
      * @param key 键
-     * @param time 时间(秒)
+     * @param time 时间(毫秒)
      * @return
      */
     public boolean expire(String key,long time){
         try {
             if(time>0){
-                redisTemplate.expire(key, time, TimeUnit.SECONDS);
+                redisTemplate.expire(key, time, TimeUnit.MILLISECONDS);
             }
             return true;
         } catch (Exception e) {
@@ -46,10 +46,10 @@ public class RedisUtil {
     /**
      * 根据key 获取过期时间
      * @param key 键 不能为null
-     * @return 时间(秒) 返回0代表为永久有效
+     * @return 时间(毫秒) 返回0代表为永久有效
      */
     public long getExpire(String key){
-        return redisTemplate.getExpire(key,TimeUnit.SECONDS);
+        return redisTemplate.getExpire(key,TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -111,13 +111,13 @@ public class RedisUtil {
      * 普通缓存放入并设置时间
      * @param key 键
      * @param value 值
-     * @param time 时间(秒) time要大于0 如果time小于等于0 将设置无限期
+     * @param time 时间(毫秒) time要大于0 如果time小于等于0 将设置无限期
      * @return true成功 false 失败
      */
     public boolean set(String key,Object value,long time){
         try {
             if(time>0){
-                redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set(key, value, time, TimeUnit.MILLISECONDS);
             }else{
                 set(key, value);
             }

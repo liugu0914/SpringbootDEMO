@@ -2,6 +2,7 @@ package com.jiopeel.config.exception;
 
 import com.jiopeel.base.Base;
 import com.jiopeel.base.StateCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * @auhor:lyc
  * @Date:2019/10/30 23:44
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -25,11 +27,13 @@ public class GlobalExceptionHandler {
         mav.addObject("exception", e);
         mav.addObject("url", request.getRequestURL());
         mav.setViewName(DEFAULT_ERROR_VIEW);
+        e.printStackTrace();
         return mav;
     }
 
-    @ExceptionHandler(value = {RuntimeException.class})
-    public Base RuntimeExceptionHandler(HttpServletRequest request, Exception e)  {
+    @ExceptionHandler(value = {ServerException.class})
+    public Base ServerExceptionHandler(ServerException e)  {
+        e.printStackTrace();
         return Base.fail(e.getMessage());
     }
 }

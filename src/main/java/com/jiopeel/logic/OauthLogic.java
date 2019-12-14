@@ -1,8 +1,10 @@
 package com.jiopeel.logic;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiopeel.bean.OauthToken;
 import com.jiopeel.bean.UserGrant;
 import com.jiopeel.config.exception.ServerException;
+import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.dao.UserDao;
@@ -25,6 +27,10 @@ public class OauthLogic {
 
     @Resource
     private UserGrantDao dao;
+
+
+    @Resource
+    private RedisUtil redisUtil;
 
     /**
      * @Description :保存第三方登陆信息
@@ -100,7 +106,7 @@ public class OauthLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    public UserGrant redirectType(HttpServletRequest request, String granttype) {
+    public String redirectType(HttpServletRequest request, String granttype) {
         if (BaseUtil.empty(granttype))
             throw new ServerException("授权类型不能为空");
         Map<String, String[]> parameterMap = request.getParameterMap();
@@ -108,34 +114,87 @@ public class OauthLogic {
         switch (granttype) {
             case "github":
                 access_token = getTokenbyGithub(parameterMap);
+                addOauthUser(access_token, granttype);
+                break;
+            case "local":
+                access_token = getTokenbyLocal(parameterMap);
                 break;
             default:
                 break;
         }
-        return addOauthUser(access_token, granttype);
+        return access_token;
+    }
+
+    /**
+     * @Description :处理本地登陆信息
+     * @Param: parameterMap
+     * @Return: String 返回access_token
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    private String getTokenbyLocal(Map<String, String[]> parameterMap) {
+        String access_token = null;
+        if (parameterMap.containsKey(OauthConstant.CODE)) {
+            String code = parameterMap.get(OauthConstant.CODE)[0];
+            Map<String, Object> params=new HashMap<String, Object>();
+            params.put(OauthConstant.CLIENT_ID,OauthConstant.local_client_id);
+            params.put(OauthConstant.CLIENT_SECRET,OauthConstant.local_client_secret);
+            params.put(OauthConstant.CODE,code);
+            String res = HttpTool.post(OauthConstant.local_token,params);
+            JSONObject parse = (JSONObject) JSONObject.parse(res);
+            access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
+        }
+        return access_token;
     }
 
     /**
      * @Description :处理github登陆信息
-     * @Param: request
-     * @Param: granttype 授权类型
+     * @Param: parameterMap
      * @Return: String 返回access_token
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
     private String getTokenbyGithub(Map<String, String[]> parameterMap) {
         String access_token = null;
-        if (parameterMap.containsKey("code")) {
-            String code = parameterMap.get("code")[0];
+        if (parameterMap.containsKey(OauthConstant.CODE)) {
+            String code = parameterMap.get(OauthConstant.CODE)[0];
             Map<String, Object> params=new HashMap<String, Object>();
-            params.put("client_id",OauthConstant.GITHUB_CLIENT_ID);
-            params.put("client_secret",OauthConstant.GITHUB_CLIENT_SECRET);
-            params.put("code",code);
+            params.put(OauthConstant.CLIENT_ID,OauthConstant.GITHUB_CLIENT_ID);
+            params.put(OauthConstant.CLIENT_SECRET,OauthConstant.GITHUB_CLIENT_SECRET);
+            params.put(OauthConstant.CODE,code);
             String res = HttpTool.post(OauthConstant.GITHUB_TOKEN,params);
             res = BaseUtil.Url2JSON(res);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
-            access_token = parse.getString("access_token");
+            access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
         }
         return access_token;
+    }
+
+
+    /**
+     * @Description :验证授权码
+     * @Param: parameterMap
+     * @Return: OauthToken
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    public OauthToken chkLocalOauth(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if (!parameterMap.containsKey(OauthConstant.CODE))
+            throw new ServerException("授权码不能为空");
+        if (!parameterMap.containsKey(OauthConstant.CLIENT_ID))
+            throw new ServerException(OauthConstant.CLIENT_ID+"不能为空");
+        if (!parameterMap.containsKey(OauthConstant.CLIENT_SECRET))
+            throw new ServerException(OauthConstant.CLIENT_SECRET+"不能为空");
+        String code =parameterMap.get(OauthConstant.CODE)[0];
+        String client_id=parameterMap.get(OauthConstant.CLIENT_ID)[0];
+        String client_secret=parameterMap.get(OauthConstant.CLIENT_SECRET)[0];
+        if (!OauthConstant.local_client_id.equals(client_id))
+            throw new ServerException(OauthConstant.CLIENT_ID+"不匹配");
+        if (!OauthConstant.local_client_secret.equals(client_secret))
+            throw new ServerException(OauthConstant.CLIENT_SECRET+"不匹配");
+        if (!redisUtil.hasKey(code))
+            throw new ServerException("授权码已失效");
+        return (OauthToken)redisUtil.get(code);
     }
 }

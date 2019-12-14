@@ -1,11 +1,13 @@
 package com.jiopeel.config.interceptor;
 
+import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.constant.Constant;
 import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,9 +16,17 @@ import java.io.IOException;
 import java.util.Date;
 
 
+/**
+ * @description：拦截登录
+ * @author     ：lyc
+ * @date       ：2019/12/14 16:43
+ */
 @Component
 @Slf4j
-public class LogicInterceptor implements HandlerInterceptor {
+public class OAuthInterceptor implements HandlerInterceptor {
+
+    @Resource
+    private RedisUtil redisUtil;
 
     //controller 调用之前被调用
     @Override
@@ -71,7 +81,7 @@ public class LogicInterceptor implements HandlerInterceptor {
         //token超时处理
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
-        response.sendRedirect("/index");
+        response.sendRedirect("/signin");
     }
 
     //对于请求是ajax请求重定向问题的处理方法

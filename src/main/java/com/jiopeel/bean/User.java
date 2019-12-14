@@ -14,7 +14,7 @@ public class User extends Bean implements Serializable {
 
     @Tolerate
     public User() {
-
+        super();
     }
 
     /**
