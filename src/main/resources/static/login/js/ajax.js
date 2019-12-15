@@ -26,11 +26,11 @@ var Ajax = {
      */
     send: function (op) {
         //从本地获取token
-        var token = localStorage.getItem('token') || '';
+        var token = localStorage.getItem('access_token') || '';
         var settings = {
             url: op.url,
             headers: {
-                "token": token
+                "access_token": token
             },
             type: op.type || 'POST',
             dataType: op.dataType || 'json',
@@ -55,9 +55,6 @@ var Ajax = {
             expires = "expires="+ d.toUTCString();
         }
         document.cookie = key + "=" + value + ";" + expires + ";path=/";
-    },
-    setToken:function(value){
-        this.setCookie("token",value);
     },
     getCookie: function(cname) {
         var name = cname + "=";

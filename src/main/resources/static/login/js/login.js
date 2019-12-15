@@ -147,26 +147,26 @@ var Login = {
         return flag;
     },
     signin: function (e) {
+        e.preventDefault();
         var form = $(Login.vars.lowin_login).find('form');
         var flag = Login.checkinput(form);
         if (flag) {
-            var op = {
-                url: Login.vars.option.login_url,
-                type: 'post',
-                dataType: 'json',
-                data: form.serialize(),
-                success: Login.loginsuc,
-                error: function (XMLHttpRequest) {
-                    console.log(XMLHttpRequest);
-                }
-            };
-            $.ajax(op);
+            form.submit();
+            // var op = {
+            //     url: Login.vars.option.login_url,
+            //     type: 'post',
+            //     dataType: 'json',
+            //     data: form.serialize(),
+            //     success: Login.loginsuc,
+            //     error: function (XMLHttpRequest) {
+            //         console.log(XMLHttpRequest);
+            //     }
+            // };
+            // $.ajax(op);
         }
-        e.preventDefault();
     },
     loginsuc: function (res) {
         if (res.result) {
-            Ajax.setToken(res.token);
             window.location.href = "../main";
         } else
             Msg.isSuc(res.message, res.result);

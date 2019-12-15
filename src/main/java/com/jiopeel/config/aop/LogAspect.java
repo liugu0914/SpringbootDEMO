@@ -1,6 +1,7 @@
 package com.jiopeel.config.aop;
 
 import com.jiopeel.bean.User;
+import com.jiopeel.config.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,7 +36,7 @@ public class LogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         HttpServletResponse response = attributes.getResponse();
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getAttribute("user");
         String methodName = joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName();
         //1、记录执行时间
         long startTime = System.currentTimeMillis();

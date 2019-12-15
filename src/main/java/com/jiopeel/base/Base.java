@@ -72,11 +72,6 @@ public class Base implements Serializable {
     }
 
     /**
-     * 令牌
-     */
-    private String token;
-
-    /**
      * 数据返回
      */
     private Object data;

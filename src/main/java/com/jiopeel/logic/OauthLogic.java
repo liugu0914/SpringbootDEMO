@@ -1,10 +1,13 @@
 package com.jiopeel.logic;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiopeel.base.Base;
 import com.jiopeel.bean.OauthToken;
+import com.jiopeel.bean.User;
 import com.jiopeel.bean.UserGrant;
 import com.jiopeel.config.exception.ServerException;
 import com.jiopeel.config.redis.RedisUtil;
+import com.jiopeel.constant.Constant;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.dao.UserDao;
@@ -16,13 +19,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service
+@Transactional(rollbackFor = {ServerException.class, Exception.class})
 public class OauthLogic {
 
     @Resource
@@ -40,8 +46,7 @@ public class OauthLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    @Transactional(rollbackFor = {ServerException.class, Exception.class})
-    public UserGrant addOauthUser(String access_token, String granttype) {
+    public OauthToken addOauthUser(String access_token, String granttype) {
         if (BaseUtil.empty(access_token))
             throw new ServerException("access_token不能为空");
         if (BaseUtil.empty(granttype))
@@ -53,7 +58,7 @@ public class OauthLogic {
                 String user_url = String.format(OauthConstant.GITHUB_USER, access_token);
                 //请求地址
                 String result = HttpTool.get(user_url);
-                userGrant = savebyGithub(result, access_token, granttype);
+                userGrant = boxBeanbyGithub(result, access_token, granttype);
                 break;
             default:
                 break;
@@ -61,19 +66,116 @@ public class OauthLogic {
         if (BaseUtil.empty(userGrant))
             throw new ServerException("信息有误，授权登陆失败！");
         UserGrant user_data = dao.queryOne("login.getuserGrant", userGrant);
+        User user = null;
         if (BaseUtil.empty(user_data)) {
+            user = addUser(userGrant);
+            userGrant.setUserid(user.getId());
             if (!dao.add("login.saveuserGrant", userGrant))
                 throw new ServerException("信息有误，授权登陆失败！");
-        }else {
+        } else {
             user_data.updTime();
             user_data.setImgurl(userGrant.getImgurl());
             user_data.setNickname(userGrant.getNickname());
-            user_data.setPassword(userGrant.getPassword());
+            user_data.setToken(userGrant.getToken());
+            user = updUser(user_data);
+            user_data.setUserid(user.getId());
             if (!dao.upd("login.upduserGrant", user_data))
                 throw new ServerException("信息有误，授权登陆失败！");
         }
-        return userGrant;
+        return !BaseUtil.empty(user)? RedisUser(user):null;
     }
+
+    /**
+     * @Description :将用户信息存入redis
+     * @Param: user
+     * @auhor:lyc
+     * @Date:2019/12/15 18:14
+     */
+    public OauthToken RedisUser(User user) {
+        return RedisCode(user, null);
+    }
+
+    /**
+     * @Description :授权码模式
+     * @Param: user
+     * @Param: code
+     * @auhor:lyc
+     * @Date:2019/12/15 18:14
+     */
+    public OauthToken RedisCode(User user, String code) {
+        OauthToken oauthToken = null;
+        if (redisUtil.hasKey(user.getId())) {
+            oauthToken = (OauthToken) redisUtil.get(user.getId());
+        } else {
+            oauthToken = new OauthToken();
+            oauthToken.setUserId(user.getId());
+        }
+        //将token放入redis
+        redisUtil.set(oauthToken.getAccess_token(), user, Constant.TOKEN_TIMEOUT);
+        //将reflesh_token放入redis
+        redisUtil.set(oauthToken.getRefresh_token(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        //将userId放入redis
+        redisUtil.set(user.getId(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        //将code存入redis
+        if (!BaseUtil.empty(code))
+            redisUtil.set(code, oauthToken, Constant.CODE_TIMEOUT);
+        return oauthToken;
+    }
+
+
+    /**
+     * @Description : 更新redis 中的用户数据
+     * @Param: oauthToken
+     * @auhor:lyc
+     * @Date:2019/12/15 18:14
+     */
+    public void RedisUserUpd(OauthToken oauthToken) {
+        User user = getUser(oauthToken.getUserId());
+        redisUtil.set(oauthToken.getAccess_token(), user, Constant.TOKEN_TIMEOUT);
+        redisUtil.set(oauthToken.getRefresh_token(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        redisUtil.set(user.getId(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+    }
+
+    /**
+     * @Description :通过第三方登陆更新用户信息
+     * @Param: userGrant
+     * @Return: User
+     * @auhor:lyc
+     * @Date:2019/12/15 18:14
+     */
+    private User updUser(UserGrant user_data) {
+        User user = dao.queryOne("login.getUserbyUserGrant", user_data);
+        if (BaseUtil.empty(user))
+            return addUser(user_data);
+        user.setImgurl(user_data.getImgurl());
+        user.setUsername(user_data.getNickname());
+        user.updTime();
+        dao.upd("login.updUser", user);
+        return user;
+    }
+
+    /**
+     * @Description :通过第三方登陆添加随机用户信息
+     * @Param: userGrant
+     * @Return: User
+     * @auhor:lyc
+     * @Date:2019/12/15 18:14
+     */
+    private User addUser(UserGrant userGrant) {
+        User user = User.builder().account(userGrant.getNickname())
+                .imgurl(userGrant.getImgurl())
+                .password(BaseUtil.MD5(BaseUtil.getUUID()))
+                .type(userGrant.getGranttype())
+                .username(userGrant.getNickname())
+                .account(BaseUtil.getUUID())
+                .build();
+        user.createUUID();
+        user.createTime();
+        if (!dao.add("login.saveUser", user))
+            throw new ServerException("添加失败");
+        return user;
+    }
+
 
     /**
      * @Description :处理github第三方登陆信息
@@ -84,15 +186,19 @@ public class OauthLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private UserGrant savebyGithub(String result, String access_token, String granttype) {
+    private UserGrant boxBeanbyGithub(String result, String access_token, String granttype) {
         JSONObject obj = (JSONObject) JSONObject.parse(result);
         UserGrant userGrant = UserGrant.builder()
                 .granttype(granttype)
-                .imgurl(obj.getString("avatar_url"))
-                .onlyid(obj.getString("id"))
-                .nickname(obj.getString("login"))
-                .password(access_token)
+                .token(access_token)
                 .build();
+        try {
+            userGrant.setImgurl(obj.getString("avatar_url"));
+            userGrant.setOnlyid(obj.getString("id"));
+            userGrant.setNickname(obj.getString("login"));
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
         userGrant.createUUID();
         userGrant.createTime();
         return userGrant;
@@ -102,27 +208,66 @@ public class OauthLogic {
      * @Description :处理第三方登陆信息
      * @Param: request
      * @Param: granttype 授权类型
-     * @Return: UserGrant
+     * @Return: OauthToken
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    public String redirectType(HttpServletRequest request, String granttype) {
+    public String redirectType(HttpServletRequest request, HttpServletResponse response, String granttype) {
         if (BaseUtil.empty(granttype))
             throw new ServerException("授权类型不能为空");
         Map<String, String[]> parameterMap = request.getParameterMap();
-        String access_token = null;
+        OauthToken oauthToken=null;
+        String access_token="";
         switch (granttype) {
             case "github":
-                access_token = getTokenbyGithub(parameterMap);
-                addOauthUser(access_token, granttype);
+                 oauthToken = addOauthUser(getTokenbyGithub(parameterMap), granttype);
+                access_token=oauthToken.getAccess_token();
                 break;
             case "local":
-                access_token = getTokenbyLocal(parameterMap);
+                access_token= getTokenbyLocal(parameterMap);
                 break;
             default:
                 break;
         }
+        AddTokenCookie(response,access_token);
         return access_token;
+    }
+
+    /**
+     * @Description :将token信息保存到本地cookie上
+     * @Param: response
+     * @Param: access_token
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    public void AddTokenCookie(HttpServletResponse response, String access_token) {
+        OauthToken oauthToken=null;
+        if (redisUtil.hasKey(access_token)) {
+            User user = (User) redisUtil.get(access_token);
+            if (redisUtil.hasKey(user.getId()))
+                oauthToken=(OauthToken)redisUtil.get(user.getId());
+        }
+        if (BaseUtil.empty(oauthToken))
+            return;
+        AddTokenCookie(response,oauthToken);
+    }
+
+    /**
+     * @Description :将token信息保存到本地cookie上
+     * @Param: response
+     * @Param: oauthToken
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    public void AddTokenCookie(HttpServletResponse response, OauthToken oauthToken) {
+        Cookie[] cookies = {
+                new Cookie(OauthConstant.ACCESS_TOKEN, oauthToken.getAccess_token()),
+                new Cookie(OauthConstant.REFLESH_TOKEN, oauthToken.getRefresh_token())
+        };
+        for (Cookie cookie : cookies) {
+            cookie.setPath("/");
+            response.addCookie(cookie);
+        }
     }
 
     /**
@@ -136,11 +281,11 @@ public class OauthLogic {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
             String code = parameterMap.get(OauthConstant.CODE)[0];
-            Map<String, Object> params=new HashMap<String, Object>();
-            params.put(OauthConstant.CLIENT_ID,OauthConstant.local_client_id);
-            params.put(OauthConstant.CLIENT_SECRET,OauthConstant.local_client_secret);
-            params.put(OauthConstant.CODE,code);
-            String res = HttpTool.post(OauthConstant.local_token,params);
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put(OauthConstant.CLIENT_ID, OauthConstant.local_client_id);
+            params.put(OauthConstant.CLIENT_SECRET, OauthConstant.local_client_secret);
+            params.put(OauthConstant.CODE, code);
+            String res = HttpTool.post(OauthConstant.local_token, params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
         }
@@ -158,11 +303,11 @@ public class OauthLogic {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
             String code = parameterMap.get(OauthConstant.CODE)[0];
-            Map<String, Object> params=new HashMap<String, Object>();
-            params.put(OauthConstant.CLIENT_ID,OauthConstant.GITHUB_CLIENT_ID);
-            params.put(OauthConstant.CLIENT_SECRET,OauthConstant.GITHUB_CLIENT_SECRET);
-            params.put(OauthConstant.CODE,code);
-            String res = HttpTool.post(OauthConstant.GITHUB_TOKEN,params);
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put(OauthConstant.CLIENT_ID, OauthConstant.GITHUB_CLIENT_ID);
+            params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITHUB_CLIENT_SECRET);
+            params.put(OauthConstant.CODE, code);
+            String res = HttpTool.post(OauthConstant.GITHUB_TOKEN, params);
             res = BaseUtil.Url2JSON(res);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
@@ -183,18 +328,61 @@ public class OauthLogic {
         if (!parameterMap.containsKey(OauthConstant.CODE))
             throw new ServerException("授权码不能为空");
         if (!parameterMap.containsKey(OauthConstant.CLIENT_ID))
-            throw new ServerException(OauthConstant.CLIENT_ID+"不能为空");
+            throw new ServerException(OauthConstant.CLIENT_ID + "不能为空");
         if (!parameterMap.containsKey(OauthConstant.CLIENT_SECRET))
-            throw new ServerException(OauthConstant.CLIENT_SECRET+"不能为空");
-        String code =parameterMap.get(OauthConstant.CODE)[0];
-        String client_id=parameterMap.get(OauthConstant.CLIENT_ID)[0];
-        String client_secret=parameterMap.get(OauthConstant.CLIENT_SECRET)[0];
+            throw new ServerException(OauthConstant.CLIENT_SECRET + "不能为空");
+        String code = parameterMap.get(OauthConstant.CODE)[0];
+        String client_id = parameterMap.get(OauthConstant.CLIENT_ID)[0];
+        String client_secret = parameterMap.get(OauthConstant.CLIENT_SECRET)[0];
         if (!OauthConstant.local_client_id.equals(client_id))
-            throw new ServerException(OauthConstant.CLIENT_ID+"不匹配");
+            throw new ServerException(OauthConstant.CLIENT_ID + "不匹配");
         if (!OauthConstant.local_client_secret.equals(client_secret))
-            throw new ServerException(OauthConstant.CLIENT_SECRET+"不匹配");
+            throw new ServerException(OauthConstant.CLIENT_SECRET + "不匹配");
         if (!redisUtil.hasKey(code))
             throw new ServerException("授权码已失效");
-        return (OauthToken)redisUtil.get(code);
+        OauthToken oauthToken = (OauthToken) redisUtil.get(code);
+        if (redisUtil.hasKey(code))
+            redisUtil.del(code);
+        return oauthToken;
+    }
+
+    /**
+     * @Description :通过id获取用户信息
+     * @Param: userId
+     * @Return: User
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    public User getUser(String userId) {
+        return dao.queryOne("login.getUser", userId);
+    }
+
+    /**
+     * 退出登陆
+     *
+     * @param request
+     * @Author lyc
+     * @Date:2019/12/12 23:42
+     */
+    public void loginOut(HttpServletRequest request) {
+        String reflesh_token = "";
+        Cookie[] cookie = request.getCookies();
+        if (cookie != null && cookie.length > 0) {
+            for (int i = 0; i < cookie.length; i++) {
+                if (!BaseUtil.empty(reflesh_token))
+                    break;
+                Cookie cook = cookie[i];
+                if (cook.getName().equalsIgnoreCase(OauthConstant.REFLESH_TOKEN))//获取键
+                    reflesh_token = cook.getValue();
+            }
+        }
+        if (redisUtil.hasKey(reflesh_token)) {
+            OauthToken oauthToken = (OauthToken) redisUtil.get(reflesh_token);
+            if (redisUtil.hasKey(oauthToken.getUserId()))
+                redisUtil.del(oauthToken.getUserId());
+            if (redisUtil.hasKey(oauthToken.getAccess_token()))
+                redisUtil.del(oauthToken.getAccess_token());
+            redisUtil.del(reflesh_token);
+        }
     }
 }

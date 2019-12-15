@@ -9,6 +9,11 @@ public class OauthConstant {
     public final static String ACCESS_TOKEN = "access_token";
 
     /**
+     * reflesh_token
+     */
+    public final static String REFLESH_TOKEN = "reflesh_token";
+
+    /**
      * code
      */
     public final static String CODE = "code";
@@ -36,7 +41,7 @@ public class OauthConstant {
     /**
      *  本地 token获取地址
      */
-    public final static String local_token = "http://localhost:8088/login/oauth/access_token";
+    public final static String local_token = "http://localhost:8088/oauth/access_token";
 
 
     /**

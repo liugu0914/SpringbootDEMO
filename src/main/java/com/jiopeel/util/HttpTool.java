@@ -1,5 +1,6 @@
 package com.jiopeel.util;
 
+import com.jiopeel.config.exception.ServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.nutz.http.*;
 import org.nutz.http.Request.METHOD;
@@ -29,47 +30,50 @@ public class HttpTool {
         if (log.isDebugEnabled()) {
             log.debug("Request url: {}, default timeout: {}", url, CONNECT_TIME_OUT);
         }
+        String content="";
         try {
             Response resp = Http.get(url, CONNECT_TIME_OUT);
             if (resp.isOK()) {
-                String content = resp.getContent("UTF-8");
+                content = resp.getContent("UTF-8");
                 if (log.isInfoEnabled()) {
                     log.info("GET Request success. Response content: {}", content);
                 }
-                return content;
             }
 
             throw Lang.wrapThrow(new RuntimeException(String.format("Get request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
-            throw Lang.wrapThrow(e);
+            log.error(e.getMessage());
         }
+        return  content;
     }
 
     public static String get(String url,String data) {
         if (log.isDebugEnabled()) {
             log.debug("Request url: {}, default timeout: {}", url, CONNECT_TIME_OUT);
         }
+        String content="";
         try {
             Request req = Request.create(url, METHOD.GET);
             req.setEnc("UTF-8");
             req.setData(data);
             Response resp = Sender.create(req, CONNECT_TIME_OUT).send();
             if (resp.isOK()) {
-                String content = resp.getContent("UTF-8");
+                 content = resp.getContent("UTF-8");
                 if (log.isInfoEnabled()) {
                     log.info("GET Request success. Response content: {}", content);
                 }
-                return content;
+
             }
 
             throw Lang.wrapThrow(new RuntimeException(String.format("Get request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
-            throw Lang.wrapThrow(e);
+            log.error(e.getMessage());
         }
+        return content;
     }
 
     public static String post(String url, String body) {
@@ -79,7 +83,7 @@ public class HttpTool {
                     body,
                     CONNECT_TIME_OUT);
         }
-
+        String content="";
         try {
             Request req = Request.create(url, METHOD.POST);
             req.setEnc("UTF-8");
@@ -87,29 +91,30 @@ public class HttpTool {
 
             Response resp = Sender.create(req, CONNECT_TIME_OUT).send();
             if (resp.isOK()) {
-                String content = resp.getContent();
+                 content = resp.getContent();
                 if (log.isInfoEnabled()) {
                     log.info("POST Request success. Response content: {}", content);
                 }
-                return content;
             }
 
             throw Lang.wrapThrow(new RuntimeException(String.format("Post request [%s] failed. status: %s",
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
-            throw Lang.wrapThrow(e);
+            log.error(e.getMessage());
         }
+        return content;
     }
 
     public static String post(String url, Map<String, Object> params) {
+        String content="";
         try {
             Request req = Request.create(url, METHOD.POST);
             req.setEnc("UTF-8");
             req.setParams(params);
             Response resp = Sender.create(req, CONNECT_TIME_OUT).send();
             if (resp.isOK()) {
-                String content = resp.getContent();
+                content = resp.getContent();
                 if (log.isInfoEnabled()) {
                     log.info("POST Request success. Response content: {}", content);
                 }
@@ -120,8 +125,9 @@ public class HttpTool {
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
-            throw Lang.wrapThrow(e);
+            log.error(e.getMessage());
         }
+        return content;
     }
 
     public static String upload(String url, File file) {
@@ -131,13 +137,13 @@ public class HttpTool {
                     file.getName(),
                     CONNECT_TIME_OUT);
         }
-
+        String content="";
         try {
             Request req = Request.create(url, METHOD.POST);
             req.getParams().put("media", file);
             Response resp = new FilePostSender(req).send();
             if (resp.isOK()) {
-                String content = resp.getContent();
+                 content = resp.getContent();
                 return content;
             }
 
@@ -145,15 +151,15 @@ public class HttpTool {
                     url,
                     resp.getStatus())));
         } catch (Exception e) {
-            throw Lang.wrapThrow(e);
+            log.error(e.getMessage());
         }
+        return content;
     }
 
     public static Object download(String url) {
         if (log.isDebugEnabled()) {
             log.debug("Upload url: {}, default timeout: {}", url, CONNECT_TIME_OUT);
         }
-
         try {
             Response resp = Http.get(url);
             if (resp.isOK()) {
@@ -188,7 +194,7 @@ public class HttpTool {
                     resp.getStatus(),
                     resp.getContent())));
         } catch (Exception e) {
-            throw Lang.wrapThrow(e);
+            throw  new ServerException(e.getMessage());
         }
     }
 }

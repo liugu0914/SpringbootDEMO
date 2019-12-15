@@ -7,15 +7,27 @@
     </select>
 
     <insert id="saveuserGrant" parameterType="com.jiopeel.bean.UserGrant">
-        insert into t_user_grant(id,userid,granttype,onlyid,password,imgurl,nickname,ctime,updtime)
-         values (#{id},#{userid},#{granttype},#{onlyid},#{password},#{imgurl},#{nickname},#{ctime},#{updtime})
+        insert into t_user_grant
+         values (#{id},#{userid},#{granttype},#{onlyid},#{token},#{imgurl},#{nickname},#{ctime},#{updtime})
     </insert>
 
     <update id="upduserGrant" parameterType="com.jiopeel.bean.UserGrant">
         update t_user_grant
-        set password=#{password},
+        set token=#{token},
         imgurl=#{imgurl},
-        nickname=#{nickname}
+        nickname=#{nickname},
+        updtime=#{updtime}
+        where
+        1=1
+        and id=#{id}
+    </update>
+
+    <update id="updUser" parameterType="com.jiopeel.bean.User">
+        update t_user
+        set
+        imgurl=#{imgurl},
+        username=#{username},
+        updtime=#{updtime}
         where
         1=1
         and id=#{id}
@@ -27,12 +39,20 @@
         and t_user_grant.granttype=#{granttype}
     </select>
 
+    <select id="getUserbyUserGrant" parameterType="com.jiopeel.bean.UserGrant" resultType="com.jiopeel.bean.User">
+        select t.*
+        from t_user t
+        left join t_user_grant on t_user_grant.userid=t.id
+        where  t_user_grant.onlyid=#{onlyid}
+        and t_user_grant.granttype=#{granttype}
+    </select>
+
     <insert id="saveUser" parameterType="com.jiopeel.bean.User">
-        insert into t_user(id,username,email,ctime,updtime,account,password)
-         values (#{id},#{username},#{email},#{ctime},#{updtime},#{account},#{password})
+        insert into t_user
+         values (#{id},#{username},#{email},#{account},#{password},#{type},#{imgurl},#{ctime},#{updtime})
     </insert>
 
-    <select id="checkusername" parameterType="com.jiopeel.bean.User" resultType="int">
+    <select id="checkAccount" parameterType="com.jiopeel.bean.User" resultType="int">
         select count(1) from t_user
         where  t_user.account=#{account}
     </select>
@@ -46,5 +66,10 @@
         select t_user.* from t_user
         where 1=1 and t_user.account=#{account}
         and  t_user.password=#{password}
+    </select>
+
+    <select id="getUser" parameterType="java.lang.String" resultType="com.jiopeel.bean.User">
+        select * from t_user
+        where  t_user.id=#{_paramer}
     </select>
 </mapper>

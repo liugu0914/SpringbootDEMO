@@ -33,13 +33,19 @@ public class User extends Bean implements Serializable {
     private String email;
 
     /**
-     * 用户code
-     */
-    private String usercode;
-
-    /**
      * 账号
      */
     private String account;
+
+    /**
+     * 头像
+     */
+    private String imgurl;
+
+
+    /**
+     * 登陆方式 local ， github
+     */
+    private String type;
 
 }

@@ -16,7 +16,7 @@
     <div class="lowin-wrapper">
         <div class="lowin-box lowin-login">
             <div class="lowin-box-inner">
-                <form>
+                <form action="../login" method="post">
                     <input type="hidden"  name="client_id" value="${client_id!''}">
                     <input type="hidden"  name="redirect_uri" value="${redirect_uri!''}">
                     <p>Sign in to continue</p>
@@ -37,6 +37,9 @@
                     </button>
                     <div class="text-foot">
                         Don't have an account? <a href="" class="register-link">Register</a>
+                    </div>
+                    <div class="text-foot">
+                        <a href="/oauth?granttype=github" > GitHub Sign in ?</a>
                     </div>
                 </form>
             </div>

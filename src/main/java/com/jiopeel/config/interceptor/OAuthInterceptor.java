@@ -1,7 +1,11 @@
 package com.jiopeel.config.interceptor;
 
+import com.jiopeel.bean.OauthToken;
+import com.jiopeel.bean.User;
 import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.constant.Constant;
+import com.jiopeel.constant.OauthConstant;
+import com.jiopeel.logic.OauthLogic;
 import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,9 +21,9 @@ import java.util.Date;
 
 
 /**
+ * @author ：lyc
  * @description：拦截登录
- * @author     ：lyc
- * @date       ：2019/12/14 16:43
+ * @date ：2019/12/14 16:43
  */
 @Component
 @Slf4j
@@ -28,52 +32,47 @@ public class OAuthInterceptor implements HandlerInterceptor {
     @Resource
     private RedisUtil redisUtil;
 
+    @Resource
+    private OauthLogic oauthLogic;
+
     //controller 调用之前被调用
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         request.setAttribute("startTime", System.currentTimeMillis());
-        HttpSession session = request.getSession();
         //token验证
-        String token = "";
+        String access_token = "";
+        String reflesh_token = "";
         Cookie[] cookie = request.getCookies();
         if (cookie != null && cookie.length > 0) {
             for (int i = 0; i < cookie.length; i++) {
-                Cookie cook = cookie[i];
-                if (cook.getName().equalsIgnoreCase("token")) { //获取键
-                    token = cook.getValue();
+                if (!BaseUtil.empty(access_token) && !BaseUtil.empty(reflesh_token))
                     break;
-                }
+                Cookie cook = cookie[i];
+                if (cook.getName().equalsIgnoreCase(OauthConstant.ACCESS_TOKEN)) //获取键
+                    access_token = cook.getValue();
+                if (cook.getName().equalsIgnoreCase(OauthConstant.REFLESH_TOKEN))//获取键
+                    reflesh_token = cook.getValue();
             }
         }
-        if (BaseUtil.empty(token)) {
-            log.info("token为空====>跳转登陆");
+        //reflesh_token 为空 则登陆跳转
+        if (!redisUtil.hasKey(reflesh_token)) {
+            log.warn(OauthConstant.REFLESH_TOKEN + "无效: {}", reflesh_token);
             redirect(response);
             return false;
         }
-        String result = BaseUtil.AESdec(token);
-        if (BaseUtil.empty(result)) {
-            log.info("token解析失败:{}", token);
-            redirect(response);
-            return false;
-        }
-        String[] split = result.split("#");
-        long expd = Long.valueOf(split[1]).longValue();
-        boolean flag = token.equalsIgnoreCase((String) session.getAttribute("token"));
-        if (!flag) {
-            log.info("token无效:{}", token);
-            log.info("session-token:{}", session.getAttribute("token"));
-            redirect(response);
-            return false;
-        }
-        if (new Date().getTime() > expd && flag) {
-            log.info("token超时:{}", token);
-            String tokenstr = session.getAttribute("access_token") + "#" + (new Date().getTime() + Constant.TOKEN_TIMEOUT);
-            token = BaseUtil.AES(tokenstr);
-            Cookie ss = new Cookie("token", token);
-            session.setAttribute("token", token);
+        //access_token为空 通过reflesh_token请求新的access_token
+        if (!redisUtil.hasKey(access_token)) {
+            log.warn(OauthConstant.ACCESS_TOKEN + "无效: {}", access_token);
+            log.warn("通过{}获取新的{}",OauthConstant.REFLESH_TOKEN,OauthConstant.ACCESS_TOKEN);
+            OauthToken  oauthToken= (OauthToken)redisUtil.get(reflesh_token);
+            access_token=BaseUtil.getUUID();
+            oauthToken.setAccess_token(access_token);
+            //更新redis中的数据
+            oauthLogic.RedisUserUpd(oauthToken);
+            Cookie ss = new Cookie(OauthConstant.ACCESS_TOKEN, access_token);
             response.addCookie(ss);
         }
-        request.setAttribute("user", session.getAttribute("user"));
+        request.setAttribute("user", redisUtil.get(access_token));
         return true;
     }
 
@@ -82,21 +81,5 @@ public class OAuthInterceptor implements HandlerInterceptor {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         response.sendRedirect("/signin");
-    }
-
-    //对于请求是ajax请求重定向问题的处理方法
-    public void reDirect(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        //获取当前请求的路径
-        String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getRequestURI();
-        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-            //告诉ajax我是重定向
-            response.setHeader("REDIRECT", "REDIRECT");
-            //告诉ajax我重定向的路径
-            response.setHeader("CONTENTPATH", basePath);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setHeader("token", request.getHeader("token"));
-        } else {
-            response.sendRedirect(basePath);
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.jiopeel.event;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.jiopeel.base.Base;
 import com.jiopeel.bean.User;
@@ -51,13 +52,13 @@ public class LoginEvent {
      * @date ：2019/12/14 16:35
      */
     @RequestMapping(value = {"/login"}, method = RequestMethod.POST)
-    public String login(HttpServletRequest request,
+    public String login(HttpServletRequest request, HttpServletResponse response,
                         @RequestParam("client_id") String client_id,
                         @RequestParam("redirect_uri") String redirect_uri,
                         @ModelAttribute User user) {
         String code = "";
         try {
-            code = logic.dologin(user, request, client_id);
+            code = logic.dologin(user, request,response, client_id);
         } catch (Exception e) {
             log.error(e.getMessage());
             return  "redirect:/";
@@ -72,13 +73,8 @@ public class LoginEvent {
      * @return
      */
     @RequestMapping(value = {"/loginout"}, method = RequestMethod.GET)
-    public String loginout(HttpServletRequest request) {
-        if (request.getSession().getAttribute("token") != null)
-            request.getSession().removeAttribute("token");
-        if (request.getSession().getAttribute("user") != null)
-            request.getSession().removeAttribute("user");
-        if (request.getSession().getAttribute("access_token") != null)
-            request.getSession().removeAttribute("access_token");
+    public String loginOut(HttpServletRequest request) {
+        logic.loginOut(request);
         return "redirect:/";
     }
 

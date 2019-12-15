@@ -38,9 +38,9 @@ public class UserGrant extends Bean implements Serializable {
     private String onlyid;
 
     /**
-     * 通行证 可指代 密码 token等
+     * 通行证 
      */
-    private String password;
+    private String token;
 
     /**
      * 头像

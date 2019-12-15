@@ -9,9 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @Description :授权登录
@@ -41,7 +44,7 @@ public class OauthEvent {
             granttype = "local";
         switch (granttype) {
             case "github":
-                url = String.format(OauthConstant.GITHUB_URL,OauthConstant.GITHUB_CLIENT_ID, OauthConstant.EDIRECT_URI + "/" + granttype);
+                url = String.format(OauthConstant.GITHUB_URL, OauthConstant.GITHUB_CLIENT_ID,BaseUtil.encodeURL(OauthConstant.EDIRECT_URI + "/" + granttype));
                 break;
             case "local":
                 url = String.format(OauthConstant.local_url, OauthConstant.local_client_id, BaseUtil.encodeURL(OauthConstant.EDIRECT_URI + "/" + granttype));
@@ -63,10 +66,34 @@ public class OauthEvent {
      * @Date:2019/12/12 22:08
      */
     @RequestMapping(value = {"/oauth/redirect/{granttype}"}, method = RequestMethod.GET)
-    public String redirect(HttpServletRequest request, Model model, @PathVariable("granttype") String granttype) {
-        String access_token = logic.redirectType(request, granttype);
-        model.addAttribute(OauthConstant.ACCESS_TOKEN,access_token);
-        return "redirect:/main" ;
+    public String redirect(HttpServletRequest request, HttpServletResponse response,
+                           Model model,
+                            @PathVariable("granttype") String granttype) {
+        model.addAttribute("access_token",  logic.redirectType(request, response,granttype));
+//        return "oauth/addCookie";
+        return  "redirect:/main";
+    }
+
+    /**
+     * 中间过程添加cookie
+     * @param access_token
+     * @param response 授权类型
+     * @return
+     * @auhor:lyc
+     * @Date:2019/12/12 22:08
+     */
+    @ResponseBody
+    @RequestMapping(value = {"/oauth/addcookie"}, method = RequestMethod.GET)
+    public void redirect(@RequestParam(value = "access_token",required =false) String access_token, HttpServletResponse response) {
+        if (!BaseUtil.empty(access_token))
+            logic.AddTokenCookie(response,access_token);
+        try {
+            response.sendRedirect("/main");
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json; charset=utf-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
