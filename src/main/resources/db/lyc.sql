@@ -26,6 +26,8 @@ CREATE TABLE `t_user`
     `email`    varchar(100) DEFAULT NULL,
     `account`  varchar(100) DEFAULT NULL,
     `password` varchar(100) DEFAULT NULL,
+    `imgurl`   varchar(500) DEFAULT NULL,
+    `type`     varchar(100) DEFAULT NULL,
     `ctime`    datetime     DEFAULT NULL,
     `updtime`  datetime     DEFAULT NULL,
     PRIMARY KEY (`id`)
