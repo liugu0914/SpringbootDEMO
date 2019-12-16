@@ -7,7 +7,7 @@
     </select>
 
     <insert id="saveuserGrant" parameterType="com.jiopeel.bean.UserGrant">
-        insert into t_user_grant
+        insert into t_user_grant (id,userid,granttype,onlyid,token,imgurl,nickname,ctime,updtime)
          values (#{id},#{userid},#{granttype},#{onlyid},#{token},#{imgurl},#{nickname},#{ctime},#{updtime})
     </insert>
 
@@ -48,8 +48,8 @@
     </select>
 
     <insert id="saveUser" parameterType="com.jiopeel.bean.User">
-        insert into t_user
-         values (#{id},#{username},#{email},#{account},#{password},#{type},#{imgurl},#{ctime},#{updtime})
+        insert into t_user (id, username, email, account, password ,type, imgurl, ctime, updtime)
+          values (#{id},#{username},#{email},#{account},#{password},#{type},#{imgurl},#{ctime},#{updtime})
     </insert>
 
     <select id="checkAccount" parameterType="com.jiopeel.bean.User" resultType="int">
