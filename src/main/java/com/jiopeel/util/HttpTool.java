@@ -76,6 +76,31 @@ public class HttpTool {
         return content;
     }
 
+    public static String get(String url, Map<String, Object> params) {
+        String content="";
+        try {
+            Request req = Request.create(url, METHOD.GET);
+            req.setEnc("UTF-8");
+            req.setParams(params);
+            Response resp = Sender.create(req, CONNECT_TIME_OUT).send();
+            if (resp.isOK()) {
+                content = resp.getContent();
+                if (log.isInfoEnabled()) {
+                    log.info("GET Request success. Response content: {}", content);
+                }
+                return content;
+            }
+
+            throw Lang.wrapThrow(new RuntimeException(String.format("Get request [%s] failed. status: %s",
+                    url,
+                    resp.getStatus())));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return content;
+    }
+
+
     public static String post(String url, String body) {
         if (log.isDebugEnabled()) {
             log.debug("Request url: {}, post data: {}, default timeout: {}",

@@ -10,6 +10,7 @@ import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.constant.Constant;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.constant.OauthConstant;
+import com.jiopeel.constant.UserConstant;
 import com.jiopeel.dao.UserDao;
 import com.jiopeel.dao.UserGrantDao;
 import com.jiopeel.util.BaseUtil;
@@ -52,14 +53,17 @@ public class OauthLogic {
         if (BaseUtil.empty(granttype))
             throw new ServerException("granttype不能为空");
         UserGrant userGrant = null;
+        String result = "";
         switch (granttype) {
-            case "github":
-                //组装Url
-                String user_url = String.format(OauthConstant.GITHUB_USER, access_token);
+            case UserConstant.USER_TYPE_GITHUB:
                 //请求地址
-                String result = HttpTool.get(user_url);
+                result = HttpTool.get(String.format(OauthConstant.GITHUB_USER, access_token));
                 userGrant = boxBeanbyGithub(result, access_token, granttype);
                 break;
+            case UserConstant.USER_TYPE_GITEE:
+                //请求地址
+                result = HttpTool.get(String.format(OauthConstant.GITEE_USER, access_token));
+                userGrant = boxBeanbyGitee(result, access_token, granttype);
             default:
                 break;
         }
@@ -82,7 +86,7 @@ public class OauthLogic {
             if (!dao.upd("login.upduserGrant", user_data))
                 throw new ServerException("信息有误，授权登陆失败！");
         }
-        return !BaseUtil.empty(user)? RedisUser(user):null;
+        return !BaseUtil.empty(user) ? RedisUser(user) : null;
     }
 
     /**
@@ -176,6 +180,33 @@ public class OauthLogic {
         return user;
     }
 
+    /**
+     * @Description :处理github第三方登陆信息
+     * @Param: result
+     * @Param: access_token
+     * @Param: granttype
+     * @Return: UserGrant
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    private UserGrant boxBeanbyGitee(String result, String access_token, String granttype) {
+        JSONObject obj = (JSONObject) JSONObject.parse(result);
+        UserGrant userGrant = UserGrant.builder()
+                .granttype(granttype)
+                .token(access_token)
+                .build();
+        try {
+            userGrant.setImgurl(obj.getString("avatar_url"));
+            userGrant.setOnlyid(obj.getString("id"));
+            userGrant.setNickname(obj.getString("name"));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        userGrant.createUUID();
+        userGrant.createTime();
+        return userGrant;
+    }
+
 
     /**
      * @Description :处理github第三方登陆信息
@@ -196,7 +227,7 @@ public class OauthLogic {
             userGrant.setImgurl(obj.getString("avatar_url"));
             userGrant.setOnlyid(obj.getString("id"));
             userGrant.setNickname(obj.getString("login"));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         userGrant.createUUID();
@@ -216,20 +247,24 @@ public class OauthLogic {
         if (BaseUtil.empty(granttype))
             throw new ServerException("授权类型不能为空");
         Map<String, String[]> parameterMap = request.getParameterMap();
-        OauthToken oauthToken=null;
-        String access_token="";
+        OauthToken oauthToken = null;
+        String access_token = "";
         switch (granttype) {
-            case "github":
-                 oauthToken = addOauthUser(getTokenbyGithub(parameterMap), granttype);
-                access_token=oauthToken.getAccess_token();
+            case UserConstant.USER_TYPE_GITHUB:
+                oauthToken = addOauthUser(getTokenbyGithub(parameterMap), granttype);
+                access_token = oauthToken.getAccess_token();
                 break;
-            case "local":
-                access_token= getTokenbyLocal(parameterMap);
+            case UserConstant.USER_TYPE_GITEE:
+                oauthToken = addOauthUser(getTokenbyGitee(parameterMap), granttype);
+                access_token = oauthToken.getAccess_token();
+                break;
+            case UserConstant.USER_TYPE_LOCAL:
+                access_token = getTokenbyLocal(parameterMap);
                 break;
             default:
                 break;
         }
-        AddTokenCookie(response,access_token);
+        AddTokenCookie(response, access_token);
         return access_token;
     }
 
@@ -241,15 +276,15 @@ public class OauthLogic {
      * @Date:2019/12/12 21:49
      */
     public void AddTokenCookie(HttpServletResponse response, String access_token) {
-        OauthToken oauthToken=null;
+        OauthToken oauthToken = null;
         if (redisUtil.hasKey(access_token)) {
             User user = (User) redisUtil.get(access_token);
             if (redisUtil.hasKey(user.getId()))
-                oauthToken=(OauthToken)redisUtil.get(user.getId());
+                oauthToken = (OauthToken) redisUtil.get(user.getId());
         }
         if (BaseUtil.empty(oauthToken))
             return;
-        AddTokenCookie(response,oauthToken);
+        AddTokenCookie(response, oauthToken);
     }
 
     /**
@@ -286,6 +321,31 @@ public class OauthLogic {
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.local_client_secret);
             params.put(OauthConstant.CODE, code);
             String res = HttpTool.post(OauthConstant.local_token, params);
+            JSONObject parse = (JSONObject) JSONObject.parse(res);
+            access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
+        }
+        return access_token;
+    }
+
+
+    /**
+     * @Description :处理gitee登陆信息
+     * @Param: parameterMap
+     * @Return: String 返回access_token
+     * @auhor:lyc
+     * @Date:2019/12/12 21:49
+     */
+    private String getTokenbyGitee(Map<String, String[]> parameterMap) {
+        String access_token = null;
+        if (parameterMap.containsKey(OauthConstant.CODE)) {
+            String code = parameterMap.get(OauthConstant.CODE)[0];
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put(OauthConstant.CLIENT_ID, OauthConstant.GITEE_CLIENT_ID);
+            params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
+            params.put(OauthConstant.CODE, code);
+            params.put("grant_type", "authorization_code");
+            params.put("redirect_uri", OauthConstant.EDIRECT_URI+"/gitee");
+            String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
         }

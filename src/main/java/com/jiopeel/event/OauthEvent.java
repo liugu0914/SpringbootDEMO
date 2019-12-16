@@ -3,6 +3,7 @@ package com.jiopeel.event;
 import com.jiopeel.bean.OauthToken;
 import com.jiopeel.config.exception.ServerException;
 import com.jiopeel.constant.OauthConstant;
+import com.jiopeel.constant.UserConstant;
 import com.jiopeel.logic.OauthLogic;
 import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -41,12 +42,15 @@ public class OauthEvent {
     public String oauth(@RequestParam(value = "granttype", required = false) String granttype) {
         String url = "";
         if (BaseUtil.empty(granttype))
-            granttype = "local";
+            granttype = UserConstant.USER_TYPE_LOCAL;
         switch (granttype) {
-            case "github":
+            case UserConstant.USER_TYPE_GITHUB:
                 url = String.format(OauthConstant.GITHUB_URL, OauthConstant.GITHUB_CLIENT_ID,BaseUtil.encodeURL(OauthConstant.EDIRECT_URI + "/" + granttype));
                 break;
-            case "local":
+            case UserConstant.USER_TYPE_GITEE:
+                url = String.format(OauthConstant.GITEE_URL, OauthConstant.GITEE_CLIENT_ID,BaseUtil.encodeURL(OauthConstant.EDIRECT_URI + "/" + granttype));
+                break;
+            case UserConstant.USER_TYPE_LOCAL:
                 url = String.format(OauthConstant.local_url, OauthConstant.local_client_id, BaseUtil.encodeURL(OauthConstant.EDIRECT_URI + "/" + granttype));
                 break;
             default:
