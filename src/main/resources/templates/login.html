@@ -16,7 +16,7 @@
     <div class="lowin-wrapper">
         <div class="lowin-box lowin-login">
             <div class="lowin-box-inner">
-                <form action="../login" method="post">
+                <form>
                     <input type="hidden"  name="client_id" value="${client_id!''}">
                     <input type="hidden"  name="redirect_uri" value="${redirect_uri!''}">
                     <p>Sign in to continue</p>
@@ -77,15 +77,17 @@
     </footer>
 </div>
 <script src="bootstrap/js/jquery.js"></script>
-<script src="login/js/login.js"></script>
 <script src="login/js/Ajax.js"></script>
 <script src="bootstrap/js/message.js"></script>
+<script src="login/js/login.js"></script>
 
 <script>
-    Login.init({
-        login_url: '../login',
-        forgot_url: '../forgot',
-        register_url:'../register'
+    $(function () {
+        Login.init({
+            login_url: '../login',
+            forgot_url: '../forgot',
+            register_url:'../register'
+        });
     });
 </script>
 </body>

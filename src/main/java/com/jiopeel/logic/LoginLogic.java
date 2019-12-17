@@ -53,6 +53,7 @@ public class LoginLogic {
         user.createUUID();
         user.createTime();
         user.setType(UserConstant.USER_TYPE_LOCAL);
+        user.setEnable(UserConstant.USER_YES);
         user.setUsername(user.getAccount());
         user.setPassword(BaseUtil.MD5(user.getPassword()));
         boolean s = dao.add("login.saveUser", user);
@@ -87,6 +88,8 @@ public class LoginLogic {
         password = BaseUtil.MD5(password);
         if (!user.getPassword().equals(password))
             throw new ServerException("密码不正确");
+        if (!UserConstant.USER_YES.equals(user.getEnable()))
+            throw new ServerException("该账号已被禁用");
         //code
         String code = BaseUtil.getUUID();
         OauthToken oauthToken = oauthLogic.RedisCode(user, code);

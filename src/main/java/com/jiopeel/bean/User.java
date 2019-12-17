@@ -48,4 +48,9 @@ public class User extends Bean implements Serializable {
      */
     private String type;
 
+    /**
+     * 是否可用 0否1是
+     */
+    private String enable;
+
 }

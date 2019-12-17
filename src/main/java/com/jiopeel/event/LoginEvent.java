@@ -8,6 +8,8 @@ import com.jiopeel.base.Base;
 import com.jiopeel.bean.User;
 import com.jiopeel.config.exception.ServerException;
 import com.jiopeel.config.redis.RedisUtil;
+import com.jiopeel.constant.OauthConstant;
+import com.jiopeel.constant.UserConstant;
 import com.jiopeel.logic.LoginLogic;
 
 import com.jiopeel.util.BaseUtil;
@@ -15,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -41,6 +45,10 @@ public class LoginEvent {
                        @RequestParam(value = "client_id", required = false) String client_id,
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
+        if (BaseUtil.empty(client_id))
+            client_id= OauthConstant.local_client_id;
+        if (BaseUtil.empty(redirect_uri))
+            redirect_uri=OauthConstant.EDIRECT_URI+"/"+ UserConstant.USER_TYPE_LOCAL;
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
         return "login";
@@ -51,20 +59,21 @@ public class LoginEvent {
      * @author ：lyc
      * @date ：2019/12/14 16:35
      */
+    @ResponseBody
     @RequestMapping(value = {"/login"}, method = RequestMethod.POST)
-    public String login(HttpServletRequest request, HttpServletResponse response,
+    public Object login(HttpServletRequest request, HttpServletResponse response,
                         @RequestParam("client_id") String client_id,
                         @RequestParam("redirect_uri") String redirect_uri,
-                        @ModelAttribute User user) {
+                        @ModelAttribute User user)  {
         String code = "";
         try {
             code = logic.dologin(user, request,response, client_id);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return  "redirect:/";
+            return  Base.fail(e.getMessage());
         }
         //回调授权地址
-        return "redirect:" + redirect_uri + "?code=" + code;
+        return Base.suc("登陆成功",redirect_uri + "?code=" + code);
     }
 
     /**

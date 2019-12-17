@@ -151,41 +151,24 @@ var Login = {
         var form = $(Login.vars.lowin_login).find('form');
         var flag = Login.checkinput(form);
         if (flag) {
-            form.submit();
-            // var op = {
-            //     url: Login.vars.option.login_url,
-            //     type: 'post',
-            //     dataType: 'json',
-            //     data: form.serialize(),
-            //     success: Login.loginsuc,
-            //     error: function (XMLHttpRequest) {
-            //         console.log(XMLHttpRequest);
-            //     }
-            // };
-            // $.ajax(op);
+            // form.submit();
+            Ajax.post(Login.vars.option.login_url,form.serialize(),Login.loginsuc,Login.error);
         }
     },
     loginsuc: function (res) {
         if (res.result) {
-            window.location.href = "../main";
+            window.location.href = res.data ? res.data : "/";
         } else
             Msg.isSuc(res.message, res.result);
+    },
+    error:function (XMLHttpRequest) {
+        console.log(XMLHttpRequest);
     },
     signup: function (e) {
         var form = $(Login.vars.lowin_register).find('form');
         var flag = Login.checkinput(form);
         if (flag) {
-            var op = {
-                url: Login.vars.option.register_url,
-                type: 'post',
-                dataType: 'json',
-                data: form.serialize(),
-                success: Login.registersuc,
-                error: function (XMLHttpRequest) {
-                    console.log(XMLHttpRequest);
-                }
-            };
-            $.ajax(op);
+            Ajax.post(Login.vars.option.register_url,form.serialize(),Login.registersuc,Login.error);
         }
         e.preventDefault();
     },

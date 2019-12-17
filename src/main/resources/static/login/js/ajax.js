@@ -3,20 +3,24 @@ var Ajax = {
     GET: 'GET',
     JSON: 'json',
     HTML: 'html',
-    post: function (url, data) {
+    post: function (url, data,suc,err) {
         var settings = {
             url: url,
             data: data || {},
             type: Ajax.POST,
+            suc:suc,
+            err:err,
             dataType: Ajax.JSON
         };
         Ajax.send(settings);
     },
-    get: function (url,data) {
+    get: function (url,data,suc,err) {
         var settings = {
             url: url,
             data: data || {},
             type: Ajax.GET,
+            suc:suc,
+            err:err,
             dataType: Ajax.JSON
         };
         Ajax.send(settings);
@@ -26,17 +30,13 @@ var Ajax = {
      */
     send: function (op) {
         //从本地获取token
-        var token = localStorage.getItem('access_token') || '';
         var settings = {
             url: op.url,
-            headers: {
-                "access_token": token
-            },
-            type: op.type || 'POST',
-            dataType: op.dataType || 'json',
+            type: op.type || Ajax.POST,
+            dataType: op.dataType || Ajax.JSON,
             data: op.data || {},
-            success: Ajax.success,
-            error: Ajax.error
+            success:op.suc ||  Ajax.success,
+            error: op.err ||  Ajax.error
         };
         settings=$.extend({}, settings, op);
         $.ajax(settings);

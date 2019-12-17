@@ -80,6 +80,6 @@ public class OAuthInterceptor implements HandlerInterceptor {
         //token超时处理
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
-        response.sendRedirect("/signin");
+        response.sendRedirect("/index");
     }
 }

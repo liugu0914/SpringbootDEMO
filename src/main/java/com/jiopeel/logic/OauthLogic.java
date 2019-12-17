@@ -167,6 +167,7 @@ public class OauthLogic {
      */
     private User addUser(UserGrant userGrant) {
         User user = User.builder()
+                .enable(UserConstant.USER_YES)
                 .account(userGrant.getNickname())
                 .imgurl(userGrant.getImgurl())
                 .password(BaseUtil.MD5(BaseUtil.getUUID()))
