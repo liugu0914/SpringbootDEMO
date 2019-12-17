@@ -4,6 +4,7 @@
     <contextName>logback</contextName>
     <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
     <property name="log_path" value="../logs"/>
+    <property name="log_debug" value="debug"/>
     <property name="log_info" value="info"/>
     <property name="log_warn" value="warn"/>
     <property name="log_error" value="error"/>
@@ -26,6 +27,29 @@
             <charset>${log_chartSet}</charset>
         </encoder>
     </appender>
+
+    <!--输出到文件-->
+    <appender name="file_debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_path}/%d{yyyy-MM-dd}/${log_debug}/${log_info}.%d{yyyy-MM-dd-HH}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <!-- 过滤的级别 -->
+            <level>${log_debug}</level>
+        </filter>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <!--格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符-->
+            <pattern>${log_file_pattern}</pattern>
+            <charset>${log_chartSet}</charset>
+        </encoder>
+    </appender>
+
 
     <!--输出到文件-->
     <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -108,6 +132,7 @@
 
     <root level="info">
         <appender-ref ref="console"/>
+        <appender-ref ref="file_debug"/>
         <appender-ref ref="file_info"/>
         <appender-ref ref="file_warn"/>
         <appender-ref ref="file_error"/>
