@@ -151,10 +151,10 @@ public class OauthLogic {
         User user = dao.queryOne("login.getUserbyUserGrant", user_data);
         if (BaseUtil.empty(user))
             return addUser(user_data);
-        user.setImgurl(user_data.getImgurl());
-        user.setUsername(user_data.getNickname());
-        user.updTime();
-        dao.upd("login.updUser", user);
+//        user.setImgurl(user_data.getImgurl());
+//        user.setUsername(user_data.getNickname());
+//        user.updTime();
+//        dao.upd("login.updUser", user);
         return user;
     }
 
@@ -166,7 +166,8 @@ public class OauthLogic {
      * @Date:2019/12/15 18:14
      */
     private User addUser(UserGrant userGrant) {
-        User user = User.builder().account(userGrant.getNickname())
+        User user = User.builder()
+                .account(userGrant.getNickname())
                 .imgurl(userGrant.getImgurl())
                 .password(BaseUtil.MD5(BaseUtil.getUUID()))
                 .type(userGrant.getGranttype())

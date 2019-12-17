@@ -97,7 +97,6 @@ public class LoginEvent {
      */
     @RequestMapping(value = {"/main"}, method = RequestMethod.GET)
     public String main() {
-        //权限验证
         return "admin/main";
     }
 }
