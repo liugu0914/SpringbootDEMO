@@ -46,8 +46,6 @@ public class LogAspect {
         Logger log = LoggerFactory.getLogger(aopclass);
         if (seconds>=5)
             log.warn("超时请求 : {}s",seconds);
-
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         String username=user==null?"":user.getUsername();
         String pid=user==null?"":String.valueOf(user.getId());
         String servletPath=request.getServletPath();

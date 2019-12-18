@@ -357,7 +357,7 @@ public class OauthLogic {
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
             params.put(OauthConstant.CODE, code);
             params.put("grant_type", "authorization_code");
-            params.put("redirect_uri", OauthConstant.EDIRECT_URI + "/gitee");
+            params.put("redirect_uri", OauthConstant.EDIRECT_URI + "/"+UserConstant.USER_TYPE_GITEE);
             String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
@@ -456,7 +456,7 @@ public class OauthLogic {
             if (redisUtil.hasKey(oauthToken.getAccess_token()))
                 redisUtil.del(oauthToken.getAccess_token());
             redisUtil.del(reflesh_token);
-            if (redisUtil.hasKey(UserConstant.USER)) {
+            if (redisUtil.hHasKey(UserConstant.USER,oauthToken.getUserId())) {
                 redisUtil.hdel(UserConstant.USER, oauthToken.getUserId());
             }
         }
