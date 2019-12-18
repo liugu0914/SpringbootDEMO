@@ -72,4 +72,16 @@
         select * from t_user
         where  t_user.id=#{_paramer}
     </select>
+
+    <update id="UpdAgentNotNow" parameterType="java.lang.String">
+        update t_user_agent
+        set  now='0'
+        where  1=1
+        and userid=#{_paramer}
+    </update>
+
+    <insert id="AddUserAgent" parameterType="com.jiopeel.bean.UserAgent">
+        insert into t_user_agent (id,userid,ip,useragent,browser,version,system,mac,now,ctime,updtime)
+         values (#{id},#{userid},#{ip},#{useragent},#{browser},#{version},#{system},#{mac},#{now},#{ctime},#{updtime})
+    </insert>
 </mapper>

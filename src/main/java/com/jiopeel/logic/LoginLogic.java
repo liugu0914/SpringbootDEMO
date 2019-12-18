@@ -1,16 +1,10 @@
 package com.jiopeel.logic;
 
 
-import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.jiopeel.base.Base;
 import com.jiopeel.bean.OauthToken;
 import com.jiopeel.bean.User;
 import com.jiopeel.config.exception.ServerException;
-
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.constant.UserConstant;
 import com.jiopeel.dao.UserDao;
@@ -18,6 +12,10 @@ import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 登陆信息处理
@@ -29,7 +27,7 @@ public class LoginLogic {
     @Resource
     private UserDao dao;
     @Resource
-    private  OauthLogic oauthLogic;
+    private OauthLogic oauthLogic;
 
 
     /**
@@ -62,7 +60,8 @@ public class LoginLogic {
 
     /**
      * 登陆操作操作
-     *x
+     * x
+     *
      * @param tmpUser   页面登陆数据
      * @param request
      * @param response
@@ -71,6 +70,7 @@ public class LoginLogic {
      * @Author lyc
      * @Date:2019/12/12 23:42
      */
+    @Transactional(rollbackFor = {Exception.class, RuntimeException.class})
     public String dologin(User tmpUser, HttpServletRequest request, HttpServletResponse response,
                           String client_id) {
         if (!OauthConstant.local_client_id.equals(client_id))
@@ -90,16 +90,18 @@ public class LoginLogic {
             throw new ServerException("密码不正确");
         if (!UserConstant.USER_YES.equals(user.getEnable()))
             throw new ServerException("该账号已被禁用");
+        oauthLogic.BoxuserAgent(user.getId(),request);
         //code
         String code = BaseUtil.getUUID();
         OauthToken oauthToken = oauthLogic.RedisCode(user, code);
-        oauthLogic.AddTokenCookie(response,oauthToken);
+        oauthLogic.AddTokenCookie(response, oauthToken);
         return code;
     }
 
 
     /**
      * 退出登陆
+     *
      * @param request
      * @Author lyc
      * @Date:2019/12/12 23:42

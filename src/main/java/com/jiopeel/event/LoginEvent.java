@@ -1,27 +1,19 @@
 package com.jiopeel.event;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.jiopeel.base.Base;
 import com.jiopeel.bean.User;
-import com.jiopeel.config.exception.ServerException;
-import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.constant.UserConstant;
 import com.jiopeel.logic.LoginLogic;
-
 import com.jiopeel.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Description :首页登陆

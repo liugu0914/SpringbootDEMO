@@ -1,16 +1,18 @@
 
 package com.jiopeel.util;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class WebUtil implements Serializable {
     private static final long serialVersionUID = 8804935919085171285L;
@@ -18,7 +20,7 @@ public class WebUtil implements Serializable {
     public WebUtil() {
     }
 
-    public static String getIpAddr(HttpServletRequest request) throws Exception {
+    public static String getIpAddr(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
@@ -33,23 +35,37 @@ public class WebUtil implements Serializable {
         }
 
         if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
-            InetAddress inet = InetAddress.getLocalHost();
-            ip = inet.getHostAddress();
+            InetAddress inet = null;
+            try {
+                inet = InetAddress.getLocalHost();
+                ip = inet.getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
         }
 
         return ip;
     }
 
-    public static String getMacAddr() throws Exception {
-        Enumeration el = NetworkInterface.getNetworkInterfaces();
+    public static String getMacAddr() {
+        Enumeration el = null;
+        try {
+            el = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
 
-        byte[] mac;
+        byte[] mac=null;
         do {
             if (!el.hasMoreElements()) {
                 return null;
             }
 
-            mac = ((NetworkInterface) el.nextElement()).getHardwareAddress();
+            try {
+                mac = ((NetworkInterface) el.nextElement()).getHardwareAddress();
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
         } while (mac == null || mac.length == 0);
 
         StringBuilder builder = new StringBuilder();

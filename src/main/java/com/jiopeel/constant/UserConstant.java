@@ -3,6 +3,11 @@ package com.jiopeel.constant;
 public class UserConstant {
 
     /**
+     * 用户集
+     */
+    public final static String USER="user";
+
+    /**
      * 登陆方式 local ， github
      */
     public final static String USER_TYPE_LOCAL ="local";

@@ -1,20 +1,22 @@
 package com.jiopeel.logic;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jiopeel.base.Base;
 import com.jiopeel.bean.OauthToken;
 import com.jiopeel.bean.User;
+import com.jiopeel.bean.UserAgent;
 import com.jiopeel.bean.UserGrant;
 import com.jiopeel.config.exception.ServerException;
 import com.jiopeel.config.redis.RedisUtil;
 import com.jiopeel.constant.Constant;
 import com.jiopeel.constant.OauthConstant;
-import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.constant.UserConstant;
-import com.jiopeel.dao.UserDao;
 import com.jiopeel.dao.UserGrantDao;
 import com.jiopeel.util.BaseUtil;
 import com.jiopeel.util.HttpTool;
+import com.jiopeel.util.WebUtil;
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.Version;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -120,6 +121,14 @@ public class OauthLogic {
         redisUtil.set(oauthToken.getRefresh_token(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
         //将userId放入redis
         redisUtil.set(user.getId(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        //redis 放入user
+        if (redisUtil.hasKey(UserConstant.USER)) {
+            redisUtil.hset(UserConstant.USER, user.getId(), user);
+        } else {
+            Map<String, Object> userMap = new HashMap<String, Object>();
+            userMap.put(user.getId(), user);
+            redisUtil.hmset(UserConstant.USER, userMap);
+        }
         //将code存入redis
         if (!BaseUtil.empty(code))
             redisUtil.set(code, oauthToken, Constant.CODE_TIMEOUT);
@@ -266,6 +275,8 @@ public class OauthLogic {
             default:
                 break;
         }
+        if (!BaseUtil.empty(oauthToken))
+            BoxuserAgent(oauthToken.getUserId(),request);
         AddTokenCookie(response, access_token);
         return access_token;
     }
@@ -346,7 +357,7 @@ public class OauthLogic {
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
             params.put(OauthConstant.CODE, code);
             params.put("grant_type", "authorization_code");
-            params.put("redirect_uri", OauthConstant.EDIRECT_URI+"/gitee");
+            params.put("redirect_uri", OauthConstant.EDIRECT_URI + "/gitee");
             String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
@@ -445,6 +456,54 @@ public class OauthLogic {
             if (redisUtil.hasKey(oauthToken.getAccess_token()))
                 redisUtil.del(oauthToken.getAccess_token());
             redisUtil.del(reflesh_token);
+            if (redisUtil.hasKey(UserConstant.USER)) {
+                redisUtil.hdel(UserConstant.USER, oauthToken.getUserId());
+            }
+        }
+    }
+
+    /**
+     * 获取登录浏览器信息
+     *
+     * @param userId
+     * @param request
+     * @Author lyc
+     * @Date:2019/12/12 23:42
+     */
+    public void BoxuserAgent(String userId, HttpServletRequest request) {
+        try {
+            String ua = request.getHeader("User-Agent");
+            eu.bitwalker.useragentutils.UserAgent userAgent = eu.bitwalker.useragentutils.UserAgent.parseUserAgentString(ua);
+            //获取浏览器信息
+            Browser browser = userAgent.getBrowser();
+            //获取系统信息
+            OperatingSystem os = userAgent.getOperatingSystem();
+            //系统名称
+            String system = os.getName();
+            //浏览器名称
+            String browserName = browser.getName();
+            Version version = browser.getVersion(ua);
+            String versionName = version.getVersion();
+            String ipAddr = WebUtil.getIpAddr(request);
+            String macAddr = WebUtil.getMacAddr();
+            if (!BaseUtil.empty(macAddr))
+                macAddr=macAddr.toUpperCase();
+            UserAgent agent = UserAgent.builder()
+                    .userid(userId)
+                    .useragent(ua)
+                    .browser(browserName)
+                    .ip(ipAddr)
+                    .mac(macAddr)
+                    .now(UserConstant.USER_YES)
+                    .system(system)
+                    .version(versionName)
+                    .build();
+            agent.createUUID();
+            agent.createTime();
+            dao.upd("login.UpdAgentNotNow", userId);
+            dao.add("login.AddUserAgent", agent);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.jiopeel.config.interceptor;
 
 import com.jiopeel.bean.OauthToken;
-import com.jiopeel.bean.User;
 import com.jiopeel.config.redis.RedisUtil;
-import com.jiopeel.constant.Constant;
 import com.jiopeel.constant.OauthConstant;
 import com.jiopeel.logic.OauthLogic;
 import com.jiopeel.util.BaseUtil;
@@ -15,9 +13,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Date;
 
 
 /**
