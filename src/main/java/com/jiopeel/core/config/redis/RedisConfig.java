@@ -1,0 +1,106 @@
+package com.jiopeel.core.config.redis;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jiopeel.core.config.fastjson.FastJson2JsonRedisSerializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+/**
+ * @description：reids装配
+ * @author     ：lyc
+ * @date       ：2019/12/13 18:50
+ */
+@Configuration
+public class RedisConfig {
+
+    /**
+     * retemplate相关配置
+     * @param factory
+     * @return
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        // 配置连接工厂
+        template.setConnectionFactory(factory);
+        //使用Fastjson2JsonRedisSerializer来序列化和反序列化redis的value值
+        FastJson2JsonRedisSerializer serializer = new FastJson2JsonRedisSerializer(Object.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        serializer.setObjectMapper(mapper);
+        template.setDefaultSerializer(serializer);
+        template.setKeySerializer(serializer);
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(serializer);
+        template.setHashValueSerializer(serializer);
+        //使用StringRedisSerializer来序列化和反序列化redis的key值
+        template.setKeySerializer(new StringRedisSerializer());
+        template.afterPropertiesSet();
+        return template;
+    }
+
+
+
+    /**
+     * 对hash类型的数据操作
+     *
+     * @param redisTemplate
+     * @return
+     */
+    @Bean
+    public HashOperations<String, String, Object> hashOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForHash();
+    }
+
+    /**
+     * 对redis字符串类型数据操作
+     *
+     * @param redisTemplate
+     * @return
+     */
+    @Bean
+    public ValueOperations<String, Object> valueOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForValue();
+    }
+
+    /**
+     * 对链表类型的数据操作
+     *
+     * @param redisTemplate
+     * @return
+     */
+    @Bean
+    public ListOperations<String, Object> listOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForList();
+    }
+
+    /**
+     * 对无序集合类型的数据操作
+     *
+     * @param redisTemplate
+     * @return
+     */
+    @Bean
+    public SetOperations<String, Object> setOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForSet();
+    }
+
+    /**
+     * 对有序集合类型的数据操作
+     *
+     * @param redisTemplate
+     * @return
+     */
+    @Bean
+    public ZSetOperations<String, Object> zSetOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForZSet();
+    }
+}

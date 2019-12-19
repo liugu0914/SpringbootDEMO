@@ -21,6 +21,6 @@ spring:
 #mybatis配置
 mybatis:
    configuration:
-      log-impl: com.jiopeel.config.log.LogbackImp
+      log-impl: com.jiopeel.core.config.log.LogbackImp
       cache-enabled: true
-   mapper-locations: classpath*:com/jiopeel/dao/*.xml
+   mapper-locations: classpath*:com/jiopeel/**/dao/*.xml
