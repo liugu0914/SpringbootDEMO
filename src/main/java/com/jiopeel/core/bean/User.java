@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Builder
 public class User extends Bean implements Serializable {
 
-    private static final long serialVersionUID = -2502043601744976503L;
+    private static final long serialVersionUID = -5471590656721463241L;
 
     @Tolerate
     public User() {

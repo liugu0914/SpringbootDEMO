@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @Service
-public class LoginLogic {
+public class LoginLogic extends BaseLogic{
 
     @Resource
     private UserDao dao;

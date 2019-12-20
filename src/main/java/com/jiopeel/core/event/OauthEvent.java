@@ -12,8 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -23,7 +21,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Controller
-public class OauthEvent {
+public class OauthEvent extends  BaseEvent{
 
     @Resource
     private OauthLogic logic;
@@ -63,16 +61,13 @@ public class OauthEvent {
     /**
      * 授权回调地址
      *
-     * @param request
      * @param granttype 授权类型
      * @return
      * @auhor:lyc
      * @Date:2019/12/12 22:08
      */
     @RequestMapping(value = {"/oauth/redirect/{granttype}"}, method = RequestMethod.GET)
-    public String redirect(HttpServletRequest request, HttpServletResponse response,
-                           Model model,
-                            @PathVariable("granttype") String granttype) {
+    public String redirect( Model model, @PathVariable("granttype") String granttype) {
         model.addAttribute("access_token",  logic.redirectType(request, response,granttype));
         return  "redirect:/main";
     }
@@ -80,14 +75,13 @@ public class OauthEvent {
     /**
      * 中间过程添加cookie
      * @param access_token
-     * @param response 授权类型
      * @return
      * @auhor:lyc
      * @Date:2019/12/12 22:08
      */
     @ResponseBody
     @RequestMapping(value = {"/oauth/addcookie"}, method = RequestMethod.GET)
-    public void redirect(@RequestParam(value = "access_token",required =false) String access_token, HttpServletResponse response) {
+    public void redirect(@RequestParam(value = "access_token",required =false) String access_token) {
         if (!BaseUtil.empty(access_token))
             logic.AddTokenCookie(response,access_token);
         try {
@@ -109,7 +103,7 @@ public class OauthEvent {
      */
     @ResponseBody
     @RequestMapping(value = {"/oauth/access_token"}, method = RequestMethod.POST)
-    public OauthToken getOauthUserInfo(HttpServletRequest request) {
+    public OauthToken getOauthUserInfo() {
         return logic.chkLocalOauth(request);
     }
 
@@ -124,7 +118,7 @@ public class OauthEvent {
      */
     @ResponseBody
     @RequestMapping(value = {"/oauth/getuser"}, method = RequestMethod.GET)
-    public void getOauthUserInfo(HttpServletRequest request, @RequestParam(OauthConstant.ACCESS_TOKEN) String access_token,
+    public void getOauthUserInfo( @RequestParam(OauthConstant.ACCESS_TOKEN) String access_token,
                                  @RequestParam("granttype") String granttype) {
         if (BaseUtil.empty(access_token))
             throw new ServerException("access_token不能为空");

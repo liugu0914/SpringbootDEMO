@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Builder
 public class UserGrant extends Bean implements Serializable {
 
-    private static final long serialVersionUID = -3540383839044057287L;
+    private static final long serialVersionUID = -8465793931947933341L;
 
     @Tolerate
     public UserGrant() {

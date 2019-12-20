@@ -31,7 +31,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @Transactional(rollbackFor = {ServerException.class, Exception.class})
-public class OauthLogic {
+public class OauthLogic extends BaseLogic{
 
     @Resource
     private UserGrantDao dao;

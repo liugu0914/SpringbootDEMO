@@ -32,8 +32,9 @@ public abstract class BaseDao<T extends Bean> {
     public <E> E queryOne(String sqlmapper) {
         return getSqlSession().selectOne(sqlmapper);
     }
-    public <E> E queryOne(String sqlmapper,Object object) {
-        return getSqlSession().selectOne(sqlmapper,object);
+
+    public <E> E queryOne(String sqlmapper, Object object) {
+        return getSqlSession().selectOne(sqlmapper, object);
     }
 
     public boolean add(String nameSpec, Object object) {
@@ -41,7 +42,7 @@ public abstract class BaseDao<T extends Bean> {
     }
 
     public boolean add(String nameSpec) {
-        return add(nameSpec,null);
+        return add(nameSpec, null);
     }
 
     public boolean upd(String nameSpec, Object object) {
@@ -49,7 +50,7 @@ public abstract class BaseDao<T extends Bean> {
     }
 
     public boolean upd(String nameSpec) {
-        return upd(nameSpec,null);
+        return upd(nameSpec, null);
     }
 
 }

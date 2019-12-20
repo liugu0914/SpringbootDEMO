@@ -12,8 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @Description :首页登陆
@@ -22,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Slf4j
 @Controller
-public class LoginEvent {
+public class LoginEvent extends BaseEvent{
 
     @Resource
     private LoginLogic logic;
@@ -33,8 +31,7 @@ public class LoginEvent {
     }
 
     @RequestMapping(value = {"/index"}, method = RequestMethod.GET)
-    public String home(HttpServletRequest request,
-                       @RequestParam(value = "client_id", required = false) String client_id,
+    public String home(@RequestParam(value = "client_id", required = false) String client_id,
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
         if (BaseUtil.empty(client_id))
@@ -53,8 +50,7 @@ public class LoginEvent {
      */
     @ResponseBody
     @RequestMapping(value = {"/login"}, method = RequestMethod.POST)
-    public Object login(HttpServletRequest request, HttpServletResponse response,
-                        @RequestParam("client_id") String client_id,
+    public Object login( @RequestParam("client_id") String client_id,
                         @RequestParam("redirect_uri") String redirect_uri,
                         @ModelAttribute User user)  {
         String code = "";
@@ -74,7 +70,7 @@ public class LoginEvent {
      * @return
      */
     @RequestMapping(value = {"/loginout"}, method = RequestMethod.GET)
-    public String loginOut(HttpServletRequest request) {
+    public String loginOut() {
         logic.loginOut(request);
         return "redirect:/";
     }
@@ -86,7 +82,7 @@ public class LoginEvent {
      */
     @ResponseBody
     @RequestMapping(value = {"/register"}, method = RequestMethod.POST)
-    public Base register(HttpServletRequest request, @ModelAttribute User user) throws Exception {
+    public Base register(@ModelAttribute User user) {
         return logic.addregister(user);
     }
 
