@@ -13,14 +13,9 @@ import java.io.Serializable;
  * @date       ：2019/12/20 9:47
  */
 @Data
-@Builder
 public class Permission extends Bean implements Serializable {
 
     private static final long serialVersionUID = 3203908955920194752L;
-
-    @Tolerate
-    public Permission() {
-    }
 
     /**
      * 权限名称

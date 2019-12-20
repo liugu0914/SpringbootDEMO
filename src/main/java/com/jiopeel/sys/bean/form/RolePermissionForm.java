@@ -11,13 +11,8 @@ import lombok.experimental.Tolerate;
  * @date       ：2019/12/20 9:47
  */
 @Data
-@Builder
 public class RolePermissionForm extends RolePermission {
 
     private static final long serialVersionUID = 9163453692525450867L;
-
-    @Tolerate
-    public RolePermissionForm() {
-    }
 
 }

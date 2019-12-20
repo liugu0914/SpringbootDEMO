@@ -13,14 +13,9 @@ import java.io.Serializable;
  * @date       ：2019/12/20 9:47
  */
 @Data
-@Builder
 public class Menu extends Bean implements Serializable {
 
     private static final long serialVersionUID = -2418633026700955554L;
-
-    @Tolerate
-    public Menu() {
-    }
 
     /**
      * 角色名称

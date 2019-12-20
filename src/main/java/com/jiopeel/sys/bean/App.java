@@ -13,14 +13,9 @@ import java.io.Serializable;
  * @date       ：2019/12/20 9:47
  */
 @Data
-@Builder
 public class App extends Bean implements Serializable {
 
     private static final long serialVersionUID = 5731452336384975505L;
-
-    @Tolerate
-    public App() {
-    }
     /**
      * 应用名称
      */

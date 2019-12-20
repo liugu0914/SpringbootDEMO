@@ -13,14 +13,9 @@ import java.io.Serializable;
  * @date       ：2019/12/20 9:47
  */
 @Data
-@Builder
 public class UserRole extends Bean implements Serializable {
 
     private static final long serialVersionUID = 2900400799253271456L;
-
-    @Tolerate
-    public UserRole() {
-    }
 
     /**
      * 用户id

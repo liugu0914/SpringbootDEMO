@@ -11,13 +11,8 @@ import lombok.experimental.Tolerate;
  * @date       ：2019/12/20 9:47
  */
 @Data
-@Builder
 public class RoleQuery extends Role {
 
     private static final long serialVersionUID = 8584355095093312857L;
-
-    @Tolerate
-    public RoleQuery() {
-    }
 
 }
