@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class HttpException implements ErrorController {
 
-    private static final String ERROR_PATH = "/error";
+    private static final String ERROR_PATH = "core/error/error";
 
     private static final String STATUS = "status";
 

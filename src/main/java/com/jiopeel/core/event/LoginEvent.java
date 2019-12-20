@@ -40,7 +40,7 @@ public class LoginEvent extends BaseEvent{
             redirect_uri=OauthConstant.EDIRECT_URI+"/"+ UserConstant.USER_TYPE_LOCAL;
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
-        return "login";
+        return "core/login";
     }
 
     /**
@@ -94,6 +94,6 @@ public class LoginEvent extends BaseEvent{
      */
     @RequestMapping(value = {"/main"}, method = RequestMethod.GET)
     public String main() {
-        return "admin/main";
+        return "core/admin/main";
     }
 }

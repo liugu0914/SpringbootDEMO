@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    public static final String DEFAULT_ERROR_VIEW = "error/error";
+    public static final String DEFAULT_ERROR_VIEW = "core/error/error";
 
     @ExceptionHandler(value = {Exception.class})
     public ModelAndView defaultErrorHandler(HttpServletRequest request, Exception e)  {
