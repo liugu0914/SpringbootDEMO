@@ -65,8 +65,9 @@ public class OAuthInterceptor implements HandlerInterceptor {
             oauthToken.setAccess_token(access_token);
             //更新redis中的数据
             oauthLogic.RedisUserUpd(oauthToken);
-            Cookie ss = new Cookie(OauthConstant.ACCESS_TOKEN, access_token);
-            response.addCookie(ss);
+            Cookie token = new Cookie(OauthConstant.ACCESS_TOKEN, access_token);
+            token.setPath("/");
+            response.addCookie(token);
         }
         request.setAttribute("user", redisUtil.get(access_token));
         return true;
