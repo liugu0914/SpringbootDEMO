@@ -18,7 +18,6 @@ import javax.annotation.Resource;
  * @description：应用Event层
  * @date ：2019/12/20 10:25
  */
-@Slf4j
 @Controller
 @RequestMapping("/admin/app")
 public class AppEvent extends BaseEvent {
