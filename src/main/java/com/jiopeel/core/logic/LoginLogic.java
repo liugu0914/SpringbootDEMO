@@ -10,7 +10,6 @@ import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.dao.UserDao;
 import com.jiopeel.core.util.BaseUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * 登陆信息处理
  */
-@Slf4j
 @Service
 public class LoginLogic extends BaseLogic{
 

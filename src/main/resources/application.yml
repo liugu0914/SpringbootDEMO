@@ -7,4 +7,4 @@ Spring:
     #开发环境:dev 生产环境:prod
     active: dev
 logging:
-  config: classpath:logback-sys.xml
+  config: classpath:logback-config.xml

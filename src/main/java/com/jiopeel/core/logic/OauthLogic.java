@@ -6,7 +6,6 @@ import com.jiopeel.core.bean.User;
 import com.jiopeel.core.bean.UserAgent;
 import com.jiopeel.core.bean.UserGrant;
 import com.jiopeel.core.config.exception.ServerException;
-import com.jiopeel.core.config.redis.RedisUtil;
 import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
@@ -36,9 +35,6 @@ public class OauthLogic extends BaseLogic{
     @Resource
     private UserGrantDao dao;
 
-
-    @Resource
-    private RedisUtil redisUtil;
 
     /**
      * @Description :保存第三方登陆信息

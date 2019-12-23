@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
  * @auhor:lyc
  * @Date:2019/10/30 23:53
  */
-@Controller
 public abstract class BaseEvent {
 
     @Resource
