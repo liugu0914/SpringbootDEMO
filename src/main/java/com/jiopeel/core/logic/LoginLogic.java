@@ -1,10 +1,12 @@
 package com.jiopeel.core.logic;
 
 
+import com.alibaba.fastjson.JSON;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.bean.User;
 import com.jiopeel.core.config.exception.ServerException;
+import com.jiopeel.core.config.interceptor.PageIntercept;
 import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 登陆信息处理
@@ -107,5 +110,12 @@ public class LoginLogic extends BaseLogic{
      */
     public void loginOut(HttpServletRequest request) {
         oauthLogic.loginOut(request);
+    }
+
+
+    public void dosomething(String userId) {
+        PageIntercept.startPage(0,10);
+        List<Object> query = dao.query("login.getUser", userId);
+        System.out.println(JSON.toJSONString(query));
     }
 }

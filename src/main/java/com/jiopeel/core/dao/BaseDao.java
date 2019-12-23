@@ -1,6 +1,8 @@
 package com.jiopeel.core.dao;
 
 import com.jiopeel.core.bean.Bean;
+import com.jiopeel.core.bean.Page;
+import com.jiopeel.core.config.interceptor.PageIntercept;
 import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
@@ -17,7 +19,7 @@ import java.util.Map;
  * @Date:2019/12/21 11:51
  */
 @Slf4j
-public abstract class BaseDao<T extends Bean> {
+public class BaseDao<T extends Bean> {
 
     @Resource
     private SqlSession sqlSession;
@@ -35,7 +37,7 @@ public abstract class BaseDao<T extends Bean> {
      */
     private void isInfoLog(String nameSpec) {
         if (log.isDebugEnabled() || log.isInfoEnabled())
-            log.info("nameSpec : [{}]",nameSpec);
+            log.info("nameSpec : [{}]", nameSpec);
     }
 
     /**
@@ -193,6 +195,22 @@ public abstract class BaseDao<T extends Bean> {
         return beans;
     }
 
+
+    /**
+     * @Description :查询
+     * @param: nameSpec  命名空间
+     * @param: object  传递参数
+     * @param: page  分页器
+     * @Return: 符合查询条件的集合
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <E> Page<E> queryPageList(String nameSpec, Object object,Page<E> page) {
+        PageIntercept.startPage(0,10);
+        List<E> list = this.getSqlSession().selectList(nameSpec, object);
+        return  null;
+    }
+
     /**
      * @param nameSpec 命名空间
      * @return 符合查询条件的对象
@@ -201,12 +219,12 @@ public abstract class BaseDao<T extends Bean> {
      */
     public <E> E queryOne(String nameSpec) {
         isInfoLog(nameSpec);
-        return queryOne(nameSpec,null);
+        return queryOne(nameSpec, null);
     }
 
     /**
      * @param nameSpec 命名空间
-     * @param object    传参对象
+     * @param object   传参对象
      * @return 符合查询条件的对象
      * @auhor:lyc
      * @Date:2019/12/21 11:48
