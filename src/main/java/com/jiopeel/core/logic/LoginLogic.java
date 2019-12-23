@@ -5,6 +5,7 @@ import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.bean.User;
 import com.jiopeel.core.config.exception.ServerException;
+import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.dao.UserDao;
@@ -51,7 +52,7 @@ public class LoginLogic extends BaseLogic{
         user.createUUID();
         user.createTime();
         user.setType(UserConstant.USER_TYPE_LOCAL);
-        user.setEnable(UserConstant.USER_YES);
+        user.setEnable(Constant.ENABLE_YES);
         user.setUsername(user.getAccount());
         user.setPassword(BaseUtil.MD5(user.getPassword()));
         boolean s = dao.add("login.saveUser", user);
@@ -88,7 +89,7 @@ public class LoginLogic extends BaseLogic{
         password = BaseUtil.MD5(password);
         if (!user.getPassword().equals(password))
             throw new ServerException("密码不正确");
-        if (!UserConstant.USER_YES.equals(user.getEnable()))
+        if (!Constant.ENABLE_YES.equals(user.getEnable()))
             throw new ServerException("该账号已被禁用");
         oauthLogic.BoxuserAgent(user.getId(),request);
         //code

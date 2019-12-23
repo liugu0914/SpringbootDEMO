@@ -16,4 +16,12 @@ public class Constant {
      *code存在时间 5分钟
      */
     public final static Long CODE_TIMEOUT = 1000 * 60 * 5L;
+
+
+    /**
+     * 是否可用 0否1是
+     */
+    public final static String ENABLE_YES="1";
+
+    public final static String ENABLE_NO="0";
 }

@@ -1,6 +1,6 @@
 package com.jiopeel.sys.constant;
 
-public class Constant {
+public class SysConstant {
     /**
      * reflesh_token超时时间 1天
      */
@@ -11,9 +11,4 @@ public class Constant {
      */
     public final static Long TOKEN_TIMEOUT = 1000 * 60 * 60 * 2L;
 
-
-    /**
-     *code存在时间 5分钟
-     */
-    public final static Long CODE_TIMEOUT = 1000 * 60 * 5L;
 }

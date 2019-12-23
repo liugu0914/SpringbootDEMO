@@ -176,7 +176,7 @@ public class OauthLogic extends BaseLogic{
      */
     private User addUser(UserGrant userGrant) {
         User user = User.builder()
-                .enable(UserConstant.USER_YES)
+                .enable(Constant.ENABLE_YES)
                 .account(userGrant.getNickname())
                 .imgurl(userGrant.getImgurl())
                 .password(BaseUtil.MD5(BaseUtil.getUUID()))
@@ -494,7 +494,7 @@ public class OauthLogic extends BaseLogic{
                     .browser(browserName)
                     .ip(ipAddr)
                     .mac(macAddr)
-                    .now(UserConstant.USER_YES)
+                    .now(Constant.ENABLE_YES)
                     .system(system)
                     .version(versionName)
                     .build();
