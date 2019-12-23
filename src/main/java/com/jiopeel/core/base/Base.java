@@ -48,6 +48,10 @@ public class Base implements Serializable {
         return new Base(StateCode.SUCCESS.getStatus(), msg);
     }
 
+    public static Base suc(Object data) {
+        return new Base(StateCode.SUCCESS.getStatus(), StateCode.SUCCESS.getMessage(),data);
+    }
+
     public static Base suc(String msg, Object data) {
         return new Base(StateCode.SUCCESS.getStatus(), msg, data);
     }

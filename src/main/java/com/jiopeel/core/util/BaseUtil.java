@@ -11,14 +11,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 public class BaseUtil {
@@ -357,5 +357,79 @@ public class BaseUtil {
             log.error("URL参数为：" + clazz.toString());
         }
         return requestURL.toString();
+    }
+
+    /**
+     * 将list<E>转换为数组
+     *
+     *
+     * @param data
+     *            list<Bean>集合
+     * @return Bean[] 对象
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> E[] arrs(List<E> data) {
+        int i;
+        E[] result = null;
+        if (!BaseUtil.empty(data) && (i = data.size()) > 0) {
+            result = (E[]) Array.newInstance(data.get(0).getClass(), i);
+            data.toArray(result);
+        }
+        return result;
+    }
+
+    /**
+     * 将list<E>转换为数组
+     *
+     *
+     * @param data
+     *            list<Bean>集合
+     * @return Bean[] 对象
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> E[] arrs(Set<E> data) {
+        int i;
+        E[] result = null;
+        if (!BaseUtil.empty(data) && (i = data.size()) > 0) {
+            result = (E[]) Array.newInstance(data.iterator().next().getClass(), i);
+            data.toArray(result);
+        }
+        return result;
+    }
+
+    /**
+     * 将T[]数组转换为list
+     *
+     *
+     * @param data
+     *            Bean[] 数组集合
+     * @return List<Bean> 对象
+     */
+    public static <E> List<E> list(E[] data) {
+        if (BaseUtil.empty(data))
+            return null;
+        List<E> result = new ArrayList<E>(data.length);
+        for (E bean : data) {
+            result.add(bean);
+        }
+        return result;
+    }
+
+    /**
+     * 将Collection<E>数组转换为list
+     *
+     *
+     * @param data
+     *            Collection<E>集合
+     * @return List<Bean> 对象
+     */
+    public static <E> List<E> list(Collection<E> data) {
+        if (BaseUtil.empty(data))
+            return null;
+        List<E> result = new ArrayList<E>(data.size());
+        for (E bean : data) {
+            result.add(bean);
+        }
+        return result;
     }
 }

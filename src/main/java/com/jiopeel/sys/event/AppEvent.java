@@ -2,12 +2,14 @@ package com.jiopeel.sys.event;
 
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.event.BaseEvent;
+import com.jiopeel.sys.bean.App;
+import com.jiopeel.sys.bean.form.AppForm;
+import com.jiopeel.sys.bean.query.AppQuery;
 import com.jiopeel.sys.logic.AppLogic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -24,36 +26,91 @@ public class AppEvent extends BaseEvent {
     @Resource
     private AppLogic logic;
 
+    /**
+     * @Description :根据id获取数据
+     * @Param: id
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
     @RequestMapping(value = "get/{id}", method = {RequestMethod.GET})
     public Base get(@PathVariable("id") String id) {
-        return Base.suc();
+        return logic.get(id);
     }
-
+    /**
+     * @Description :根据id获取数据
+     * @Param: id
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
     @RequestMapping(value = "getInfo/{id}", method = {RequestMethod.GET})
     public Base getInfo(@PathVariable("id") String id) {
-        return Base.suc();
+        return logic.getInfo(id);
     }
 
-    @RequestMapping(value = "getList", method = {RequestMethod.GET})
-    public Base getList(@PathVariable("id") String id) {
-        return Base.suc();
+    /**
+     * @Description :获取分页列表数据
+     * @Param: appQuery
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @RequestMapping(value = "getList", method = {RequestMethod.POST})
+    public String getList(@RequestBody AppQuery appQuery, Model model) {
+        model.addAttribute("list",logic.getList(appQuery)) ;
+        return  "sys/app/index";
     }
 
-    @RequestMapping(value = "list", method = {RequestMethod.GET})
-    public Base list(@PathVariable("id") String id) {
-        return Base.suc();
+    /**
+     * @Description :获取列表数据
+     * @Param: appQuery
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @RequestMapping(value = "list", method = {RequestMethod.POST})
+    public String list(@RequestBody AppQuery appQuery, Model model) {
+        model.addAttribute("list",logic.getList(appQuery)) ;
+        return  "sys/app/index";
     }
 
-    @RequestMapping(value = "save", method = {RequestMethod.GET})
-    public Base save(@PathVariable("id") String id) {
-        return Base.suc();
+    /**
+     * @Description :保存
+     * @Param: appForm
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
+    @RequestMapping(value = "save", method = {RequestMethod.POST})
+    public Base save(@RequestBody AppForm appForm) {
+        return logic.save(appForm);
     }
 
-    @RequestMapping(value = "upd", method = {RequestMethod.GET})
-    public Base upd(@PathVariable("id") String id) {
-        return Base.suc();
+    /**
+     * @Description :修改
+     * @Param: appForm
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
+    @RequestMapping(value = "upd", method = {RequestMethod.POST})
+    public Base upd(@RequestBody AppForm appForm) {
+        return logic.upd(appForm);
     }
 
+    /**
+     * @Description :删除
+     * @Param: ids
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
     @RequestMapping(value = "del/{ids}", method = {RequestMethod.GET})
     public Base del(@PathVariable("ids") String ids) {
         return logic.del(ids);
