@@ -4,9 +4,6 @@ import com.jiopeel.core.bean.Bean;
 import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -23,10 +20,10 @@ import java.util.Map;
 public abstract class BaseDao<T extends Bean> {
 
     @Resource
-    public SqlSession sqlSession;
+    private SqlSession sqlSession;
 
 
-    public SqlSession getSqlSession() {
+    private SqlSession getSqlSession() {
         return this.sqlSession;
     }
 
@@ -38,7 +35,7 @@ public abstract class BaseDao<T extends Bean> {
      */
     private void isInfoLog(String nameSpec) {
         if (log.isDebugEnabled() || log.isInfoEnabled())
-            log.info(nameSpec);
+            log.info("nameSpec : [{}]",nameSpec);
     }
 
     /**

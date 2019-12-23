@@ -24,4 +24,11 @@ public class Constant {
     public final static String ENABLE_YES="1";
 
     public final static String ENABLE_NO="0";
+
+    /**
+     *  0否1是
+     */
+    public final static String YES="1";
+
+    public final static String NO="0";
 }

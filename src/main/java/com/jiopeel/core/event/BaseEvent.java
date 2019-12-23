@@ -1,7 +1,5 @@
 package com.jiopeel.core.event;
 
-import org.springframework.stereotype.Controller;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
