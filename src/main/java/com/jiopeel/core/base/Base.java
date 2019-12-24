@@ -49,7 +49,7 @@ public class Base implements Serializable {
     }
 
     public static Base suc(Object data) {
-        return new Base(StateCode.SUCCESS.getStatus(), StateCode.SUCCESS.getMessage(),data);
+        return new Base(StateCode.SUCCESS.getStatus(), StateCode.SUCCESS.getMessage(), data);
     }
 
     public static Base suc(String msg, Object data) {
@@ -72,6 +72,10 @@ public class Base implements Serializable {
         Base base = new Base(StateCode.FAIL.getStatus(), msg, data);
         base.setResult(false);
         return base;
+    }
+
+    public static Base judge(boolean flag) {
+        return flag ? suc() : fail();
     }
 
     /**

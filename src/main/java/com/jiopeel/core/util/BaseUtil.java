@@ -282,9 +282,9 @@ public class BaseUtil {
      * @Date:2019/11/1 22:53
      */
     public static String encodeURL(String url) {
-        String str="";
+        String str = "";
         try {
-            str=URLEncoder.encode(url, "UTF-8");
+            str = URLEncoder.encode(url, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -362,9 +362,7 @@ public class BaseUtil {
     /**
      * 将list<E>转换为数组
      *
-     *
-     * @param data
-     *            list<Bean>集合
+     * @param data list<Bean>集合
      * @return Bean[] 对象
      */
     @SuppressWarnings("unchecked")
@@ -381,9 +379,7 @@ public class BaseUtil {
     /**
      * 将list<E>转换为数组
      *
-     *
-     * @param data
-     *            list<Bean>集合
+     * @param data list<Bean>集合
      * @return Bean[] 对象
      */
     @SuppressWarnings("unchecked")
@@ -400,9 +396,7 @@ public class BaseUtil {
     /**
      * 将T[]数组转换为list
      *
-     *
-     * @param data
-     *            Bean[] 数组集合
+     * @param data Bean[] 数组集合
      * @return List<Bean> 对象
      */
     public static <E> List<E> list(E[] data) {
@@ -418,9 +412,7 @@ public class BaseUtil {
     /**
      * 将Collection<E>数组转换为list
      *
-     *
-     * @param data
-     *            Collection<E>集合
+     * @param data Collection<E>集合
      * @return List<Bean> 对象
      */
     public static <E> List<E> list(Collection<E> data) {
@@ -431,5 +423,54 @@ public class BaseUtil {
             result.add(bean);
         }
         return result;
+    }
+
+    /**
+     * 获取对象中的所有字段成员 包括父类
+     *
+     * @param object
+     * @return Field[]
+     */
+    public static Field[] getAllFields(Object object) {
+        Class clazz = object.getClass();
+        Class superclass = clazz.getSuperclass();
+        List<Field> fieldList = new ArrayList<Field>();
+        if (superclass != null)
+            fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
+        fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        Field[] fields = new Field[fieldList.size()];
+        fieldList.toArray(fields);
+        return fields;
+    }
+
+    /**
+     * 驼峰转下划线
+     *
+     * @param c
+     * @return String
+     */
+    public static String camel2under(String c) {
+        String separator = "_";
+        c = c.replaceAll("([a-z])([A-Z])", "$1" + separator + "$2").toLowerCase();
+        return c;
+    }
+
+
+    /**
+     * 下划线转驼峰
+     *
+     * @param s
+     * @return String
+     */
+    private static String under2camel(String s) {
+        String separator = "_";
+        String under = "";
+        s = s.toLowerCase().replace(separator, " ");
+        String sarr[] = s.split(" ");
+        for (int i = 0; i < sarr.length; i++) {
+            String w = sarr[i].substring(0, 1).toUpperCase() + sarr[i].substring(1);
+            under += w;
+        }
+        return under;
     }
 }

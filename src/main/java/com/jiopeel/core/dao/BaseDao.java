@@ -2,16 +2,16 @@ package com.jiopeel.core.dao;
 
 import com.jiopeel.core.bean.Bean;
 import com.jiopeel.core.bean.Page;
+import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.config.interceptor.PageIntercept;
 import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * @Description :数据交互dao层
@@ -53,6 +53,7 @@ public class BaseDao<T extends Bean> {
         return getSqlSession().insert(nameSpec, object) > 0;
     }
 
+
     /**
      * @Description :添加
      * @param: nameSpec  命名空间
@@ -64,6 +65,54 @@ public class BaseDao<T extends Bean> {
         isInfoLog(nameSpec);
         return add(nameSpec, null);
     }
+
+    /**
+     * @Description :添加
+     * @param: bean  传递参数
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> boolean add(T bean) {
+        boolean flag=true;
+        if (bean instanceof Bean) {
+            Class<? extends Bean> clazz = bean.getClass();
+            String tableName = "t_"+BaseUtil.camel2under(clazz.getSimpleName());
+            Field[] Fields = BaseUtil.getAllFields(bean);
+            List<String> nameList=new ArrayList<String>();
+            List<Object> valueList=new ArrayList<Object>();
+            try {
+                for (Field field:Fields) {
+                    String name = field.getName();
+                    field.setAccessible(true);
+                    Object obj=field.get(bean);
+                    if ("serialVersionUID".equals(name))
+                        continue;
+                    if (obj instanceof Date)
+                        obj=BaseUtil.Dateformat((Date) obj);
+                    if (obj instanceof Integer)
+                        obj=BaseUtil.parseInt(obj);
+                    if (obj instanceof BigDecimal)
+                        obj=((BigDecimal) obj).doubleValue();
+                    field.setAccessible(true);
+                    nameList.add(name);
+                    valueList.add(obj);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Map<String,Object> map=new HashMap<String,Object>();
+            map.put("nameList",nameList);
+            map.put("valueList",valueList);
+            map.put("tableName",tableName);
+            flag=add("core.add",map);
+        } else {
+            flag=false;
+            log.error(" Param must be extends Bean ");
+        }
+        return flag;
+    }
+
 
 
     /**

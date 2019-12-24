@@ -1,10 +1,12 @@
 package com.jiopeel.sys.event;
 
 import com.jiopeel.core.base.Base;
+import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.event.BaseEvent;
 import com.jiopeel.sys.bean.App;
 import com.jiopeel.sys.bean.form.AppForm;
 import com.jiopeel.sys.bean.query.AppQuery;
+import com.jiopeel.sys.bean.result.AppResult;
 import com.jiopeel.sys.logic.AppLogic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -35,7 +37,7 @@ public class AppEvent extends BaseEvent {
     @ResponseBody
     @RequestMapping(value = "get/{id}", method = {RequestMethod.GET})
     public Base get(@PathVariable("id") String id) {
-        return logic.get(id);
+        return Base.suc(logic.get(id));
     }
     /**
      * @Description :根据id获取数据
@@ -47,7 +49,7 @@ public class AppEvent extends BaseEvent {
     @ResponseBody
     @RequestMapping(value = "getInfo/{id}", method = {RequestMethod.GET})
     public Base getInfo(@PathVariable("id") String id) {
-        return logic.getInfo(id);
+        return Base.suc(logic.getInfo(id));
     }
 
     /**
@@ -58,8 +60,8 @@ public class AppEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "getList", method = {RequestMethod.POST})
-    public String getList(@RequestBody AppQuery appQuery, Model model) {
-        model.addAttribute("list",logic.getList(appQuery)) ;
+    public String getList(@RequestBody AppQuery appQuery, Page<AppResult> page, Model model) {
+        model.addAttribute("list",logic.getList(appQuery,page)) ;
         return  "sys/app/index";
     }
 
@@ -72,7 +74,7 @@ public class AppEvent extends BaseEvent {
      */
     @RequestMapping(value = "list", method = {RequestMethod.POST})
     public String list(@RequestBody AppQuery appQuery, Model model) {
-        model.addAttribute("list",logic.getList(appQuery)) ;
+        model.addAttribute("list",logic.list(appQuery)) ;
         return  "sys/app/index";
     }
 

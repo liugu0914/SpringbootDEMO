@@ -3,9 +3,7 @@ package com.jiopeel.core.logic;
 
 import com.alibaba.fastjson.JSON;
 import com.jiopeel.core.base.Base;
-import com.jiopeel.core.bean.OauthToken;
-import com.jiopeel.core.bean.Page;
-import com.jiopeel.core.bean.User;
+import com.jiopeel.core.bean.*;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.config.interceptor.PageIntercept;
 import com.jiopeel.core.constant.Constant;
@@ -115,6 +113,12 @@ public class LoginLogic extends BaseLogic{
 
 
     public void dosomething(String userId) {
+        UserGrant bean = new UserGrant();
+        bean.createTime();
+        bean.createUUID();
+        bean.setUserid("e017cc0c0b9c47e6aa8accf9a938c467");
+         bean.setGranttype("github12212");
+        dao.add(bean);
         Page<User> userPage = dao.queryPageList("login.getUser", userId, new Page<User>());
         System.out.println(JSON.toJSONString(userPage));
     }
