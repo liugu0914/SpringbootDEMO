@@ -1,6 +1,7 @@
 package com.jiopeel.core.config.interceptor;
 
 import com.jiopeel.core.bean.Page;
+import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
@@ -17,23 +18,33 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Mybatis - 通用分页插件（如果开启二级缓存需要注意）
+ * Mybatis -分页插件（如果开启二级缓存需要注意）
+ * @author     ：lyc
+ * @date       ：2019/12/24 18:35
  */
-@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class,Integer.class}),
+@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}),
         @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {Statement.class})})
 @Slf4j
 public class PageIntercept implements Interceptor {
 
     public static final ThreadLocal<Page> localPage = new ThreadLocal<Page>();
 
+    public static final String LMT_TABLE_NAME = "_lyc_lmt_";
+
+    public static final String ROW_NAME = "_lyc_row_";
+
+    private String dbType;
+
     /**
      * 开始分页
      *
-     * @param pageNum
-     * @param pageSize
+     * @param page
      */
-    public static void startPage(int pageNum, int pageSize) {
-        localPage.set(new Page(pageNum, pageSize));
+    public static <E> void startPage(Page<E> page) {
+        if (BaseUtil.empty(page))
+            page = new Page<E>();
+        localPage.set(page);
+
     }
 
     /**
@@ -47,6 +58,12 @@ public class PageIntercept implements Interceptor {
         return page;
     }
 
+    /**
+     * 代理对象
+     * @param invocation
+     * @throws Throwable
+     * @return Object
+     */
     public Object intercept(Invocation invocation) throws Throwable {
         if (localPage.get() == null) {
             return invocation.proceed();
@@ -65,17 +82,19 @@ public class PageIntercept implements Interceptor {
                 Object object = metaStatementHandler.getValue("target");
                 metaStatementHandler = SystemMetaObject.forObject(object);
             }
+            Connection connection = (Connection) invocation.getArgs()[0];
+            this.dbType = getDBType(connection);
             MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
-            //分页信息if (localPage.get() != null) {
+            //分页信息
             Page page = localPage.get();
             BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
             // 分页参数作为参数对象parameterObject的一个属性
             String sql = boundSql.getSql();
+            if (!checkIsSelect(sql) || sql.indexOf(LMT_TABLE_NAME) > 0)
+                return invocation.proceed();
             // 重写sql
             String pageSql = buildPageSql(sql, page);
-            //重写分页sql
             metaStatementHandler.setValue("delegate.boundSql.sql", pageSql);
-            Connection connection = (Connection) invocation.getArgs()[0];
             // 重设分页参数里的总页数等
             setPageParameter(sql, connection, mappedStatement, boundSql, page);
             // 将执行权交给下一个插件
@@ -87,6 +106,23 @@ public class PageIntercept implements Interceptor {
             return result;
         }
         return null;
+    }
+
+    /**
+     * 通过Connection获取数据库类型
+     * @param connection
+     * @return String
+     */
+    private String getDBType(Connection connection) throws SQLException {
+        //通过driverName是否包含关键字判断
+        if (connection.getMetaData().getDriverName().toUpperCase().indexOf("MYSQL") != -1) {
+            return "mysql";
+        } else if (connection.getMetaData().getDriverName().toUpperCase().indexOf("SQL SERVER") != -1) {
+            return "sqlserver";
+        } else if (connection.getMetaData().getDriverName().toUpperCase().indexOf("ORACLE") != -1) {
+            return "oracle";
+        }
+        return "mysql";
     }
 
     /**
@@ -105,8 +141,14 @@ public class PageIntercept implements Interceptor {
         }
     }
 
+    /**
+     * 设置初始参数
+     *
+     * @param properties
+     */
     public void setProperties(Properties properties) {
-
+        //读取设置的数据库类型
+        this.dbType = properties.getProperty("dbType", "mysql").toLowerCase();
     }
 
     /**
@@ -114,14 +156,29 @@ public class PageIntercept implements Interceptor {
      *
      * @param sql
      * @param page
-     * @return
+     * @return String
      */
     private String buildPageSql(String sql, Page page) {
-        StringBuilder pageSql = new StringBuilder(200);
-        pageSql.append("select * from (");
-        pageSql.append(sql);
-        pageSql.append(" ) temp limit ").append(page.getStartRow());
-        pageSql.append(" , ").append(page.getPageSize());
+        StringBuilder pageSql = new StringBuilder();
+        switch (this.dbType) {
+            case "mysql":
+                pageSql.append("select * from (");
+                pageSql.append(sql);
+                pageSql.append(") " + LMT_TABLE_NAME);
+                pageSql.append(String.format(" limit %d,%d ", page.getStartRow(), page.getPageSize()));
+                break;
+            case "sqlserver":
+                pageSql.append("select *,1 as" + ROW_NAME + " from (");
+                pageSql.append(sql);
+                pageSql.append(") " + LMT_TABLE_NAME);
+                pageSql.append(String.format(" order by " + ROW_NAME + " offset %d rows fetch next %d rows only", page.getStartRow(), page.getPageSize()));
+                break;
+            case "oracle":
+                int endResult = page.getStartRow() + page.getPageSize();
+                sql = "select *,rownum  " + ROW_NAME + " from (" + sql + ") where rownum <=" + endResult;
+                pageSql.append("select * from (" + sql + ") " + LMT_TABLE_NAME + " where _lyc_row >" + page.getStartRow());
+                break;
+        }
         return pageSql.toString();
     }
 
@@ -137,7 +194,7 @@ public class PageIntercept implements Interceptor {
     private void setPageParameter(String sql, Connection connection, MappedStatement mappedStatement,
                                   BoundSql boundSql, Page page) {
         // 记录总记录数
-        String countSql = "select count(0) from (" + sql + ") temp";
+        String countSql = "select count(0) from (" + sql + ") "+ LMT_TABLE_NAME;
         PreparedStatement countStmt = null;
         ResultSet rs = null;
         try {
@@ -182,5 +239,19 @@ public class PageIntercept implements Interceptor {
                                Object parameterObject) throws SQLException {
         ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, parameterObject, boundSql);
         parameterHandler.setParameters(ps);
+    }
+
+
+    /**
+     * 判断是否是select语句，只有select语句，才会用到分页
+     *
+     * @return ： 是则返回true 否则返回false
+     * @author ：lyc
+     * @date ：2019/12/24 15:39
+     */
+    private boolean checkIsSelect(String sql) {
+        String trimSql = sql.trim();
+        int index = trimSql.toLowerCase().indexOf("select");
+        return index == 0;
     }
 }

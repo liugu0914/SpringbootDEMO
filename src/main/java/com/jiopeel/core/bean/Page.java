@@ -43,4 +43,8 @@ public class Page<E> {
         this.endRow = pageNum * pageSize;
     }
 
+    public Page() {
+        this(0,20);
+    }
+
 }

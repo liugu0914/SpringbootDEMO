@@ -1,6 +1,7 @@
 package com.jiopeel.core.event;
 
 import com.jiopeel.core.base.Base;
+import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.bean.User;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;

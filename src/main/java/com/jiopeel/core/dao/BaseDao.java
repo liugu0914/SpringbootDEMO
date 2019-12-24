@@ -205,10 +205,11 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> Page<E> queryPageList(String nameSpec, Object object,Page<E> page) {
-        PageIntercept.startPage(0,10);
-        List<E> list = this.getSqlSession().selectList(nameSpec, object);
-        return  null;
+    public <E> Page<E> queryPageList(String nameSpec, Object object, Page<E> page) {
+        PageIntercept.startPage(page);
+        this.getSqlSession().selectList(nameSpec, object);
+        page = PageIntercept.endPage();
+        return page;
     }
 
     /**

@@ -4,6 +4,7 @@ package com.jiopeel.core.logic;
 import com.alibaba.fastjson.JSON;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
+import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.bean.User;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.config.interceptor.PageIntercept;
@@ -114,8 +115,7 @@ public class LoginLogic extends BaseLogic{
 
 
     public void dosomething(String userId) {
-        PageIntercept.startPage(0,10);
-        List<Object> query = dao.query("login.getUser", userId);
-        System.out.println(JSON.toJSONString(query));
+        Page<User> userPage = dao.queryPageList("login.getUser", userId, new Page<User>());
+        System.out.println(JSON.toJSONString(userPage));
     }
 }
