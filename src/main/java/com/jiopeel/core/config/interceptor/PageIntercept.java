@@ -19,8 +19,9 @@ import java.util.Properties;
 
 /**
  * Mybatis -分页插件（如果开启二级缓存需要注意）
- * @author     ：lyc
- * @date       ：2019/12/24 18:35
+ *
+ * @author ：lyc
+ * @date ：2019/12/24 18:35
  */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}),
         @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {Statement.class})})
@@ -60,9 +61,10 @@ public class PageIntercept implements Interceptor {
 
     /**
      * 代理对象
+     *
      * @param invocation
-     * @throws Throwable
      * @return Object
+     * @throws Throwable
      */
     public Object intercept(Invocation invocation) throws Throwable {
         if (localPage.get() == null) {
@@ -82,16 +84,16 @@ public class PageIntercept implements Interceptor {
                 Object object = metaStatementHandler.getValue("target");
                 metaStatementHandler = SystemMetaObject.forObject(object);
             }
-            Connection connection = (Connection) invocation.getArgs()[0];
-            this.dbType = getDBType(connection);
             MappedStatement mappedStatement = (MappedStatement) metaStatementHandler.getValue("delegate.mappedStatement");
-            //分页信息
-            Page page = localPage.get();
             BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
             // 分页参数作为参数对象parameterObject的一个属性
             String sql = boundSql.getSql();
             if (!checkIsSelect(sql) || sql.indexOf(LMT_TABLE_NAME) > 0)
                 return invocation.proceed();
+            Connection connection = (Connection) invocation.getArgs()[0];
+            this.dbType = getDBType(connection);
+            //分页信息
+            Page page = localPage.get();
             // 重写sql
             String pageSql = buildPageSql(sql, page);
             metaStatementHandler.setValue("delegate.boundSql.sql", pageSql);
@@ -110,6 +112,7 @@ public class PageIntercept implements Interceptor {
 
     /**
      * 通过Connection获取数据库类型
+     *
      * @param connection
      * @return String
      */
@@ -194,7 +197,7 @@ public class PageIntercept implements Interceptor {
     private void setPageParameter(String sql, Connection connection, MappedStatement mappedStatement,
                                   BoundSql boundSql, Page page) {
         // 记录总记录数
-        String countSql = "select count(0) from (" + sql + ") "+ LMT_TABLE_NAME;
+        String countSql = "select count(0) from (" + sql + ") " + LMT_TABLE_NAME;
         PreparedStatement countStmt = null;
         ResultSet rs = null;
         try {
