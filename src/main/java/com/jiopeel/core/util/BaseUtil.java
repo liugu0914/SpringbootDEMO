@@ -93,14 +93,26 @@ public class BaseUtil {
         return param == null || "".equals(param) || "null".equals(param);
     }
 
+    /**
+     * 转int
+     *
+     * @param param
+     * @return
+     */
     public static int parseInt(Object param) {
         if (empty(param)) {
             return 0;
         } else {
-            return (Integer) param;
+            return Integer.valueOf(String.valueOf(param));
         }
     }
 
+    /**
+     * 转long
+     *
+     * @param param
+     * @return
+     */
     public static long parseLong(Object param) {
 
         if (empty(param)) {
@@ -433,11 +445,11 @@ public class BaseUtil {
      */
     public static Field[] getAllFields(Object object) {
         Class clazz = object.getClass();
-        Class superclass = clazz.getSuperclass();
         List<Field> fieldList = new ArrayList<Field>();
-        if (superclass != null)
-            fieldList.addAll(Arrays.asList(superclass.getDeclaredFields()));
-        fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
+        while (clazz!=null){
+            fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz=clazz.getSuperclass();
+        }
         Field[] fields = new Field[fieldList.size()];
         fieldList.toArray(fields);
         return fields;
@@ -462,7 +474,7 @@ public class BaseUtil {
      * @param s
      * @return String
      */
-    private static String under2camel(String s) {
+    public static String under2camel(String s) {
         String separator = "_";
         String under = "";
         s = s.toLowerCase().replace(separator, " ");
@@ -472,5 +484,38 @@ public class BaseUtil {
             under += w;
         }
         return under;
+    }
+
+    /**
+     * 将list拆分
+     *
+     * @param items    查询条件
+     * @param steps 划分大小
+     * @return 拆分之后的结果
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public static <E> List<List<E>> splitList(List<E> items, int steps) {
+        List<List<E>> beans = new ArrayList<>(steps);
+        if (items==null || items.isEmpty())
+            return  beans;
+        if(steps<=0 || steps>=Integer.MAX_VALUE)
+            return beans;
+        int len = items.size();
+        int[] nums = new int[len / steps + ((len % steps == 0) ? 0 : 1)];
+        for (int i = 0; i < len; i++) {
+            nums[i] = (i + 1) * steps;
+            if (nums[i] >= len)
+                break;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            int j = i == 0 ? 0 : nums[i - 1], t = nums[i];
+            List<E> list = items.subList(j, t > len ? len : t);
+            if (list != null && list.size() != 0)
+                beans.add(list);
+            if (t >= len)
+                break;
+        }
+        return beans;
     }
 }

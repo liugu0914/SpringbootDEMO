@@ -17,13 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 登陆信息处理
  */
 @Service
-public class LoginLogic extends BaseLogic{
+public class LoginLogic extends BaseLogic {
 
     @Resource
     private UserDao dao;
@@ -91,7 +92,7 @@ public class LoginLogic extends BaseLogic{
             throw new ServerException("密码不正确");
         if (!Constant.ENABLE_YES.equals(user.getEnable()))
             throw new ServerException("该账号已被禁用");
-        oauthLogic.BoxuserAgent(user.getId(),request);
+        oauthLogic.BoxuserAgent(user.getId(), request);
         //code
         String code = BaseUtil.getUUID();
         OauthToken oauthToken = oauthLogic.RedisCode(user, code);
@@ -113,12 +114,16 @@ public class LoginLogic extends BaseLogic{
 
 
     public void dosomething(String userId) {
-        UserGrant bean = new UserGrant();
-        bean.createTime();
-        bean.createUUID();
-        bean.setUserid("e017cc0c0b9c47e6aa8accf9a938c467");
-         bean.setGranttype("github12212");
-        dao.add(bean);
+        List<UserGrant> lists = new ArrayList<UserGrant>();
+        for (int i = 0; i < 1000; i++) {
+            UserGrant bean = new UserGrant();
+            bean.createTime();
+            bean.createUUID();
+            bean.setUserid("e017cc0c0b9c47e6aa8accf9a938c467");
+            bean.setGranttype("github12212");
+            lists.add(bean);
+        }
+        dao.addBatch(lists);
         Page<User> userPage = dao.queryPageList("login.getUser", userId, new Page<User>());
         System.out.println(JSON.toJSONString(userPage));
     }

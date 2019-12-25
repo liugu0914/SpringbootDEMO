@@ -13,4 +13,17 @@
             #{item}
         </foreach>
     </insert>
+
+    <insert id="addBatch" parameterType="Map">
+        insert into ${tableName}
+        <foreach item="item" index="index" collection="nameList" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+        values
+        <foreach item="item" index="index" collection="lists" open="" separator="," close="">
+            <foreach item="val" index="order" collection="item" open="(" separator="," close=")">
+                #{val}
+            </foreach>
+        </foreach>
+    </insert>
 </mapper>

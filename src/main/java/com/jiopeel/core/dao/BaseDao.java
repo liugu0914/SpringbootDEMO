@@ -24,6 +24,14 @@ public class BaseDao<T extends Bean> {
     @Resource
     private SqlSession sqlSession;
 
+    private static final String serialVersionUID = "serialVersionUID";
+
+    private static final String CORE_ADD = "core.add";
+
+    private static final String CORE_ADD_BATCH = "core.addBatch";
+
+    private static final Integer MAX_ROW = 100;
+
 
     private SqlSession getSqlSession() {
         return this.sqlSession;
@@ -74,45 +82,106 @@ public class BaseDao<T extends Bean> {
      * @Date:2019/12/21 11:48
      */
     public <T extends Bean> boolean add(T bean) {
-        boolean flag=true;
+        boolean flag = true;
         if (bean instanceof Bean) {
             Class<? extends Bean> clazz = bean.getClass();
-            String tableName = "t_"+BaseUtil.camel2under(clazz.getSimpleName());
+            String tableName = "t_" + BaseUtil.camel2under(clazz.getSimpleName());
             Field[] Fields = BaseUtil.getAllFields(bean);
-            List<String> nameList=new ArrayList<String>();
-            List<Object> valueList=new ArrayList<Object>();
-            try {
-                for (Field field:Fields) {
-                    String name = field.getName();
-                    field.setAccessible(true);
-                    Object obj=field.get(bean);
-                    if ("serialVersionUID".equals(name))
-                        continue;
-                    if (obj instanceof Date)
-                        obj=BaseUtil.Dateformat((Date) obj);
-                    if (obj instanceof Integer)
-                        obj=BaseUtil.parseInt(obj);
-                    if (obj instanceof BigDecimal)
-                        obj=((BigDecimal) obj).doubleValue();
-                    field.setAccessible(true);
-                    nameList.add(name);
-                    valueList.add(obj);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            List<String> nameList = new ArrayList<String>();
+            List<Object> valueList = new ArrayList<Object>();
+            for (Field field : Fields) {
+                String name = field.getName();
+                if (serialVersionUID.equals(name))
+                    continue;
+                Object obj = getFieldVal(field, bean);
+                nameList.add(name);
+                valueList.add(obj);
             }
-            Map<String,Object> map=new HashMap<String,Object>();
-            map.put("nameList",nameList);
-            map.put("valueList",valueList);
-            map.put("tableName",tableName);
-            flag=add("core.add",map);
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("nameList", nameList);
+            map.put("valueList", valueList);
+            map.put("tableName", tableName);
+            flag = add(CORE_ADD, map);
         } else {
-            flag=false;
+            flag = false;
             log.error(" Param must be extends Bean ");
         }
         return flag;
     }
 
+    /**
+     * @Description :获取字段对应的值
+     * @param: field  字段
+     * @param: bean
+     * @Return: Object 返回值
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    private <T extends Bean> Object getFieldVal(Field field, T bean) {
+        field.setAccessible(true);
+        Object obj = null;
+        try {
+            obj = field.get(bean);
+            if (obj instanceof String)
+                obj = String.valueOf(obj);
+            if (obj instanceof Integer)
+                obj = BaseUtil.parseInt(obj);
+            if (obj instanceof Date)
+                obj = BaseUtil.Dateformat((Date) obj);
+            if (obj instanceof BigDecimal)
+                obj = ((BigDecimal) obj).doubleValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    /**
+     * @Description :批量添加
+     * @param: bean  传递参数
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> boolean addBatch(List<T> list) {
+        boolean flag = true;
+        String tableName = null;
+        List<String> nameList = new ArrayList<String>();
+        List<List<Object>> lists = new ArrayList<List<Object>>();
+        for (T bean : list) {
+            Class<? extends Bean> clazz = bean.getClass();
+            if (BaseUtil.empty(tableName))
+                tableName = "t_" + BaseUtil.camel2under(clazz.getSimpleName());
+            Field[] Fields = BaseUtil.getAllFields(bean);
+            List<Object> valueList = new ArrayList<Object>();
+            for (Field field : Fields) {
+                String name = field.getName();
+                if (serialVersionUID.equals(name))
+                    continue;
+                Object obj = getFieldVal(field, bean);
+                if (!nameList.contains(name))
+                    nameList.add(name);
+                valueList.add(obj);
+            }
+            lists.add(valueList);
+        }
+        if (lists == null || lists.isEmpty()) {
+            log.error("无添加数据");
+            return flag;
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("nameList", nameList);
+        map.put("lists", lists);
+        map.put("tableName", tableName);
+        if (lists.size() < MAX_ROW)
+            return add(CORE_ADD_BATCH, map);
+        List<List<List<Object>>> items = BaseUtil.splitList(lists, MAX_ROW);
+        for (List<List<Object>> item : items) {
+            map.put("lists", item);
+            flag = flag && add(CORE_ADD_BATCH, map);
+        }
+        return flag;
+    }
 
 
     /**
@@ -174,9 +243,9 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> List<E> query(String nameSpec) {
+    public <T> List<T> query(String nameSpec) {
         isInfoLog(nameSpec);
-        List<E> beans = getSqlSession().selectList(nameSpec);
+        List<T> beans = getSqlSession().selectList(nameSpec);
         return beans;
     }
 
@@ -184,7 +253,7 @@ public class BaseDao<T extends Bean> {
      * 通过mybatis命名空间获得集合对象
      * 1.集合内可以存放任何对象(在mybatis中定义)
      * 1.1 假如object参数为List<?>或arrays对象则执行 1.1.1
-     * 1.1.1 判断长度是否大于2000,大于则分批每2000行个执行1次
+     * 1.1.1 判断长度是否大于MAX_ROW,大于则分批每MAX_ROW行个执行1次
      *
      * @param nameSpec 命名空间
      * @param object   map参数
@@ -192,30 +261,30 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> List<E> query(String nameSpec, Object object) {
+    public <T> List<T> query(String nameSpec, Object object) {
         isInfoLog(nameSpec);
 
         if (object != null && (object instanceof List || object.getClass().isArray())) {
             Class<?> clazz = object.getClass();
-            if (clazz.equals(int[].class) && ((int[]) object).length > 2000)
+            if (clazz.equals(int[].class) && ((int[]) object).length > MAX_ROW)
                 object = Arrays.asList((int[]) object);// 如果是arrays则转换为list,以方便后续分批次
-            else if (clazz.equals(long[].class) && ((long[]) object).length > 2000)
+            else if (clazz.equals(long[].class) && ((long[]) object).length > MAX_ROW)
                 object = Arrays.asList((long[]) object);
-            else if (clazz.equals(String[].class) && ((String[]) object).length > 2000)
+            else if (clazz.equals(String[].class) && ((String[]) object).length > MAX_ROW)
                 object = Arrays.asList((String[]) object);
             else if (object.getClass().isArray() && !(object instanceof Map) && !(clazz.equals(int[].class))
-                    && !(clazz.equals(long[].class)) && ((Object[]) object).length > 2000)
+                    && !(clazz.equals(long[].class)) && ((Object[]) object).length > MAX_ROW)
                 object = BaseUtil.list((Object[]) object);
 
             List<?> items = null;
-            if (object instanceof List && (items = (List<?>) object).size() > 2000)
+            if (object instanceof List && (items = (List<?>) object).size() > MAX_ROW)
                 return this.query(nameSpec, items);
         }
         return this.getSqlSession().selectList(nameSpec, object);
     }
 
     /**
-     * list集合查询条件且长度大于2000行后的分批查询
+     * list集合查询条件且长度大于MAX_ROW行后的分批查询
      *
      * @param nameSpec 命名空间
      * @param items    查询条件
@@ -223,19 +292,19 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    private <E> List<E> query(String nameSpec, List<?> items) {
-        List<E> beans = new ArrayList<E>(2000);
-        int len = items.size(), steps = 2000;
+    private <T> List<T> query(String nameSpec, List<?> items) {
+        List<T> beans = new ArrayList<T>(MAX_ROW);
+        int len = items.size(), steps = MAX_ROW;
         int[] nums = new int[len / steps + 1];
         for (int i = 0; i < len; i++) {
             nums[i] = (i + 1) * steps;
             if (nums[i] >= len)
                 break;
-        } // 计算每2000次1个批次,结果分几个批次完成
+        } // 计算每MAX_ROW次1个批次,结果分几个批次完成
 
         for (int i = 0; i < nums.length; i++) {
             int j = i == 0 ? 0 : nums[i - 1], t = nums[i];
-            List<E> item = this.getSqlSession().selectList(nameSpec, items.subList(j, t > len ? len : t));
+            List<T> item = this.getSqlSession().selectList(nameSpec, items.subList(j, t > len ? len : t));
             if (item != null && item.size() != 0)
                 beans.addAll(item);
             if (t >= len)
@@ -246,7 +315,7 @@ public class BaseDao<T extends Bean> {
 
 
     /**
-     * @Description :查询
+     * @Description :分页查询
      * @param: nameSpec  命名空间
      * @param: object  传递参数
      * @param: page  分页器
@@ -267,7 +336,7 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> E queryOne(String nameSpec) {
+    public <T> T queryOne(String nameSpec) {
         isInfoLog(nameSpec);
         return queryOne(nameSpec, null);
     }
@@ -279,7 +348,7 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> E queryOne(String nameSpec, Object object) {
+    public <T> T queryOne(String nameSpec, Object object) {
         isInfoLog(nameSpec);
         return getSqlSession().selectOne(nameSpec, object);
     }
