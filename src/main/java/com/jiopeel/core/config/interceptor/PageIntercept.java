@@ -170,7 +170,7 @@ public class PageIntercept implements Interceptor {
                 pageSql.append(") " + LMT_TABLE_NAME);
                 pageSql.append(String.format(" limit %d,%d ", page.getStartRow(), page.getPageSize()));
                 break;
-            case "sqlserver":
+            case "sqlserver"://适用Sql Server 2012 版本以上
                 pageSql.append("select *,1 as" + ROW_NAME + " from (");
                 pageSql.append(sql);
                 pageSql.append(") " + LMT_TABLE_NAME);

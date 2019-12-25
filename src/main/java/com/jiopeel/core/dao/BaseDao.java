@@ -19,7 +19,7 @@ import java.util.*;
  * @Date:2019/12/21 11:51
  */
 @Slf4j
-public class BaseDao<T extends Bean> {
+public class BaseDao<E extends Bean> {
 
     @Resource
     private SqlSession sqlSession;
@@ -31,6 +31,8 @@ public class BaseDao<T extends Bean> {
     private static final String CORE_ADD_BATCH = "core.addBatch";
 
     private static final Integer MAX_ROW = 100;
+
+    private static final String TABLE_HEADER = "t_";
 
 
     private SqlSession getSqlSession() {
@@ -85,7 +87,7 @@ public class BaseDao<T extends Bean> {
         boolean flag = true;
         if (bean instanceof Bean) {
             Class<? extends Bean> clazz = bean.getClass();
-            String tableName = "t_" + BaseUtil.camel2under(clazz.getSimpleName());
+            String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
             Field[] Fields = BaseUtil.getAllFields(bean);
             List<String> nameList = new ArrayList<String>();
             List<Object> valueList = new ArrayList<Object>();
@@ -143,15 +145,15 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T extends Bean> boolean addBatch(List<T> list) {
+    public <E extends Bean> boolean addBatch(List<E> list) {
         boolean flag = true;
         String tableName = null;
         List<String> nameList = new ArrayList<String>();
         List<List<Object>> lists = new ArrayList<List<Object>>();
-        for (T bean : list) {
+        for (E bean : list) {
             Class<? extends Bean> clazz = bean.getClass();
             if (BaseUtil.empty(tableName))
-                tableName = "t_" + BaseUtil.camel2under(clazz.getSimpleName());
+                tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
             Field[] Fields = BaseUtil.getAllFields(bean);
             List<Object> valueList = new ArrayList<Object>();
             for (Field field : Fields) {
@@ -243,9 +245,9 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T> List<T> query(String nameSpec) {
+    public <E> List<E> query(String nameSpec) {
         isInfoLog(nameSpec);
-        List<T> beans = getSqlSession().selectList(nameSpec);
+        List<E> beans = getSqlSession().selectList(nameSpec);
         return beans;
     }
 
@@ -261,7 +263,7 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T> List<T> query(String nameSpec, Object object) {
+    public <E> List<E> query(String nameSpec, Object object) {
         isInfoLog(nameSpec);
 
         if (object != null && (object instanceof List || object.getClass().isArray())) {
@@ -292,8 +294,8 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    private <T> List<T> query(String nameSpec, List<?> items) {
-        List<T> beans = new ArrayList<T>(MAX_ROW);
+    private <E> List<E> query(String nameSpec, List<?> items) {
+        List<E> beans = new ArrayList<E>(MAX_ROW);
         int len = items.size(), steps = MAX_ROW;
         int[] nums = new int[len / steps + 1];
         for (int i = 0; i < len; i++) {
@@ -304,7 +306,7 @@ public class BaseDao<T extends Bean> {
 
         for (int i = 0; i < nums.length; i++) {
             int j = i == 0 ? 0 : nums[i - 1], t = nums[i];
-            List<T> item = this.getSqlSession().selectList(nameSpec, items.subList(j, t > len ? len : t));
+            List<E> item = this.getSqlSession().selectList(nameSpec, items.subList(j, t > len ? len : t));
             if (item != null && item.size() != 0)
                 beans.addAll(item);
             if (t >= len)
@@ -336,7 +338,7 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T> T queryOne(String nameSpec) {
+    public <E> E queryOne(String nameSpec) {
         isInfoLog(nameSpec);
         return queryOne(nameSpec, null);
     }
@@ -348,7 +350,7 @@ public class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T> T queryOne(String nameSpec, Object object) {
+    public <E> E queryOne(String nameSpec, Object object) {
         isInfoLog(nameSpec);
         return getSqlSession().selectOne(nameSpec, object);
     }
