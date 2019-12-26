@@ -20,10 +20,22 @@
             ${item}
         </foreach>
         values
-        <foreach item="item" index="index" collection="lists" open="" separator="," close="">
+        <foreach item="item" index="index" collection="lists" separator="," >
             <foreach item="val" index="order" collection="item" open="(" separator="," close=")">
                 #{val}
             </foreach>
         </foreach>
     </insert>
+
+    <update id="upd" parameterType="Map">
+        update ${tableName}
+        set
+        <foreach item="obj" index="name" collection="fieldMap"  separator="," >
+            ${name}=#{obj}
+        </foreach>
+        where
+        <foreach item="obj" index="name" collection="clauseMap"  separator="and" >
+            ${name}=#{obj}
+        </foreach>
+    </update>
 </mapper>

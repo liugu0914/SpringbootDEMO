@@ -188,7 +188,7 @@ public class OauthLogic extends BaseLogic{
     }
 
     /**
-     * @Description :处理github第三方登陆信息
+     * @Description :处理gitee第三方登陆信息
      * @Param: result
      * @Param: access_token
      * @Param: granttype

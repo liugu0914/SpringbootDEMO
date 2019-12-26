@@ -19,7 +19,7 @@ import java.util.*;
  * @Date:2019/12/21 11:51
  */
 @Slf4j
-public class BaseDao<E extends Bean> {
+public abstract class BaseDao<E extends Bean> {
 
     @Resource
     private SqlSession sqlSession;
@@ -27,6 +27,8 @@ public class BaseDao<E extends Bean> {
     private static final String serialVersionUID = "serialVersionUID";
 
     private static final String CORE_ADD = "core.add";
+
+    private static final String CORE_UPD = "core.upd";
 
     private static final String CORE_ADD_BATCH = "core.addBatch";
 
@@ -84,31 +86,24 @@ public class BaseDao<E extends Bean> {
      * @Date:2019/12/21 11:48
      */
     public <T extends Bean> boolean add(T bean) {
-        boolean flag = true;
-        if (bean instanceof Bean) {
-            Class<? extends Bean> clazz = bean.getClass();
-            String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
-            Field[] Fields = BaseUtil.getAllFields(bean);
-            List<String> nameList = new ArrayList<String>();
-            List<Object> valueList = new ArrayList<Object>();
-            for (Field field : Fields) {
-                String name = field.getName();
-                if (serialVersionUID.equals(name))
-                    continue;
-                Object obj = getFieldVal(field, bean);
-                nameList.add(name);
-                valueList.add(obj);
-            }
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("nameList", nameList);
-            map.put("valueList", valueList);
-            map.put("tableName", tableName);
-            flag = add(CORE_ADD, map);
-        } else {
-            flag = false;
-            log.error(" Param must be extends Bean ");
+        Class<? extends Bean> clazz = bean.getClass();
+        String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
+        Field[] Fields = BaseUtil.getAllFields(bean);
+        List<String> nameList = new ArrayList<String>();
+        List<Object> valueList = new ArrayList<Object>();
+        for (Field field : Fields) {
+            String name = field.getName();
+            if (serialVersionUID.equals(name))
+                continue;
+            Object obj = getFieldVal(field, bean);
+            nameList.add(name);
+            valueList.add(obj);
         }
-        return flag;
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("nameList", nameList);
+        map.put("valueList", valueList);
+        map.put("tableName", tableName);
+        return add(CORE_ADD, map);
     }
 
     /**
@@ -169,7 +164,7 @@ public class BaseDao<E extends Bean> {
         }
         if (lists == null || lists.isEmpty()) {
             log.error("无添加数据");
-            return flag;
+            return false;
         }
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("nameList", nameList);
@@ -209,6 +204,46 @@ public class BaseDao<E extends Bean> {
     public boolean upd(String nameSpec) {
         isInfoLog(nameSpec);
         return upd(nameSpec, null);
+    }
+
+    /**
+     * @Description :单表更新
+     * @param: bean  传递参数
+     * @param: clause 作为where的条件
+     * @param: strings 不需要更新的字段
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> boolean upd(T bean, String whereValues, String... strings) {
+        if (BaseUtil.empty(whereValues)) {
+            whereValues = "";
+            log.warn("where的条件字段为空");
+        }
+        if (strings == null || strings.length == 0)
+            strings = new String[1];
+        List<String> splitfield = Arrays.asList(whereValues.split(","));
+        List<String> strlist = Arrays.asList(strings);
+        Class<? extends Bean> clazz = bean.getClass();
+        String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
+        Field[] Fields = BaseUtil.getAllFields(bean);
+        Map<String, Object> fieldMap = new HashMap<String, Object>();
+        Map<String, Object> clauseMap = new HashMap<String, Object>();
+        for (Field field : Fields) {
+            String name = field.getName();
+            if (serialVersionUID.equals(name) || strlist.contains(name))
+                continue;
+            Object obj = getFieldVal(field, bean);
+            if (!splitfield.isEmpty() && splitfield.contains(name))
+                clauseMap.put(name, obj);
+            else
+                fieldMap.put(name, obj);
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("tableName", tableName);
+        map.put("clauseMap", clauseMap);
+        map.put("fieldMap", fieldMap);
+        return upd(CORE_UPD, map);
     }
 
     /**

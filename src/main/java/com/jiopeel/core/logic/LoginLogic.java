@@ -114,16 +114,17 @@ public class LoginLogic extends BaseLogic {
 
 
     public void dosomething(String userId) {
-        List<UserGrant> lists = new ArrayList<UserGrant>();
-        for (int i = 0; i < 1000; i++) {
+//        List<UserGrant> lists = new ArrayList<UserGrant>();
+//        for (int i = 0; i < 1; i++) {
             UserGrant bean = new UserGrant();
             bean.createTime();
             bean.createUUID();
             bean.setUserid("e017cc0c0b9c47e6aa8accf9a938c467");
             bean.setGranttype("github12212");
-            lists.add(bean);
-        }
-        dao.addBatch(lists);
+            dao.upd(bean,"userid","id","ctime");
+//            lists.add(bean);
+//        }
+//        dao.addBatch(lists);
         Page<User> userPage = dao.queryPageList("login.getUser", userId, new Page<User>());
         System.out.println(JSON.toJSONString(userPage));
     }
