@@ -79,7 +79,7 @@ public abstract class BaseDao<E extends Bean> {
     }
 
     /**
-     * @Description :添加
+     * @Description :单表添加
      * @param: bean  传递参数
      * @Return: boolean 是否执行成功
      * @auhor:lyc
