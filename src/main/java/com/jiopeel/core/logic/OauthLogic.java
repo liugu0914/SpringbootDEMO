@@ -30,7 +30,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @Transactional(rollbackFor = {ServerException.class, Exception.class})
-public class OauthLogic extends BaseLogic{
+public class OauthLogic extends BaseLogic {
 
     @Resource
     private UserGrantDao dao;
@@ -104,17 +104,15 @@ public class OauthLogic extends BaseLogic{
      * @Date:2019/12/15 18:14
      */
     public OauthToken RedisCode(User user, String code) {
-        OauthToken oauthToken = null;
         if (redisUtil.hasKey(user.getId())) {
-            oauthToken = (OauthToken) redisUtil.get(user.getId());
-        } else {
-            oauthToken = new OauthToken();
-            oauthToken.setUserId(user.getId());
+            OauthToken oldToken = (OauthToken) redisUtil.get(user.getId());
+            if (redisUtil.hasKey(oldToken.getAccess_token()))
+                redisUtil.del(oldToken.getAccess_token());
         }
+        OauthToken oauthToken = new OauthToken();
+        oauthToken.setUserId(user.getId());
         //将token放入redis
-        redisUtil.set(oauthToken.getAccess_token(), user, Constant.TOKEN_TIMEOUT);
-        //将reflesh_token放入redis
-        redisUtil.set(oauthToken.getRefresh_token(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        redisUtil.set(oauthToken.getAccess_token(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
         //将userId放入redis
         redisUtil.set(user.getId(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
         //redis 放入user
@@ -140,9 +138,9 @@ public class OauthLogic extends BaseLogic{
      */
     public void RedisUserUpd(OauthToken oauthToken) {
         User user = getUser(oauthToken.getUserId());
-        redisUtil.set(oauthToken.getAccess_token(), user, Constant.TOKEN_TIMEOUT);
-        redisUtil.set(oauthToken.getRefresh_token(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        redisUtil.set(oauthToken.getAccess_token(), oauthToken, Constant.TOKEN_TIMEOUT);
         redisUtil.set(user.getId(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+        redisUtil.hset(UserConstant.USER, user.getId(), user);
     }
 
     /**
@@ -272,7 +270,7 @@ public class OauthLogic extends BaseLogic{
                 break;
         }
         if (!BaseUtil.empty(oauthToken))
-            BoxuserAgent(oauthToken.getUserId(),request);
+            BoxuserAgent(oauthToken.getUserId(), request);
         AddTokenCookie(response, access_token);
         return access_token;
     }
@@ -286,11 +284,8 @@ public class OauthLogic extends BaseLogic{
      */
     public void AddTokenCookie(HttpServletResponse response, String access_token) {
         OauthToken oauthToken = null;
-        if (redisUtil.hasKey(access_token)) {
-            User user = (User) redisUtil.get(access_token);
-            if (redisUtil.hasKey(user.getId()))
-                oauthToken = (OauthToken) redisUtil.get(user.getId());
-        }
+        if (redisUtil.hasKey(access_token))
+            oauthToken = (OauthToken) redisUtil.get(access_token);
         if (BaseUtil.empty(oauthToken))
             return;
         AddTokenCookie(response, oauthToken);
@@ -306,7 +301,6 @@ public class OauthLogic extends BaseLogic{
     public void AddTokenCookie(HttpServletResponse response, OauthToken oauthToken) {
         Cookie[] cookies = {
                 new Cookie(OauthConstant.ACCESS_TOKEN, oauthToken.getAccess_token()),
-                new Cookie(OauthConstant.REFLESH_TOKEN, oauthToken.getRefresh_token())
         };
         for (Cookie cookie : cookies) {
             cookie.setPath("/");
@@ -353,7 +347,7 @@ public class OauthLogic extends BaseLogic{
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
             params.put(OauthConstant.CODE, code);
             params.put("grant_type", "authorization_code");
-            params.put("redirect_uri", OauthConstant.EDIRECT_URI + "/"+UserConstant.USER_TYPE_GITEE);
+            params.put("redirect_uri", OauthConstant.EDIRECT_URI + "/" + UserConstant.USER_TYPE_GITEE);
             String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
@@ -434,28 +428,39 @@ public class OauthLogic extends BaseLogic{
      * @Date:2019/12/12 23:42
      */
     public void loginOut(HttpServletRequest request) {
-        String reflesh_token = "";
-        Cookie[] cookie = request.getCookies();
-        if (cookie != null && cookie.length > 0) {
-            for (int i = 0; i < cookie.length; i++) {
-                if (!BaseUtil.empty(reflesh_token))
-                    break;
-                Cookie cook = cookie[i];
-                if (cook.getName().equalsIgnoreCase(OauthConstant.REFLESH_TOKEN))//获取键
-                    reflesh_token = cook.getValue();
-            }
-        }
-        if (redisUtil.hasKey(reflesh_token)) {
-            OauthToken oauthToken = (OauthToken) redisUtil.get(reflesh_token);
+        String access_token = getTokenfromCookie(request);
+        if (redisUtil.hasKey(access_token)) {
+            OauthToken oauthToken = (OauthToken) redisUtil.get(access_token);
             if (redisUtil.hasKey(oauthToken.getUserId()))
                 redisUtil.del(oauthToken.getUserId());
-            if (redisUtil.hasKey(oauthToken.getAccess_token()))
-                redisUtil.del(oauthToken.getAccess_token());
-            redisUtil.del(reflesh_token);
-            if (redisUtil.hHasKey(UserConstant.USER,oauthToken.getUserId())) {
+            redisUtil.del(access_token);
+            if (redisUtil.hHasKey(UserConstant.USER, oauthToken.getUserId())) {
                 redisUtil.hdel(UserConstant.USER, oauthToken.getUserId());
             }
         }
+    }
+
+
+    /**
+     * 从request中获取access_token
+     *
+     * @param request
+     * @Author lyc
+     * @Date:2019/12/12 23:42
+     */
+    public String getTokenfromCookie(HttpServletRequest request) {
+        String access_token = "";
+        Cookie[] cookie = request.getCookies();
+        if (cookie != null && cookie.length > 0) {
+            for (int i = 0; i < cookie.length; i++) {
+                if (!BaseUtil.empty(access_token))
+                    break;
+                Cookie cook = cookie[i];
+                if (cook.getName().equalsIgnoreCase(OauthConstant.ACCESS_TOKEN))//获取键
+                    access_token = cook.getValue();
+            }
+        }
+        return access_token;
     }
 
     /**
@@ -483,7 +488,7 @@ public class OauthLogic extends BaseLogic{
             String ipAddr = WebUtil.getIpAddr(request);
             String macAddr = WebUtil.getMacAddr();
             if (!BaseUtil.empty(macAddr))
-                macAddr=macAddr.toUpperCase();
+                macAddr = macAddr.toUpperCase();
             UserAgent agent = UserAgent.builder()
                     .userid(userId)
                     .useragent(ua)

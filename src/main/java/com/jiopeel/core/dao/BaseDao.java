@@ -361,6 +361,7 @@ public abstract class BaseDao<E extends Bean> {
      * @Date:2019/12/21 11:48
      */
     public <E> Page<E> queryPageList(String nameSpec, Object object, Page<E> page) {
+        isInfoLog(nameSpec);
         PageIntercept.startPage(page);
         this.getSqlSession().selectList(nameSpec, object);
         page = PageIntercept.endPage();

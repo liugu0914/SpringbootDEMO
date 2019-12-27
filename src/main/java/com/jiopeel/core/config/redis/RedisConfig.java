@@ -37,7 +37,6 @@ public class RedisConfig {
         mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         serializer.setObjectMapper(mapper);
         template.setDefaultSerializer(serializer);
-        template.setKeySerializer(serializer);
         template.setValueSerializer(serializer);
         template.setHashKeySerializer(serializer);
         template.setHashValueSerializer(serializer);

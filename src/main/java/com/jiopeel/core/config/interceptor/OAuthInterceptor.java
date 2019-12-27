@@ -2,7 +2,9 @@ package com.jiopeel.core.config.interceptor;
 
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.config.redis.RedisUtil;
+import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.OauthConstant;
+import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.OauthLogic;
 import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 
 
 /**
@@ -31,45 +34,36 @@ public class OAuthInterceptor implements HandlerInterceptor {
     @Resource
     private OauthLogic oauthLogic;
 
-    //controller 调用之前被调用
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        request.setAttribute("startTime", System.currentTimeMillis());
         //token验证
-        String access_token = "";
-        String reflesh_token = "";
-        Cookie[] cookie = request.getCookies();
-        if (cookie != null && cookie.length > 0) {
-            for (int i = 0; i < cookie.length; i++) {
-                if (!BaseUtil.empty(access_token) && !BaseUtil.empty(reflesh_token))
-                    break;
-                Cookie cook = cookie[i];
-                if (cook.getName().equalsIgnoreCase(OauthConstant.ACCESS_TOKEN)) //获取键
-                    access_token = cook.getValue();
-                if (cook.getName().equalsIgnoreCase(OauthConstant.REFLESH_TOKEN))//获取键
-                    reflesh_token = cook.getValue();
-            }
-        }
-        //reflesh_token 为空 则登陆跳转
-        if (!redisUtil.hasKey(reflesh_token)) {
-            log.warn(OauthConstant.REFLESH_TOKEN + "无效: {}", reflesh_token);
+        String access_token =oauthLogic.getTokenfromCookie(request);
+        //access_token 为空 则登陆跳转
+        if (!redisUtil.hasKey(access_token)) {
+            log.warn(OauthConstant.ACCESS_TOKEN + "为空跳转登录");
             redirect(response);
             return false;
         }
-        //access_token为空 通过reflesh_token请求新的access_token
-        if (!redisUtil.hasKey(access_token)) {
-            log.warn(OauthConstant.ACCESS_TOKEN + "无效: {}", access_token);
-            log.warn("通过{}获取新的{}",OauthConstant.REFLESH_TOKEN,OauthConstant.ACCESS_TOKEN);
-            OauthToken oauthToken= (OauthToken)redisUtil.get(reflesh_token);
-            access_token=BaseUtil.getUUID();
-            oauthToken.setAccess_token(access_token);
-            //更新redis中的数据
-            oauthLogic.RedisUserUpd(oauthToken);
-            Cookie token = new Cookie(OauthConstant.ACCESS_TOKEN, access_token);
-            token.setPath("/");
-            response.addCookie(token);
+        OauthToken token = (OauthToken) redisUtil.get(access_token);
+        //reflesh_token 过期 则登陆跳转
+        if (token.getRefreshExpiresIn()<new Date().getTime()){
+            log.warn(OauthConstant.REFLESH_TOKEN + "失效，跳转登录");
+            redirect(response);
+            return false;
         }
-        request.setAttribute("user", redisUtil.get(access_token));
+        //access_token 过期，不刷新reflesh_token
+        if (token.getExpiresIn()<new Date().getTime()){
+            log.warn(OauthConstant.ACCESS_TOKEN + "过期,进行续期操作,生成新的token");
+            token.setAccess_token(BaseUtil.getUUID());
+            //存放新的token到cookie中
+            Cookie newtoken = new Cookie(OauthConstant.ACCESS_TOKEN, access_token);
+            newtoken.setPath("/");
+            response.addCookie(newtoken);
+        }else {//未过期 只刷新过期时间
+            token.setExpiresIn(new Date().getTime()+Constant.TOKEN_TIMEOUT);
+        }
+        oauthLogic.RedisUserUpd(token);
+        request.setAttribute("user", redisUtil.hget(UserConstant.USER,token.getUserId()));
         return true;
     }
 

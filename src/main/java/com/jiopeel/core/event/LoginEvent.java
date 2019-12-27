@@ -35,7 +35,7 @@ public class LoginEvent extends BaseEvent{
     public String home(@RequestParam(value = "client_id", required = false) String client_id,
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
-        logic.dosomething("ad8ed541f281482c8ee4cec1cace32a6");
+//        logic.dosomething("ad8ed541f281482c8ee4cec1cace32a6");
         if (BaseUtil.empty(client_id))
             client_id= OauthConstant.local_client_id;
         if (BaseUtil.empty(redirect_uri))
