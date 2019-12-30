@@ -95,7 +95,7 @@ public abstract class BaseDao<E extends Bean> {
             String name = field.getName();
             if (serialVersionUID.equals(name))
                 continue;
-            Object obj = getFieldVal(field, bean);
+            Object obj = BaseUtil.getFieldVal(field, bean);
             nameList.add(name);
             valueList.add(obj);
         }
@@ -104,33 +104,6 @@ public abstract class BaseDao<E extends Bean> {
         map.put("valueList", valueList);
         map.put("tableName", tableName);
         return add(CORE_ADD, map);
-    }
-
-    /**
-     * @Description :获取字段对应的值
-     * @param: field  字段
-     * @param: bean
-     * @Return: Object 返回值
-     * @auhor:lyc
-     * @Date:2019/12/21 11:48
-     */
-    private <T extends Bean> Object getFieldVal(Field field, T bean) {
-        field.setAccessible(true);
-        Object obj = null;
-        try {
-            obj = field.get(bean);
-            if (obj instanceof String)
-                obj = String.valueOf(obj);
-            if (obj instanceof Integer)
-                obj = BaseUtil.parseInt(obj);
-            if (obj instanceof Date)
-                obj = BaseUtil.Dateformat((Date) obj);
-            if (obj instanceof BigDecimal)
-                obj = ((BigDecimal) obj).doubleValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return obj;
     }
 
     /**
@@ -155,7 +128,7 @@ public abstract class BaseDao<E extends Bean> {
                 String name = field.getName();
                 if (serialVersionUID.equals(name))
                     continue;
-                Object obj = getFieldVal(field, bean);
+                Object obj = BaseUtil.getFieldVal(field, bean);
                 if (!nameList.contains(name))
                     nameList.add(name);
                 valueList.add(obj);
@@ -233,7 +206,7 @@ public abstract class BaseDao<E extends Bean> {
             String name = field.getName();
             if (serialVersionUID.equals(name) || strlist.contains(name))
                 continue;
-            Object obj = getFieldVal(field, bean);
+            Object obj = BaseUtil.getFieldVal(field, bean);
             if (!splitfield.isEmpty() && splitfield.contains(name))
                 clauseMap.put(name, obj);
             else

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -455,6 +456,38 @@ public class BaseUtil {
         return fields;
     }
 
+
+
+
+    /**
+     * @Description :获取字段对应的值
+     * @param: field  字段
+     * @param: bean
+     * @Return: Object 返回值
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public static <T> Object getFieldVal(Field field, T bean) {
+        field.setAccessible(true);
+        Object obj = null;
+        if (empty(bean))
+            return obj;
+        try {
+            obj = field.get(bean);
+            if (obj instanceof String)
+                obj = String.valueOf(obj);
+            if (obj instanceof Integer)
+                obj = BaseUtil.parseInt(obj);
+            if (obj instanceof Date)
+                obj = BaseUtil.Dateformat((Date) obj);
+            if (obj instanceof BigDecimal)
+                obj = ((BigDecimal) obj).doubleValue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
     /**
      * 驼峰转下划线
      *
@@ -518,4 +551,5 @@ public class BaseUtil {
         }
         return beans;
     }
+
 }
