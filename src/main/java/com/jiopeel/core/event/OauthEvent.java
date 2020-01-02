@@ -1,6 +1,8 @@
 package com.jiopeel.core.event;
 
+import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
+import com.jiopeel.core.bean.User;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
@@ -109,7 +111,7 @@ public class OauthEvent extends  BaseEvent{
 
 
     /**
-     * @Description :通过access_token获取第三方用户信息
+     * @Description :通过access_token获取用户信息
      * @Param: request
      * @Param: access_token
      * @Return: void
@@ -118,11 +120,10 @@ public class OauthEvent extends  BaseEvent{
      */
     @ResponseBody
     @RequestMapping(value = {"/oauth/getuser"}, method = RequestMethod.GET)
-    public void getOauthUserInfo( @RequestParam(OauthConstant.ACCESS_TOKEN) String access_token,
-                                 @RequestParam("granttype") String granttype) {
+    public Base getUserInfo( @RequestParam(OauthConstant.ACCESS_TOKEN) String access_token) {
         if (BaseUtil.empty(access_token))
             throw new ServerException("access_token不能为空");
-        logic.addOauthUser(access_token, granttype);
+        return logic.getUserbyToken(access_token);
     }
 
 }

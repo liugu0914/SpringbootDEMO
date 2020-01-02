@@ -27,11 +27,11 @@ public class Datasource {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);// 指定数据源(这个必须有，否则报错)
 
-        String typeAliasesPackage = "com.jiopeel.*.dao.*";
+        String typeAliasesPackage = "com.jiopeel.*.bean.*";
         if (typeAliasesPackage != null)
             sqlSessionFactoryBean.setTypeAliasesPackage(typeAliasesPackage);// 指定基包
 
-        String mLocations = "classpath*:com/jiopeel/**/dao/*.xml";
+        String mLocations = "classpath*:com/jiopeel/**/dao/mapper/*.xml";
         sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(mLocations));
 
         org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();

@@ -52,7 +52,7 @@ public class LoginEvent extends BaseEvent{
      */
     @ResponseBody
     @RequestMapping(value = {"/login"}, method = RequestMethod.POST)
-    public Object login( @RequestParam("client_id") String client_id,
+    public Base login( @RequestParam("client_id") String client_id,
                         @RequestParam("redirect_uri") String redirect_uri,
                         @ModelAttribute User user)  {
         String code = "";

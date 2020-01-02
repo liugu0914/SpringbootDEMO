@@ -15,4 +15,5 @@ mybatis:
    configuration:
       log-impl: com.jiopeel.core.config.log.LogbackImp
       cache-enabled: true
+      map-underscore-to-camel-case: true
    mapper-locations: classpath*:com/jiopeel/**/dao/mapper/*.xml

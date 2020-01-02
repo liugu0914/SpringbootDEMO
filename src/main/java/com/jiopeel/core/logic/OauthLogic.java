@@ -1,6 +1,7 @@
 package com.jiopeel.core.logic;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.bean.User;
 import com.jiopeel.core.bean.UserAgent;
@@ -506,5 +507,22 @@ public class OauthLogic extends BaseLogic {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @description：通过token获取用户信息
+     * @author ：lyc
+     * @date ：2020/1/2 11:10
+     */
+    public Base getUserbyToken(String access_token) {
+        User user = null;
+        OauthToken oauthToken = null;
+        if (!redisUtil.hasKey(access_token))
+            return Base.fail("该用户未登陆");
+        oauthToken = (OauthToken) redisUtil.get(access_token);
+        String userId = oauthToken.getUserId();
+        if (redisUtil.hHasKey(UserConstant.USER, userId))
+            user = (User) redisUtil.hget(UserConstant.USER, userId);
+        return Base.suc(user);
     }
 }
