@@ -42,7 +42,7 @@ public class OauthEvent extends  BaseEvent{
         String url = "";
         if (BaseUtil.empty(granttype))
             granttype = UserConstant.USER_TYPE_LOCAL;
-        String redirect_uri=BaseUtil.encodeURL(OauthConstant.EDIRECT_URI + "/" + granttype);
+        String redirect_uri=BaseUtil.encodeURL(OauthConstant.REDIRECT_URI + "/" + granttype);
         switch (granttype) {
             case UserConstant.USER_TYPE_GITHUB:
                 url = String.format(OauthConstant.GITHUB_URL, OauthConstant.GITHUB_CLIENT_ID,redirect_uri);

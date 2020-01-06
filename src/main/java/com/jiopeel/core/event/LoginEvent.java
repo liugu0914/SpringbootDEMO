@@ -39,7 +39,7 @@ public class LoginEvent extends BaseEvent{
         if (BaseUtil.empty(client_id))
             client_id= OauthConstant.local_client_id;
         if (BaseUtil.empty(redirect_uri))
-            redirect_uri=OauthConstant.EDIRECT_URI+"/"+ UserConstant.USER_TYPE_LOCAL;
+            redirect_uri=OauthConstant.REDIRECT_URI+"/"+ UserConstant.USER_TYPE_LOCAL;
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
         return "core/login";

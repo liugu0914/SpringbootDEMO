@@ -31,7 +31,7 @@ public class OauthConstant {
     /**
      * 本地回调地址
      */
-    public final static String EDIRECT_URI = "http://localhost:8088/oauth/redirect";
+    public final static String REDIRECT_URI = "http://localhost:8088/oauth/redirect";
 
     /**
      * 本地授权登陆地址

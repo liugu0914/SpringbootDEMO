@@ -348,7 +348,7 @@ public class OauthLogic extends BaseLogic {
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
             params.put(OauthConstant.CODE, code);
             params.put("grant_type", "authorization_code");
-            params.put("redirect_uri", OauthConstant.EDIRECT_URI + "/" + UserConstant.USER_TYPE_GITEE);
+            params.put("redirect_uri", OauthConstant.REDIRECT_URI + "/" + UserConstant.USER_TYPE_GITEE);
             String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
@@ -485,7 +485,7 @@ public class OauthLogic extends BaseLogic {
             //浏览器名称
             String browserName = browser.getName();
             Version version = browser.getVersion(ua);
-            String versionName = version.getVersion();
+            String versionName =BaseUtil.empty(version)?"":version.getVersion();
             String ipAddr = WebUtil.getIpAddr(request);
             String macAddr = WebUtil.getMacAddr();
             if (!BaseUtil.empty(macAddr))
