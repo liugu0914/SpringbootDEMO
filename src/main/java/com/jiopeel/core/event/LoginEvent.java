@@ -1,18 +1,21 @@
 package com.jiopeel.core.event;
 
 import com.jiopeel.core.base.Base;
-import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.bean.User;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.LoginLogic;
 import com.jiopeel.core.util.BaseUtil;
+import com.jiopeel.sys.bean.result.MenuResult;
+import com.jiopeel.sys.event.MenuEvent;
+import com.jiopeel.sys.logic.MenuLogic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Description :首页登陆
@@ -21,7 +24,7 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Controller
-public class LoginEvent extends BaseEvent{
+public class LoginEvent extends BaseEvent {
 
     @Resource
     private LoginLogic logic;
@@ -37,9 +40,9 @@ public class LoginEvent extends BaseEvent{
                        Model model) {
 //        logic.dosomething("ad8ed541f281482c8ee4cec1cace32a6");
         if (BaseUtil.empty(client_id))
-            client_id= OauthConstant.local_client_id;
+            client_id = OauthConstant.local_client_id;
         if (BaseUtil.empty(redirect_uri))
-            redirect_uri=OauthConstant.REDIRECT_URI+"/"+ UserConstant.USER_TYPE_LOCAL;
+            redirect_uri = OauthConstant.REDIRECT_URI + "/" + UserConstant.USER_TYPE_LOCAL;
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
         return "core/login";
@@ -52,18 +55,18 @@ public class LoginEvent extends BaseEvent{
      */
     @ResponseBody
     @RequestMapping(value = {"/login"}, method = RequestMethod.POST)
-    public Base login( @RequestParam("client_id") String client_id,
-                        @RequestParam("redirect_uri") String redirect_uri,
-                        @ModelAttribute User user)  {
+    public Base login(@RequestParam("client_id") String client_id,
+                      @RequestParam("redirect_uri") String redirect_uri,
+                      @ModelAttribute User user) {
         String code = "";
         try {
-            code = logic.dologin(user, request,response, client_id);
+            code = logic.dologin(user, request, response, client_id);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return  Base.fail(e.getMessage());
+            return Base.fail(e.getMessage());
         }
         //回调授权地址
-        return Base.suc("登陆成功",redirect_uri + "?code=" + code);
+        return Base.suc("登陆成功", redirect_uri + "?code=" + code);
     }
 
     /**
@@ -89,13 +92,18 @@ public class LoginEvent extends BaseEvent{
     }
 
 
+    @Resource
+    private MenuLogic menuLogic;
+    
     /**
      * 登陆成功跳转main
      *
      * @return
      */
     @RequestMapping(value = {"/main"}, method = RequestMethod.GET)
-    public String main() {
+    public String main(Model model) {
+        List<MenuResult> list = menuLogic.list(null);
+        model.addAttribute("menus",list);
         return "core/admin/main";
     }
 }

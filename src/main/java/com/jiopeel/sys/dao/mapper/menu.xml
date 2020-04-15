@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="menu">
+
+    <select id="get" parameterType="String" resultType="com.jiopeel.sys.bean.result.MenuResult">
+        select * from t_menu t
+        where  1=1
+        and  t.id=#{_parameter}
+    </select>
+
+    <select id="getInfo" parameterType="String" resultType="com.jiopeel.sys.bean.result.MenuResult">
+        select * from t_menu t
+        where  1=1
+        and  t.id=#{_parameter}
+    </select>
+
+    <select id="list" parameterType="com.jiopeel.sys.bean.query.MenuQuery" resultType="com.jiopeel.sys.bean.result.MenuResult">
+        select * from t_menu
+        where  1=1
+    </select>
+
+    <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.MenuQuery" resultType="com.jiopeel.sys.bean.result.MenuResult">
+        select * from t_menu
+        where  1=1
+    </select>
+</mapper>

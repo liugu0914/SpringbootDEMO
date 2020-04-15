@@ -37,15 +37,21 @@ public class Menu extends Bean implements Serializable {
      */
     private String enable;
 
+
+    /**
+     * 是否为父节点 0否 1是
+     */
+    private String parent;
+
     /**
      * 菜单级别
      */
-    private String level;
+    private Integer level;
 
     /**
      * 上级id
      */
-    private Integer superid;
+    private String superid;
 
     /**
      * 菜单顺序

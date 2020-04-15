@@ -179,7 +179,7 @@ public class PageIntercept implements Interceptor {
             case "oracle":
                 int endResult = page.getStartRow() + page.getPageSize();
                 sql = "select *,rownum  " + ROW_NAME + " from (" + sql + ") where rownum <=" + endResult;
-                pageSql.append("select * from (" + sql + ") " + LMT_TABLE_NAME + " where _lyc_row >" + page.getStartRow());
+                pageSql.append("select * from (" + sql + ") " + LMT_TABLE_NAME + " where " + ROW_NAME + " >" + page.getStartRow());
                 break;
         }
         return pageSql.toString();

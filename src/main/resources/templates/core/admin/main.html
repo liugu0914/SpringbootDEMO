@@ -21,7 +21,7 @@
 
         <div class="left-side-menu">
             <div class="slimscroll-menu" id="left-side-menu-container">
-                <a href="index.html" class="logo text-center">
+                <a href="/" class="logo text-center">
                     <span class="logo-lg">
                         <img src="assets/images/logo.png" alt="" height="16">
                     </span>
@@ -30,46 +30,27 @@
                     </span>
                 </a>
                 <ul class="metismenu side-nav">
+                    [#list menus?if_exists as menu]
                     <li class="side-nav-item">
                         <a href="javascript: void(0);" class="side-nav-link">
                             <i class="dripicons-meter"></i>
-                            <span class="badge badge-success float-right">3</span>
-                            <span> Dashboards </span>
-                        </a>
-                        <ul class="side-nav-second-level collapse" aria-expanded="false">
-                            <li>
-                                <a href="https://www.baidu.com" class="menu-item">Ecommerce</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="side-nav-item">
-                        <a href="javascript: void(0);" class="side-nav-link">
-                            <i class="dripicons-view-apps"></i>
-                            <span> Apps </span>
+                            <span> ${menu.name} </span>
                             <span class="menu-arrow"></span>
                         </a>
                         <ul class="side-nav-second-level collapse" aria-expanded="false">
-                            <li class="side-nav-item">
-                                <a href="javascript: void(0);" aria-expanded="false">Projects
-                                    <span class="menu-arrow"></span>
+                            [#list (menu.list)?if_exists as item]
+                            <li>
+                                <a href="${item.url!'javascript: void(0);'}" data-id="${item.id!}" class="menu-item">
+                                    ${item.name}
                                 </a>
-                                <ul class="side-nav-third-level collapse" aria-expanded="false">
-                                    <li>
-                                        <a href="apps-projects-list.html" class="menu-item">List</a>
-                                    </li>
-                                    <li>
-                                        <a href="apps-projects-details.html" class="menu-item">Details</a>
-                                    </li>
-                                </ul>
                             </li>
-
+                            [/#list]
                         </ul>
                     </li>
-
+                    [/#list]
                 </ul>
                 <div class="clearfix"></div>
             </div>
-
         </div>
 
 
@@ -396,6 +377,7 @@
     <div class="rightbar-overlay"></div>
 
 
+<!--    <script src="assets/js/app.min.js"></script>-->
     <script src="assets/js/jquery.js"></script>
     <script src="assets/js/initUI.js"></script>
     <script src="assets/js/popper.min.js"></script>

@@ -169,6 +169,7 @@ create table t_menu
     icon                 varchar(100) comment '图标',
     url                  varchar(500) comment '地址',
     enable               varchar(10) comment '是否可用',
+    parent               varchar(10) comment '是否为父节点 0否 1是',
     level                int comment '菜单级别',
     superid              varchar(32) comment '上级菜单',
     ordernum             int comment '菜单顺序',

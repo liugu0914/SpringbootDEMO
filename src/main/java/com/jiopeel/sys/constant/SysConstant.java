@@ -11,4 +11,15 @@ public class SysConstant {
      */
     public final static Long TOKEN_TIMEOUT = 1000 * 60 * 60 * 2L;
 
+
+    /**
+     * 菜单等级 1
+     */
+    public  final  static  Integer  LEVEL_1=1;
+
+    /**
+     * 菜单等级 2
+     */
+    public  final  static  Integer  LEVEL_2=2;
+
 }

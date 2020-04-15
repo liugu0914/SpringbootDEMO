@@ -40,7 +40,7 @@ public class LogAspect {
         Object result=joinPoint.proceed(joinPoint.getArgs());
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
-        int seconds= (int) (totalTime/1000);
+        double seconds= (double) (totalTime/1000);
         Class<?> aopclass = joinPoint.getTarget().getClass();
         Logger log = LoggerFactory.getLogger(aopclass);
         if (seconds>=5)

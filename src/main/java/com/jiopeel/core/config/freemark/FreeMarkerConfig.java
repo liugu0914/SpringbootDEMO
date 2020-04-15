@@ -47,8 +47,8 @@ public class FreeMarkerConfig {
         configuration.setNumberFormat("0.##");
         configuration.setWhitespaceStripping(true);//开启/关闭空白移除，默认为true；
         Map<String,String> map=new HashMap<String,String>();
-//        map.put("/common/macro.ftl","common");
-        configuration.setAutoImports(map);//公用文件设置
+        map.put("c","/core/common/common.html");
+        configuration.setAutoImports(map);//macro设置
         resolver.setSuffix(".html");
         resolver.setContentType("text/html;charset=UTF-8");
         resolver.setCache(false);
