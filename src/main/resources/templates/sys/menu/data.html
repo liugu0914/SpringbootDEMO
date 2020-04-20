@@ -1,10 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<div class="row mb-2">
+    <div class="col-sm-8">
+        <a href="javascript:void(0);" class="btn btn-success btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>添加
+        </a>
+        <a href="javascript:void(0);" class="btn btn-info btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>修改
+        </a>
+        <a href="javascript:void(0);" class="btn btn-danger btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>删除
+        </a>
+        <a href="javascript:void(0);" class="btn btn-success btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>同意审批
+        </a>
+        <a href="javascript:void(0);" class="btn btn-danger btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>拒绝审批
+        </a>
+    </div>
+    <div class="col-sm-4">
+        <div class="text-sm-right">
+            <button type="button" class="btn btn-light btn-sm mb-2 mr-1">
+                <i class="mdi mdi-settings"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover table-centered mb-0" id="main-table">
+                <thead>
+                    <tr>
+                        <th class="all" style="width: 20px;">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="check_all">
+                                <label class="custom-control-label" for="check_all">&nbsp;</label>
+                            </div>
+                        </th>
+                        <th>#</th>
+                        <th>菜单名称</th>
+                        <th>图标</th>
+                        <th>地址</th>
+                        <th>是否为父级</th>
+                        <th>层级</th>
+                        <th>上级菜单</th>
+                        <th>应用ID</th>
+                        <th>是否可用</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    [#list (PageData.result)?if_exists as bean]
+                    <tr>
+                        <td>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck2">
+                                <label class="custom-control-label" for="customCheck2">&nbsp;</label>
+                            </div>
+                        </td>
+                        <td scope="row">${bean_index+1}</td>
+                        <td>${bean.name!''}</td>
+                        <td>${bean.icon!''}</td>
+                        <td>${bean.url!''}</td>
+                        <td>
+                            [#if bean.parent?? && bean.parent=='1']是[#else]否[/#if]
+                        </td>
+                        <td>${bean.level!''}</td>
+                        <td>${bean.superid!''}</td>
+                        <td>${bean.appid!''}</td>
+                        <td>
+                            <div>
+                                <input type="checkbox" id="switch${bean.id}" [#if bean.enable?? &&
+                                       bean.enable=='1']checked[/#if] data-switch="success">
+                                <label for="switch${bean.id}" data-on-label="是" data-off-label="否"
+                                       class="mb-0 d-block"></label>
+                            </div>
+                        </td>
+                    </tr>
+                    [/#list]
 
-</body>
-</html>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+[@c.page PageData=PageData /]

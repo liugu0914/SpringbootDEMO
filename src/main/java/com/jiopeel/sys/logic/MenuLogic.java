@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -189,4 +190,15 @@ public class MenuLogic extends BaseLogic {
         Assert.isNull(form.getName(), "应用名称不能为空");
     }
 
+    /**
+     * @Description :菜单名称模糊搜索
+     * @Param: map
+     * @Return: List<MenuResult>
+     * @auhor:lyc∏
+     * @Date:2019/12/21 00:02
+     */
+    public List<MenuResult> searchMenu(Map<String,String> map) {
+        List<MenuResult> list=dao.query("menu.searchMenu",map);
+        return list;
+    }
 }

@@ -163,23 +163,25 @@ public class PageIntercept implements Interceptor {
      */
     private String buildPageSql(String sql, Page page) {
         StringBuilder pageSql = new StringBuilder();
+        int startRow= page.getStartRow();
+        int pageSize=page.getPageSize();
         switch (this.dbType) {
             case "mysql":
                 pageSql.append("select * from (");
                 pageSql.append(sql);
                 pageSql.append(") " + LMT_TABLE_NAME);
-                pageSql.append(String.format(" limit %d,%d ", page.getStartRow(), page.getPageSize()));
+                pageSql.append(String.format(" limit %d,%d ", startRow, pageSize));
                 break;
             case "sqlserver"://适用Sql Server 2012 版本以上
                 pageSql.append("select *,1 as" + ROW_NAME + " from (");
                 pageSql.append(sql);
                 pageSql.append(") " + LMT_TABLE_NAME);
-                pageSql.append(String.format(" order by " + ROW_NAME + " offset %d rows fetch next %d rows only", page.getStartRow(), page.getPageSize()));
+                pageSql.append(String.format(" order by " + ROW_NAME + " offset %d rows fetch next %d rows only",startRow, pageSize));
                 break;
             case "oracle":
-                int endResult = page.getStartRow() + page.getPageSize();
+                int endResult = startRow + pageSize;
                 sql = "select *,rownum  " + ROW_NAME + " from (" + sql + ") where rownum <=" + endResult;
-                pageSql.append("select * from (" + sql + ") " + LMT_TABLE_NAME + " where " + ROW_NAME + " >" + page.getStartRow());
+                pageSql.append("select * from (" + sql + ") " + LMT_TABLE_NAME + " where " + ROW_NAME + " >" + startRow);
                 break;
         }
         return pageSql.toString();
@@ -207,12 +209,16 @@ public class PageIntercept implements Interceptor {
             setParameters(countStmt, mappedStatement, countBS, boundSql.getParameterObject());
             rs = countStmt.executeQuery();
             int totalCount = 0;
-            if (rs.next()) {
+            if (rs.next())
                 totalCount = rs.getInt(1);
-            }
             page.setTotal(totalCount);
             int totalPage = totalCount / page.getPageSize() + ((totalCount % page.getPageSize() == 0) ? 0 : 1);
             page.setPages(totalPage);
+            if(page.getPageNum()==totalPage ){
+                int left=totalCount-(page.getPageNum()-1)*page.getPageSize()-1;
+                page.setEndRow(page.getStartRow()+left);
+            }else
+                page.setEndRow(page.getStartRow()+page.getPageSize());
         } catch (SQLException e) {
             log.error("Ignore this exception", e);
         } finally {

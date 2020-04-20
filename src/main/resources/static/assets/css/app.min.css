@@ -14151,7 +14151,7 @@ div.dt-button-info h2 {
   }
   .dataTables_paginate ul {
     text-align: center;
-    display: block;
+    justify-content: center!important;
     margin: 1.5rem 0 0 !important;
   }
   div.dt-buttons {

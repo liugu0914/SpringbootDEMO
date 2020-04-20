@@ -37,6 +37,8 @@ public class OAuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //token验证
+        String url = request.getRequestURL().toString();
+
         String access_token =oauthLogic.getTokenfromCookie(request);
         //access_token 为空 则登陆跳转
         if (!redisUtil.hasKey(access_token)) {

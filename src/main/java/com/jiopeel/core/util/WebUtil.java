@@ -1,23 +1,48 @@
 
 package com.jiopeel.core.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+@Slf4j
 public class WebUtil implements Serializable {
     private static final long serialVersionUID = 8804935919085171285L;
 
     public WebUtil() {
+    }
+
+    /**
+     * 获得request域中的值并转换为Map<String,String>
+     *
+     *
+     * @param request
+     *            当前request对象
+     * @return Map<String,String>属性名为key,域中值为val
+     */
+    public static Map<String, String> getParam2Map(HttpServletRequest request) {
+        Map<String, String> values = new HashMap<String, String>();
+        Enumeration<String> enums = request.getParameterNames();
+        while (enums.hasMoreElements()) {
+            String key = enums.nextElement();
+            String val = request.getParameter(key);
+            try {
+                val = URLDecoder.decode(val.replaceAll("%", "%25"), "UTF-8");
+            } catch (Exception e) {
+                log.warn("{}值转码失败!", val);
+            }
+            values.put(key, val.trim());
+        }
+        return values;
     }
 
     public static String getIpAddr(HttpServletRequest request) {
@@ -100,7 +125,7 @@ public class WebUtil implements Serializable {
                         }
 
                         key = (String) it.next();
-                        value = (String[]) parameterMap.get(key);
+                        value = parameterMap.get(key);
                     } while (value == null);
                 } while (value.length <= 0);
 

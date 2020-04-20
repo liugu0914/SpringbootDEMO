@@ -24,4 +24,16 @@
         select * from t_menu
         where  1=1
     </select>
+
+
+    <select id="searchMenu" parameterType="Map" resultType="com.jiopeel.sys.bean.result.MenuResult">
+        select * from t_menu t
+        where 1=1
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(search)">
+            <bind name="search" value="'%'+search+'%'"/>
+            and t.name like #{search}
+        </if>
+        ORDER BY
+        t.name limit 30
+    </select>
 </mapper>

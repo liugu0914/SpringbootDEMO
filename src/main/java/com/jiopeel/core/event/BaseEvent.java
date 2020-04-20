@@ -1,5 +1,7 @@
 package com.jiopeel.core.event;
 
+import com.jiopeel.core.config.redis.RedisUtil;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,4 +19,6 @@ public abstract class BaseEvent {
     @Resource
     public HttpServletResponse response;
 
+    @Resource
+    public RedisUtil redisUtil;
 }

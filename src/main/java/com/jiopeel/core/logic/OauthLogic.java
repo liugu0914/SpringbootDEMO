@@ -138,10 +138,14 @@ public class OauthLogic extends BaseLogic {
      * @Date:2019/12/15 18:14
      */
     public void RedisUserUpd(OauthToken oauthToken) {
-        User user = getUser(oauthToken.getUserId());
+        String userId = oauthToken.getUserId();
+        if (!redisUtil.hHasKey(UserConstant.USER, userId)) {
+            User user = getUser(userId);
+            redisUtil.hset(UserConstant.USER, userId, user);
+        }
         redisUtil.set(oauthToken.getAccess_token(), oauthToken, Constant.TOKEN_TIMEOUT);
-        redisUtil.set(user.getId(), oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
-        redisUtil.hset(UserConstant.USER, user.getId(), user);
+        redisUtil.set(userId, oauthToken, Constant.RELESH_TOKEN_TIMEOUT);
+
     }
 
     /**
@@ -485,7 +489,7 @@ public class OauthLogic extends BaseLogic {
             //浏览器名称
             String browserName = browser.getName();
             Version version = browser.getVersion(ua);
-            String versionName =BaseUtil.empty(version)?"":version.getVersion();
+            String versionName = BaseUtil.empty(version) ? "" : version.getVersion();
             String ipAddr = WebUtil.getIpAddr(request);
             String macAddr = WebUtil.getMacAddr();
             if (!BaseUtil.empty(macAddr))

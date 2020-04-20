@@ -3,6 +3,7 @@ package com.jiopeel.sys.event;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.event.BaseEvent;
+import com.jiopeel.core.util.WebUtil;
 import com.jiopeel.sys.bean.form.MenuForm;
 import com.jiopeel.sys.bean.query.MenuQuery;
 import com.jiopeel.sys.bean.result.MenuResult;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -47,8 +49,9 @@ public class MenuEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "data", method = {RequestMethod.POST})
-    public String data(@RequestBody MenuQuery query, Page<MenuResult> page, Model model) {
-        model.addAttribute("list", logic.getListPage(query, page));
+    public String data(@ModelAttribute MenuQuery query, @ModelAttribute Page<MenuResult> page, Model model) {
+        Page<MenuResult> PageData = logic.getListPage(query, page);
+        model.addAttribute("PageData", PageData);
         return "sys/menu/data";
     }
 
@@ -89,6 +92,20 @@ public class MenuEvent extends BaseEvent {
     @RequestMapping(value = "getInfo/{id}", method = {RequestMethod.GET})
     public Base getInfo(@PathVariable("id") String id) {
         return Base.suc(logic.getInfo(id));
+    }
+
+    /**
+     * @Description :菜单名称模糊搜索
+     * @Param: query
+     * @Return: Base
+     * @auhor:lyc∏
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
+    @RequestMapping(value = "searchMenu", method = {RequestMethod.POST})
+    public Base searchMenu() {
+        Map<String,String> map= WebUtil.getParam2Map(request);
+        return Base.suc(logic.searchMenu(map));
     }
 
     /**

@@ -39,6 +39,7 @@ public class LoginEvent extends BaseEvent {
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
 //        logic.dosomething("ad8ed541f281482c8ee4cec1cace32a6");
+
         if (BaseUtil.empty(client_id))
             client_id = OauthConstant.local_client_id;
         if (BaseUtil.empty(redirect_uri))
@@ -94,7 +95,7 @@ public class LoginEvent extends BaseEvent {
 
     @Resource
     private MenuLogic menuLogic;
-    
+
     /**
      * 登陆成功跳转main
      *
@@ -103,7 +104,7 @@ public class LoginEvent extends BaseEvent {
     @RequestMapping(value = {"/main"}, method = RequestMethod.GET)
     public String main(Model model) {
         List<MenuResult> list = menuLogic.list(null);
-        model.addAttribute("menus",list);
+        model.addAttribute("menus", list);
         return "core/admin/main";
     }
 }

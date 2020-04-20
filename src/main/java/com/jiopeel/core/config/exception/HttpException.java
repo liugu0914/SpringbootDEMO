@@ -6,6 +6,7 @@ import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 public class HttpException implements ErrorController {
+    private static final String ERROR = "/error";
 
     private static final String ERROR_PATH = "core/error/error";
 
@@ -23,7 +25,7 @@ public class HttpException implements ErrorController {
 
     @Override
     public String getErrorPath() {
-        return ERROR_PATH;
+        return ERROR;
     }
 
     /**
@@ -31,12 +33,12 @@ public class HttpException implements ErrorController {
      * @param request
      * @return
      */
-    @RequestMapping(value = ERROR_PATH,produces = MediaType.TEXT_HTML_VALUE)
+    @RequestMapping(value = ERROR,produces = MediaType.TEXT_HTML_VALUE)
     public String handleHTMLError(HttpServletRequest request) {
         //获取statusCode:401,404,500
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
         request.setAttribute(STATUS, statusCode);
-        return "error/error";
+        return ERROR_PATH;
     }
 
     /**
@@ -44,7 +46,8 @@ public class HttpException implements ErrorController {
      * @param request
      * @return
      */
-    @RequestMapping(value = ERROR_PATH,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = ERROR,produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     public Base handleJSONError(HttpServletRequest request) {
         //获取statusCode:401,404,500
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");

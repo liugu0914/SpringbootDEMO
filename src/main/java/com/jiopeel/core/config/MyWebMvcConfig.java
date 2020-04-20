@@ -18,7 +18,7 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(oAuthInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/", "/index", "/register", "/login","/signin","/oauth/**")
+                .excludePathPatterns("/", "/index","/error", "/register", "/login","/signin","/oauth/**")
                 .excludePathPatterns("/assets/**","/bootstrap/**","/img/**","/login/**");
     }
 
