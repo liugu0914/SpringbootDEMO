@@ -44,6 +44,7 @@ public class PageIntercept implements Interceptor {
     public static <E> void startPage(Page<E> page) {
         if (BaseUtil.empty(page))
             page = new Page<E>();
+        page = page.getPageNum() == 0 ? page.Build() : page.Build(page.getPageNum());
         localPage.set(page);
 
     }
@@ -163,9 +164,10 @@ public class PageIntercept implements Interceptor {
      */
     private String buildPageSql(String sql, Page page) {
         StringBuilder pageSql = new StringBuilder();
-        int startRow= page.getStartRow();
-        int pageSize=page.getPageSize();
+        int startRow = page.getStartRow();
+        int pageSize = page.getPageSize();
         switch (this.dbType) {
+            default:
             case "mysql":
                 pageSql.append("select * from (");
                 pageSql.append(sql);
@@ -176,7 +178,7 @@ public class PageIntercept implements Interceptor {
                 pageSql.append("select *,1 as" + ROW_NAME + " from (");
                 pageSql.append(sql);
                 pageSql.append(") " + LMT_TABLE_NAME);
-                pageSql.append(String.format(" order by " + ROW_NAME + " offset %d rows fetch next %d rows only",startRow, pageSize));
+                pageSql.append(String.format(" order by " + ROW_NAME + " offset %d rows fetch next %d rows only", startRow, pageSize));
                 break;
             case "oracle":
                 int endResult = startRow + pageSize;
@@ -214,11 +216,11 @@ public class PageIntercept implements Interceptor {
             page.setTotal(totalCount);
             int totalPage = totalCount / page.getPageSize() + ((totalCount % page.getPageSize() == 0) ? 0 : 1);
             page.setPages(totalPage);
-            if(page.getPageNum()==totalPage ){
-                int left=totalCount-(page.getPageNum()-1)*page.getPageSize()-1;
-                page.setEndRow(page.getStartRow()+left);
-            }else
-                page.setEndRow(page.getStartRow()+page.getPageSize());
+            if (page.getPageNum() == totalPage) {
+                int left = totalCount - (page.getPageNum() - 1) * page.getPageSize() - 1;
+                page.setEndRow(page.getStartRow() + left);
+            } else
+                page.setEndRow(page.getStartRow() + page.getPageSize() - 1);
         } catch (SQLException e) {
             log.error("Ignore this exception", e);
         } finally {

@@ -12,8 +12,8 @@
                                         <div class="col-sm-4 mb-2">
                                             <label>菜单名称</label>
                                             <select class="form-control " target="search"
-                                                    data-url="/admin/menu/searchMenu"
-                                                    name="name">
+                                                    data-url="/admin/common/searchMenu"
+                                                    name="id">
                                             </select>
                                         </div>
                                         <div class="col-sm-4 mb-2">
@@ -25,32 +25,30 @@
                                             </select>
                                         </div>
                                         <div class="col-sm-4 mb-2">
-                                            <label>层级</label>
-                                            <input type="text" class="form-control " name="enable">
-                                        </div>
-
-                                        <div class="col-sm-4 mb-2">
-                                            <label>上级菜单</label>
-                                            <input type="text" class="form-control " name="superid">
-                                        </div>
-                                        <div class="col-sm-4 mb-2">
-                                            <label>应用ID</label>
-                                            <input type="text" class="form-control " name="level">
+                                            <label>应用</label>
+                                            <select class="form-control " target="search"
+                                                    data-url="/admin/common/searchApp"
+                                                    name="appid">
+                                            </select>
                                         </div>
                                         <div class="col-sm-4 mb-2">
                                             <label>是否可用</label>
-                                            <input type="text" class="form-control " name="appid">
+                                            <select class="form-control " target="select" name="enable">
+                                                <option value="">全部</option>
+                                                <option value="1">是</option>
+                                                <option value="0">否</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="row">
                                         <div class="col-lg-6 mb-2">
-                                            <input type="button" id="clear" class="btn btn-block btn-light "
+                                            <input type="button" id="clear"  class="btn btn-block btn-light "
                                                    value="重置">
                                         </div>
                                         <div class="col-lg-6 mb-2">
-                                            <input type="button" id="query" class="btn btn-block btn-primary "
+                                            <input type="button" id="query" target="query" data-target=".query-data" class="btn btn-block btn-primary "
                                                    value="查询">
                                         </div>
                                     </div>
@@ -69,109 +67,11 @@
 </div>
 [@c.js]
 <script>
-    (function () {
-        if (jQuery && jQuery.fn && jQuery.fn.select2 && jQuery.fn.select2.amd) var e = jQuery.fn.select2.amd;
-        return e.define("select2/i18n/zh-CN", [], function () {
-            return {
-                errorLoading: function () {
-                    return "无法载入结果。"
-                }, inputTooLong: function (e) {
-                    var t = e.input.length - e.maximum, n = "请删除" + t + "个字符";
-                    return n
-                }, inputTooShort: function (e) {
-                    var t = e.minimum - e.input.length, n = "请再输入至少" + t + "个字符";
-                    return n
-                }, loadingMore: function () {
-                    return "载入更多结果…"
-                }, maximumSelected: function (e) {
-                    var t = "最多只能选择" + e.maximum + "个项目";
-                    return t
-                }, noResults: function () {
-                    return "未找到结果"
-                }, searching: function () {
-                    return "搜索中…"
-                }
-            }
-        }), {define: e.define, require: e.require}
-    })();
     $(function () {
-        menu.init();
+        $(document).initUI();
+        $('#query').trigger('click');
     });
-    var menu = {
-        init: function () {
-            menu.query();
-            $('#query').trigger('click');
-            $('select[target=search]').each(function () {
-                $(this).select2({
-                    ajax: {
-                        url: $(this).data('url'),
-                        delay: 250,
-                        data: function (params) {
-                            var query = {
-                                search: params.term,
-                            };
-                            // Query parameters will be ?search=[term]&type=public
-                            return query;
-                        },
-                        dataType: Ajax.JSON,
-                        type: Ajax.POST,
-                        processResults: function (results) {
-                            // Transforms the top-level key of the response object from 'items' to 'results'
-                            console.log(results);
-                            var data = $.map(results.data, function (obj) {
-                                obj.text = obj.text || obj.name;
-                                return obj;
-                            });
-                            return {results: data};
-                        }
-                    },
-                    minimumInputLength: 0,
-                    maximumSelectionLength: 100,
-                });
-            });
-            $('select[target=select]').select2({minimumResultsForSearch: -1});
-        },
-        query: function () {
-            var $form = $('#query').parents('form');
-            $('#query').on('click', function (e) {
-                var op = {
-                    url: $form.attr('action'),
-                    type: Ajax.POST,
-                    dataType: Ajax.HTML,
-                    data: $form.serialize(),
-                    success: menu.suc
-                };
-                Ajax.send(op);
-            });
-        },
-        suc: function (res) {
-            res ? $('.query-data').html(res) : null;
-            // 第一步：匹配加载的页面中是否含有js
-            var regDetectJs = /<script(.|\n)*?>(.|\n|\r\n)*?<\/script>/ig;
-            var jsContained = res.match(regDetectJs);
-            // 第二步：如果包含js，则一段一段的取出js再加载执行
-            if (jsContained) {
-                // 分段取出js正则
-                var regGetJS = /<script(.|\n)*?>((.|\n|\r\n)*)?<\/script>/im;
-                // 按顺序分段执行js
-                var jsNums = jsContained.length;
-                for (var i = 0; i < jsNums; i++) {
-                    var jsSection = jsContained[i].match(regGetJS);
-                    var script = "$(function () { " + jsSection[2] + " });";
-                    if (script) {
-                        if (window.execScript) {
-                            // 给IE的特殊待遇
-                            window.execScript(script);
-                        } else {
-                            // 给其他大部分浏览器用的
-                            window.eval(script);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+    //# sourceURL=index.js
 </script>
 [/@c.js]
 [/@c.html]

@@ -4,13 +4,14 @@
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./jq.toast.js')) :
-  typeof define === 'function' && define.amd ? define(['jquery', './jq.toast.js'], factory) :
-  (global = global || self, global.Ajax = factory(global.jQuery, global.jq.toast));
-}(this, function ($, Toast) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./jq.toast.js'), require('./tool.js')) :
+  typeof define === 'function' && define.amd ? define(['jquery', './jq.toast.js', './tool.js'], factory) :
+  (global = global || self, global.Ajax = factory(global.jQuery, global.jq.toast, global.Tool));
+}(this, function ($, Toast, Tool) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
   Toast = Toast && Toast.hasOwnProperty('default') ? Toast['default'] : Toast;
+  Tool = Tool && Tool.hasOwnProperty('default') ? Tool['default'] : Tool;
 
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -218,7 +219,15 @@
     };
 
     Ajax.error = function error(XMLHttpRequest) {
-      Toast.err(XMLHttpRequest && XMLHttpRequest.responseText ? XMLHttpRequest.responseText : '未知错误')
+      if (XMLHttpRequest && XMLHttpRequest.responseText) {
+        var responseText = XMLHttpRequest.responseText;
+
+        if (Tool.isJSON(responseText)) {
+          return Toast.err(window.JSON.parse(responseText).message);
+        }
+      }
+
+      return Toast.err('未知错误');
     };
 
     Ajax.setCookie = function setCookie(key, value, exdays) {

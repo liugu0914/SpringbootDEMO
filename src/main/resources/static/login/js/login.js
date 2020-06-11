@@ -152,7 +152,14 @@ var Login = {
         var flag = Login.checkinput(form);
         if (flag) {
             // form.submit();
-            Ajax.post(Login.vars.option.login_url,form.serialize(),Login.loginsuc,Login.error);
+            var op={
+                url:Login.vars.option.login_url,
+                data:form.serializeObject(),
+                success:Login.loginsuc,
+                error:Login.error,
+                contentType: Ajax.APPLICATION_X_WWW_FORM_URLENCODED,
+            };
+            Ajax.send(op);
         }
     },
     loginsuc: function (res) {
@@ -168,7 +175,7 @@ var Login = {
         var form = $(Login.vars.lowin_register).find('form');
         var flag = Login.checkinput(form);
         if (flag) {
-            Ajax.post(Login.vars.option.register_url,form.serialize(),Login.registersuc,Login.error);
+            Ajax.post(Login.vars.option.register_url,form.serializeObject(),Login.registersuc,Login.error);
         }
         e.preventDefault();
     },
@@ -180,4 +187,4 @@ var Login = {
         }
         Msg.isSuc(res.message, res.result);
     },
-}
+};

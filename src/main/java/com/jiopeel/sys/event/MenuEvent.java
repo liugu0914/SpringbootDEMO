@@ -49,7 +49,7 @@ public class MenuEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "data", method = {RequestMethod.POST})
-    public String data(@ModelAttribute MenuQuery query, @ModelAttribute Page<MenuResult> page, Model model) {
+    public String data(@ModelAttribute MenuQuery query, Page<MenuResult> page, Model model) {
         Page<MenuResult> PageData = logic.getListPage(query, page);
         model.addAttribute("PageData", PageData);
         return "sys/menu/data";
@@ -63,9 +63,10 @@ public class MenuEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "addOrUpd", method = {RequestMethod.POST})
-    public String addOrUpd(@RequestBody MenuQuery query, Model model) {
-        model.addAttribute("list", logic.list(query));
-        return "sys/menu/addOrUpd";
+    public String addOrUpd(Model model) {
+        Map<String, String> map = WebUtil.getParam2Map(request);
+        model.addAttribute("bean", logic.getInfo(map.get("id")));
+        return "sys/menu/add";
     }
 
     /**
@@ -95,20 +96,6 @@ public class MenuEvent extends BaseEvent {
     }
 
     /**
-     * @Description :菜单名称模糊搜索
-     * @Param: query
-     * @Return: Base
-     * @auhor:lyc∏
-     * @Date:2019/12/21 00:02
-     */
-    @ResponseBody
-    @RequestMapping(value = "searchMenu", method = {RequestMethod.POST})
-    public Base searchMenu() {
-        Map<String,String> map= WebUtil.getParam2Map(request);
-        return Base.suc(logic.searchMenu(map));
-    }
-
-    /**
      * @Description :获取分页列表数据
      * @Param: query
      * @Return: Base
@@ -117,7 +104,7 @@ public class MenuEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = "getListPage", method = {RequestMethod.POST})
-    public Base getListPage(@RequestBody MenuQuery query, Page<MenuResult> page) {
+    public Base getListPage(@ModelAttribute MenuQuery query, Page<MenuResult> page) {
         return Base.suc(logic.getListPage(query, page));
     }
 
@@ -130,7 +117,7 @@ public class MenuEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = "getList", method = {RequestMethod.POST})
-    public Base getList(@RequestBody MenuQuery query) {
+    public Base getList(@ModelAttribute MenuQuery query) {
         List<MenuResult> list = logic.list(query);
         return Base.suc(list);
     }
@@ -144,7 +131,7 @@ public class MenuEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = "save", method = {RequestMethod.POST})
-    public Base save(@RequestBody MenuForm form) {
+    public Base save(@ModelAttribute MenuForm form) {
         return logic.save(form);
     }
 
@@ -157,7 +144,7 @@ public class MenuEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = "upd", method = {RequestMethod.POST})
-    public Base upd(@RequestBody MenuForm form) {
+    public Base upd(@ModelAttribute MenuForm form) {
         return logic.upd(form);
     }
 
@@ -169,8 +156,8 @@ public class MenuEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @ResponseBody
-    @RequestMapping(value = "del/{ids}", method = {RequestMethod.GET})
-    public Base del(@PathVariable("ids") String ids) {
+    @RequestMapping(value = "del", method = {RequestMethod.POST})
+    public Base del(@RequestParam("id") String ids) {
         return logic.del(ids);
     }
 }

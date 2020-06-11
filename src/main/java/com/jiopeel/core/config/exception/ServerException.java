@@ -50,6 +50,7 @@ public class ServerException extends RuntimeException {
     public ServerException(String mes) {
         super(mes);
         this.message = mes;
+        this.status=StateCode.FAIL.getStatus();
         log.error(mes);
     }
 

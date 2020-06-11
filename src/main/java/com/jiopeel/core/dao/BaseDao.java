@@ -2,7 +2,6 @@ package com.jiopeel.core.dao;
 
 import com.jiopeel.core.bean.Bean;
 import com.jiopeel.core.bean.Page;
-import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.config.interceptor.PageIntercept;
 import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import org.apache.ibatis.session.SqlSession;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -204,7 +202,7 @@ public abstract class BaseDao<E extends Bean> {
         Map<String, Object> clauseMap = new HashMap<String, Object>();
         for (Field field : Fields) {
             String name = field.getName();
-            if (serialVersionUID.equals(name) || strlist.contains(name))
+            if (serialVersionUID.equals(name) || (strlist.contains(name) && !splitfield.contains(name)))
                 continue;
             Object obj = BaseUtil.getFieldVal(field, bean);
             if (!splitfield.isEmpty() && splitfield.contains(name))

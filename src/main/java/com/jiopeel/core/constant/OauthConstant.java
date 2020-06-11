@@ -31,17 +31,17 @@ public class OauthConstant {
     /**
      * 本地回调地址
      */
-    public final static String REDIRECT_URI = "http://localhost:8088/oauth/redirect";
+    public final static String REDIRECT_URI = "http://%s/oauth/redirect";
 
     /**
      * 本地授权登陆地址
      */
-    public final static String local_url = "http://localhost:8088/index?client_id=%s&redirect_uri=%s";
+    public final static String local_url = "http://%s/index?client_id=%s&redirect_uri=%s";
 
     /**
      *  本地 token获取地址
      */
-    public final static String local_token = "http://localhost:8088/oauth/access_token";
+    public final static String local_token = "http://%s/oauth/access_token";
 
 
     /**

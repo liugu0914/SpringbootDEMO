@@ -13,6 +13,11 @@ public class SysConstant {
 
 
     /**
+     * 无父级
+     */
+    public  final  static  String  NO_SUPER="-1";
+
+    /**
      * 菜单等级 1
      */
     public  final  static  Integer  LEVEL_1=1;

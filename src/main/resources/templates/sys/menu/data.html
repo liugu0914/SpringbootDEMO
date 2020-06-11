@@ -1,14 +1,13 @@
 <div class="row mb-2">
     <div class="col-sm-8">
-        <a href="javascript:void(0);" class="btn btn-success btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>添加
+        <a href="/admin/menu/addOrUpd" class="btn btn-success btn-sm mb-2 mr-1" target="modal">
+            <i class="cs cs-jia"></i>添加
         </a>
-        <a href="javascript:void(0);" class="btn btn-info btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>修改
+        <a href="/admin/menu/addOrUpd" class="btn btn-info btn-sm mb-2 mr-1" target="modal" data-cus="Tool.checkedData('id')">
+            <i class="cs cs-bianji"></i>编辑
         </a>
-        <a href="javascript:void(0);" class="btn btn-danger btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>删除
-        </a>
-        <a href="javascript:void(0);" class="btn btn-success btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>同意审批
-        </a>
-        <a href="javascript:void(0);" class="btn btn-danger btn-sm mb-2 mr-1"><i class="mdi mdi-plus-circle"></i>拒绝审批
+        <a href="/admin/menu/del" target="ajax" data-warn="确认删除选中数据?" data-cus="Tool.checkedData('id')" class="btn btn-danger btn-sm mb-2 mr-1">
+            <i class="cs cs-jian"></i>删除
         </a>
     </div>
     <div class="col-sm-4">
@@ -27,7 +26,7 @@
                     <tr>
                         <th class="all" style="width: 20px;">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="check_all">
+                                <input type="checkbox" class="custom-control-input chk-all" id="check_all">
                                 <label class="custom-control-label" for="check_all">&nbsp;</label>
                             </div>
                         </th>
@@ -38,7 +37,8 @@
                         <th>是否为父级</th>
                         <th>层级</th>
                         <th>上级菜单</th>
-                        <th>应用ID</th>
+                        <th>对应顺序</th>
+                        <th>应用</th>
                         <th>是否可用</th>
                     </tr>
                 </thead>
@@ -47,20 +47,24 @@
                     <tr>
                         <td>
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck2">
-                                <label class="custom-control-label" for="customCheck2">&nbsp;</label>
+                                <input type="checkbox" class="custom-control-input chk" data-id="${bean.id}"
+                                       id="check_chd_${bean_index}">
+                                <label class="custom-control-label" for="check_chd_${bean_index}">&nbsp;</label>
                             </div>
                         </td>
                         <td scope="row">${bean_index+1}</td>
                         <td>${bean.name!''}</td>
-                        <td>${bean.icon!''}</td>
+                        <td>
+                            <i class="${bean.icon!''}"></i>
+                        </td>
                         <td>${bean.url!''}</td>
                         <td>
                             [#if bean.parent?? && bean.parent=='1']是[#else]否[/#if]
                         </td>
                         <td>${bean.level!''}</td>
-                        <td>${bean.superid!''}</td>
-                        <td>${bean.appid!''}</td>
+                        <td>${bean.supername!''}</td>
+                        <td>${bean.ordernum!''}</td>
+                        <td>${bean.appname!''}</td>
                         <td>
                             <div>
                                 <input type="checkbox" id="switch${bean.id}" [#if bean.enable?? &&
@@ -71,10 +75,12 @@
                         </td>
                     </tr>
                     [/#list]
-
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+<script>
+    //# sourceURL=data.js
+</script>
 [@c.page PageData=PageData /]

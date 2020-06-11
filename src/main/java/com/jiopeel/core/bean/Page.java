@@ -8,6 +8,16 @@ import java.util.List;
 public class Page<E> {
 
     /**
+     * 每页大小
+     */
+    private static final int SIZE = 20;
+
+    /**
+     * 开始行 默认从0开始
+     */
+    private static final int START = 0;
+
+    /**
      * 第几页
      */
     private int pageNum;
@@ -37,19 +47,26 @@ public class Page<E> {
     private List<E> result;
 
     public Page(int pageNum, int pageSize) {
-        pageNum=pageNum+1;
+        pageNum = pageNum + 1;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
-        this.startRow = pageNum > 1 ? (pageNum-1) * pageSize : 0;
-        this.endRow = pageNum * pageSize;
+        this.startRow = pageNum > 1 ? (pageNum - 1) * pageSize : 0;
+        this.endRow = pageNum * pageSize - 1;
     }
 
     public Page() {
-        this(0,20);
+    }
+
+    public Page Build() {
+        return new Page<E>(START);
+    }
+
+    public Page Build(int pageNum) {
+        return new Page<E>(pageNum);
     }
 
     public Page(int pageNum) {
-        this(pageNum,20);
+        this(pageNum, SIZE);
     }
 
 }

@@ -3,37 +3,77 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="menu">
 
-    <select id="get" parameterType="String" resultType="com.jiopeel.sys.bean.result.MenuResult">
-        select * from t_menu t
+    <select id="get" parameterType="String" resultType="com.jiopeel.sys.bean.Menu">
+        select  t.* from t_menu t
         where  1=1
         and  t.id=#{_parameter}
     </select>
 
     <select id="getInfo" parameterType="String" resultType="com.jiopeel.sys.bean.result.MenuResult">
-        select * from t_menu t
-        where  1=1
+        SELECT
+            t.* ,
+            m.name as supername,
+            app.name as appname
+        FROM
+            t_menu t
+        LEFT JOIN t_menu m on m.id=t.superid
+        LEFT JOIN t_app app on app.id= t.appid
+        WHERE 1 =1
         and  t.id=#{_parameter}
     </select>
 
     <select id="list" parameterType="com.jiopeel.sys.bean.query.MenuQuery" resultType="com.jiopeel.sys.bean.result.MenuResult">
-        select * from t_menu
+        select
+        t.*,
+        m.name as supername,
+        app.name as appname
+        from t_menu t
+        LEFT JOIN t_app app on app.id= t.appid
+        LEFT JOIN t_menu m on m.id=t.superid
         where  1=1
+        order by t.level,t.ordernum
     </select>
 
     <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.MenuQuery" resultType="com.jiopeel.sys.bean.result.MenuResult">
-        select * from t_menu
+        select
+        t.*,
+        m.name as supername,
+        app.name as appname
+        from t_menu t
+        LEFT JOIN t_app app on app.id= t.appid
+        LEFT JOIN t_menu m on m.id=t.superid
         where  1=1
-    </select>
-
-
-    <select id="searchMenu" parameterType="Map" resultType="com.jiopeel.sys.bean.result.MenuResult">
-        select * from t_menu t
-        where 1=1
-        <if test="!@com.jiopeel.core.util.BaseUtil@empty(search)">
-            <bind name="search" value="'%'+search+'%'"/>
-            and t.name like #{search}
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(id)">
+            and t.id = #{id}
         </if>
-        ORDER BY
-        t.name limit 30
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(parent)">
+            and t.parent = #{parent}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(appid)">
+            and t.appid = #{appid}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(enable)">
+            and t.enable = #{enable}
+        </if>
+        order by t.level,t.ordernum
     </select>
+
+    <select id="getOrderNumBySuperId" parameterType="String" resultType="Integer">
+        SELECT
+            MAX(t.ordernum)
+        FROM
+            t_menu t
+        WHERE
+            1 =1
+	    AND t.superid=#{_parameter}
+    </select>
+
+    <delete id="del">
+        delete t from t_menu t
+        where  1=1
+        and  t.id in
+        <foreach collection="array" item="item"  open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

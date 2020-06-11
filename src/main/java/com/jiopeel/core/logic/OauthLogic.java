@@ -269,7 +269,8 @@ public class OauthLogic extends BaseLogic {
                 access_token = oauthToken.getAccess_token();
                 break;
             case UserConstant.USER_TYPE_LOCAL:
-                access_token = getTokenbyLocal(parameterMap);
+                String host=String.format("%s:%s",request.getServerName(),request.getServerPort());
+                access_token = getTokenbyLocal(host,parameterMap);
                 break;
             default:
                 break;
@@ -320,7 +321,7 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private String getTokenbyLocal(Map<String, String[]> parameterMap) {
+    private String getTokenbyLocal(String host,Map<String, String[]> parameterMap) {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
             String code = parameterMap.get(OauthConstant.CODE)[0];
@@ -328,7 +329,7 @@ public class OauthLogic extends BaseLogic {
             params.put(OauthConstant.CLIENT_ID, OauthConstant.local_client_id);
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.local_client_secret);
             params.put(OauthConstant.CODE, code);
-            String res = HttpTool.post(OauthConstant.local_token, params);
+            String res = HttpTool.post(String.format(OauthConstant.local_token,host), params);
             JSONObject parse = (JSONObject) JSONObject.parse(res);
             access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
         }

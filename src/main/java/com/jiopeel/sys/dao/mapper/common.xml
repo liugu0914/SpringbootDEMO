@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common">
+    <select id="searchMenu" parameterType="Map" resultType="com.jiopeel.sys.bean.result.CommonResult">
+        select
+        t.id,
+        t.name
+        from t_menu t
+        where 1=1
+        and t.enable='1'
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(search)">
+            <bind name="search" value="'%'+search+'%'"/>
+            and t.name like #{search}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(parent)">
+            and t.parent = #{parent}
+        </if>
+        ORDER BY
+        t.name limit 30
+    </select>
+
+    <select id="searchApp" parameterType="Map" resultType="com.jiopeel.sys.bean.result.CommonResult">
+        select
+        t.id,
+        t.name
+        from t_app t
+        where 1=1
+        and t.enable='1'
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(search)">
+            <bind name="search" value="'%'+search+'%'"/>
+            and t.name like #{search}
+        </if>
+        ORDER BY
+        t.name limit 30
+    </select>
+</mapper>

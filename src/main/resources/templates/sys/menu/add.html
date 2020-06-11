@@ -1,10 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<div class="modal-content" id="add">
+    <div class="modal-header modal-colored-header bg-dark">
+        <h5 class="modal-title" id="staticBackdropLiveLabel">[#if bean.id??]编辑[#else]添加[/#if]</h5>
+        <div>
+            <i class="cs cs-shuaxin pointer" show="tooltip" target="modal-reflesh" data-title="刷新" ></i>
+            <i class="cs cs-fangda pointer" show="tooltip" target="modal-expand"  data-title="缩放"  ></i>
+            <i class="cs cs-close pointer" show="tooltip" target="modal-close"  data-title="关闭"  ></i>
+        </div>
+    </div>
+    <div class="modal-body">
+        <form class="needs-validation pl-3 pr-3" novalidate  action="[#if bean.id??]/admin/menu/upd[#else]/admin/menu/save[/#if]">
+            <input type="hidden" name="id" value="${bean.id!''}">
+            <div class="form-group">
+                <label>菜单名称</label>
+                <input class="form-control" type="text" id="name" name="name" value="${bean.name!''}"
+                       placeholder="菜单管理">
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+                <div class="invalid-feedback">
+                    error
+                </div>
+            </div>
+            <div class="form-group">
+                <label>图标</label>
+                <select class="form-control" target="search" id="icon"
+                        data-url="/admin/common/icons"
+                        name="icon"  data-id="${bean.icon!}" data-text="<span><i class='${bean.icon!}'>${bean.icon!}</i></span>">
+                </select>
+            </div>
+            <div class="form-group" style="justify-content: space-between;display: flex;align-items: center;">
+                    <label class="mb-0">是否为父级</label>
+                    <input type="checkbox" id="parent"
+                           onchange="Add.isParent()" [#if !bean.parent?? || bean.parent=='1']checked[/#if]
+                           data-switch="success">
+                    <label  class="mb-0" for="parent" data-on-label="是" data-off-label="否"></label>
+                    <input type="hidden" name="parent" value="${(bean.parent)!0}">
+            </div>
+            <div class="form-group" id="url">
+                <label>地址</label>
+                <input class="form-control" type="text" name="url" value="${bean.url!}" required placeholder="/admin/menu/index">
+            </div>
+            <div class="form-group" id="superid">
+                <label>上级菜单</label>
+                <select class="form-control" target="search" name="superid"  data-parent="1" data-id="${bean.superid!}" data-text="${bean.supername!}"
+                        data-url="/admin/common/searchMenu">
+                </select>
+            </div>
+            <div class="form-group">
+                <label>对应顺序</label>
+                <input class="form-control" type="number" id="ordernum" name="ordernum" value="${bean.ordernum!}" placeholder="1">
+            </div>
+            <div class="form-group">
+                <label>应用ID</label>
+                <select class="form-control " target="search" data-id="${bean.appid!}" data-text="${bean.appname!}"
+                        data-url="/admin/common/searchApp"
+                        name="appid">
+                </select>
+            </div>
+            <div class="form-group" style="justify-content: space-between;display: flex;align-items: center;">
+                <label class="mb-0">是否可用</label>
+                <input type="checkbox" onchange="Add.isEnable()" id="enable" [#if !bean.enable?? || bean.enable=='1']checked[/#if]
+                       data-switch="success">
+                <label  class="mb-0" for="enable" data-on-label="是" data-off-label="否"></label>
+                <input type="hidden" name="enable" value="${(bean.enable)!1}">
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" target="modal-close">关闭</button>
+        <button type="button" class="btn btn-primary" target="submit">保存</button>
+    </div>
+</div>
+<script>
+    var Add = {
+        init: function () {
+            Add.isParent();
+        },
+        isParent: function () {
+            var $this = $('#parent');
+            var val = $this.prop('checked');
+            var $name=$('[name="parent"]','#add');
+            if (val) {//为父级菜单
+                $('#url').hide().find("[name='url']").val("");
+                var $superid=$('#superid').find("[name='superid']");
+                $superid.empty();//清空select2选项
+                $('#superid').hide();
+            } else {
+                $('#url').show();
+                $('#superid').show();
+            }
+            $name.val(val?'1':'0');
+        },
+        isEnable:function(){
+            var $this = $('#enable');
+            var val = $this.prop('checked');
+            var $name=$('[name="enable"]','#add');
+            $name.val(val?'1':'0');
+        }
+    };
 
-</body>
-</html>
+    $(function () {
+        Add.init();
+    });
+    //# sourceURL=add.js
+</script>

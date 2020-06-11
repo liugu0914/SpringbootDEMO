@@ -12,6 +12,7 @@
     <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/tabstyle-min.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="bootstrap/css/iconfont.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/lyc.css" rel="stylesheet" type="text/css" />
 
 </head>
@@ -33,7 +34,7 @@
                     [#list menus?if_exists as menu]
                     <li class="side-nav-item">
                         <a href="javascript: void(0);" class="side-nav-link">
-                            <i class="dripicons-meter"></i>
+                            <i class="${menu.icon!}"></i>
                             <span> ${menu.name} </span>
                             <span class="menu-arrow"></span>
                         </a>
@@ -378,7 +379,7 @@
 
 
 <!--    <script src="assets/js/app.min.js"></script>-->
-    <script src="assets/js/jquery.js"></script>
+    <script src="bootstrap/js/jquery.js"></script>
     <script src="assets/js/initUI.js"></script>
     <script src="assets/js/popper.min.js"></script>
     <script src="assets/js/bootstrap.js"></script>

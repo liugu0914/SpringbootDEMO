@@ -25,9 +25,9 @@ var initUI = {
         var $this = $(this);
         var attr = $this.attr('src-error');
         this.onerror = null;
-        if (attr == 'user')
+        if (attr === 'user')
             return $this.attr('src', '/img/user.png');
-        if (attr == 'img' || !attr)
+        if (attr === 'img' || !attr)
             return $this.attr('src', '/img/img.png');
         if (attr)
             return $this.attr('src', $this.attr('src-error'));
@@ -105,4 +105,4 @@ var initUI = {
             (src && src != window.location.href)?$this.attr('src',src):$this.trigger('error');
         });
     }
-}
+};
