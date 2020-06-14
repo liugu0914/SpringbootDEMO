@@ -152,11 +152,11 @@ var Login = {
         var flag = Login.checkinput(form);
         if (flag) {
             // form.submit();
-            var op={
-                url:Login.vars.option.login_url,
-                data:form.serializeObject(),
-                success:Login.loginsuc,
-                error:Login.error,
+            var op = {
+                url: Login.vars.option.login_url,
+                data: form.serializeObject(),
+                success: Login.loginsuc,
+                error: Login.error,
                 contentType: Ajax.APPLICATION_X_WWW_FORM_URLENCODED,
             };
             Ajax.send(op);
@@ -166,16 +166,13 @@ var Login = {
         if (res.result) {
             window.location.href = res.data ? res.data : "/";
         } else
-            Msg.isSuc(res.message, res.result);
-    },
-    error:function (XMLHttpRequest) {
-        console.log(XMLHttpRequest);
+            Toast.err(res.message);
     },
     signup: function (e) {
         var form = $(Login.vars.lowin_register).find('form');
         var flag = Login.checkinput(form);
         if (flag) {
-            Ajax.post(Login.vars.option.register_url,form.serializeObject(),Login.registersuc,Login.error);
+            Ajax.post(Login.vars.option.register_url, form.serializeObject(), Login.registersuc, Login.error);
         }
         e.preventDefault();
     },
@@ -184,7 +181,7 @@ var Login = {
         if (res.result) {
             Login.login();
             Login.brand();
-        }
-        Msg.isSuc(res.message, res.result);
+        } else
+            Toast.err(res.message);
     },
 };

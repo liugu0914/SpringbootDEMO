@@ -4,9 +4,9 @@
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./jq.toast.js'), require('./tool.js')) :
-  typeof define === 'function' && define.amd ? define(['jquery', './jq.toast.js', './tool.js'], factory) :
-  (global = global || self, global.Ajax = factory(global.jQuery, global.jq.toast, global.Tool));
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./toast.js'), require('./tool.js')) :
+  typeof define === 'function' && define.amd ? define(['jquery', './toast.js', './tool.js'], factory) :
+  (global = global || self, global.Ajax = factory(global.jQuery, global.Toast, global.Tool));
 }(this, function ($, Toast, Tool) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;

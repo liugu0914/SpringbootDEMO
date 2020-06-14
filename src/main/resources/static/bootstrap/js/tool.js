@@ -4,9 +4,9 @@
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./jq.toast.js')) :
-  typeof define === 'function' && define.amd ? define(['jquery', './jq.toast.js'], factory) :
-  (global = global || self, global.Tool = factory(global.jQuery, global.jq.toast));
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./toast.js')) :
+  typeof define === 'function' && define.amd ? define(['jquery', './toast.js'], factory) :
+  (global = global || self, global.Tool = factory(global.jQuery, global.Toast));
 }(this, function ($, Toast) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
@@ -62,16 +62,16 @@
       }
 
       var regval = value.match(/\(.*\)/gi);
-      var JSON = window.JSON;
 
       if (regval && regval instanceof Array && regval.length > 0) {
+        var _JSON = window.JSON;
         var argstr = regval.pop();
         value = value.replace(argstr, '');
         args = argstr.replace(/\(|\)/g, '').split(';');
         args = args.filter(function (arg) {
           return arg || arg === 0;
         }).map(function (arg) {
-          return JSON.parse(arg.replace(/'/g, '"'));
+          return _JSON.parse(arg.replace(/'/g, '"'));
         });
       }
 
@@ -156,7 +156,7 @@
         for (var index in dataName) {
           var _ret = _loop(index);
 
-          if (_ret === "continue")
+          if (_ret === "continue") continue;
         }
       } else if (typeof dataName === 'string') {
         var attrs = $.map($chks, function (element) {

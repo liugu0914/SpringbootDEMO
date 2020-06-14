@@ -1,12 +1,12 @@
 /*!
-  * Bootstrap jq.toast.js v4.3.1 (https://getbootstrap.com/)
+  * Bootstrap toast.js v4.3.1 (https://getbootstrap.com/)
   * Copyright 2011-2020 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery')) :
   typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = global || self, (global.jq = global.jq || {}, global.jq.toast = factory(global.jQuery)));
+  (global = global || self, global.Toast = factory(global.jQuery));
 }(this, function ($) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
@@ -414,7 +414,7 @@
         heading: '错误',
         text: text,
         position: 'top-center',
-        hideAfter: 2000,
+        hideAfter: 1500,
         stack: false,
         icon: 'error'
       };
@@ -489,4 +489,4 @@
   return Toast;
 
 }));
-//# sourceMappingURL=jq.toast.js.map
+//# sourceMappingURL=toast.js.map

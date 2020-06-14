@@ -1,12 +1,12 @@
 /*!
-  * Bootstrap init.js v4.3.1 (https://getbootstrap.com/)
+  * Bootstrap initui.js v4.3.1 (https://getbootstrap.com/)
   * Copyright 2011-2020 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./ajax.js'), require('./confirm.js'), require('./jq.toast.js'), require('./tool.js')) :
-  typeof define === 'function' && define.amd ? define(['jquery', './ajax.js', './confirm.js', './jq.toast.js', './tool.js'], factory) :
-  (global = global || self, global.Init = factory(global.jQuery, global.Ajax, global.Confirm, global.jq.toast, global.Tool));
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./ajax.js'), require('./confirm.js'), require('./toast.js'), require('./tool.js')) :
+  typeof define === 'function' && define.amd ? define(['jquery', './ajax.js', './confirm.js', './toast.js', './tool.js'], factory) :
+  (global = global || self, global.InitUI = factory(global.jQuery, global.Ajax, global.Confirm, global.Toast, global.Tool));
 }(this, function ($, Ajax, Confirm, Toast, Tool) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
@@ -206,13 +206,15 @@
         return src && src !== window.location.href ? $this.attr('src', src) : $this.trigger(Event.ERROR_IMG);
       });
     } // ----------------------------------------------------------------------
-    //  提示插件 需要tooltip.j
+    //  提示插件 需要tooltip.js
     // ----------------------------------------------------------------------
     ;
 
     _proto.tooltip = function tooltip() {
       if ($.fn.tooltip) {
-        $(Selector.TOOLTIP, this._element).tooltip();
+        $(Selector.TOOLTIP, this._element).tooltip({
+          bgcolor: 'random'
+        });
       }
     } // ----------------------------------------------------------------------
     //  验证是否存在select2插件
@@ -619,4 +621,4 @@
   return InitUI;
 
 }));
-//# sourceMappingURL=init.js.map
+//# sourceMappingURL=initui.js.map
