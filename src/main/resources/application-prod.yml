@@ -7,9 +7,19 @@ spring:
       #数据源类型
       type: com.zaxxer.hikari.HikariDataSource
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/lyc?useUnicode=yes&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+      url: jdbc:mysql://jiopeel_mysql:3306/lyc?useUnicode=yes&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
       username: root
       password: admin123
+   redis:
+      host: jiopeel_redis
+      port: 6379
+      password:
+      jedis:
+         pool:
+            max-active: 100
+            max-idle: 10
+      timeout: 3000
+
 #mybatis配置
 mybatis:
    configuration:
@@ -17,3 +27,5 @@ mybatis:
       cache-enabled: true
       map-underscore-to-camel-case: true
    mapper-locations: classpath*:com/jiopeel/**/dao/mapper/*.xml
+   configuration-properties:
+      dbType: mysql

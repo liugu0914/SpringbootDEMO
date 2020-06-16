@@ -12,6 +12,7 @@ import org.springframework.util.ClassUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,15 +83,13 @@ public class CommonLogic extends BaseLogic {
         //获取icontfont.css文件路径，根据正则获取类名
         StringBuffer result = new StringBuffer();
         try {
-            String path = this.getClass().getClassLoader().getResource(ICONFONT).getPath();
-            log.info("iconfont 文件路径为{}", path);
-            File file = new File(path);
-            BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
-            String s = null;
-            while ((s = br.readLine()) != null) {//使用readLine方法，一次读一行
-                result.append(System.lineSeparator() + s);
+            InputStream realPath = BaseUtil.getRealPath(ICONFONT);
+            byte[] buf = new byte[1024]; //数据中转站 临时缓冲区
+            int length = 0;
+            while((length = realPath.read(buf)) != -1){
+                result.append(System.lineSeparator() + new String(buf, 0, length));
             }
-            br.close();
+            realPath.close();
             String css = result.toString();
             if (!BaseUtil.empty(css)) {
                 // 创建 Pattern 对象

@@ -5,6 +5,6 @@ Spring:
       enabled: false
   profiles:
     #开发环境:dev 生产环境:prod
-    active: dev
+    active: @profiles.active@
 logging:
   config: classpath:logback-config.xml

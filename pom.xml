@@ -105,28 +105,27 @@
         <finalName>jiopeel</finalName>
         <resources>
             <resource>
-                <directory>src/main/java</directory>
+                <directory>${basedir}/DockerCompose</directory>
+                <excludes>
+                    <exclude>app/*</exclude>
+                    <exclude>**/*.*</exclude>
+                </excludes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/java</directory>
                 <includes>
                     <include>**/*.xml</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>**/*.*</include>
                 </includes>
-                <filtering>false</filtering>
+                <filtering>true</filtering>
             </resource>
-<!--            <resource>-->
-<!--                <targetPath>${project.build.directory}/DockerCompose</targetPath>-->
-<!--                <directory>${project.basedir}/DockerCompose</directory>-->
-<!--                <filtering>false</filtering>-->
-<!--                <includes>-->
-<!--                    <include>app/*</include>-->
-<!--                    <include>**/*.*</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
         </resources>
         <plugins>
             <plugin>
@@ -183,5 +182,26 @@
         </plugins>
     </build>
 
+    <!-- 不同环境的配置 -->
+    <profiles>
+        <!--开发环境-->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+            <!--默认激活-->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <!--生产环境-->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
