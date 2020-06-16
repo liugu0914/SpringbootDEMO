@@ -14,4 +14,7 @@ target/
 *.swo
 *.swn
 *.DS_Store
-logs
+logs/
+*.jar
+DockerCompose/mysql/data/
+DockerCompose/redis/data/

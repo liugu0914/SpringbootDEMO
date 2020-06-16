@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+
+  redis:
+    image: redis
+    container_name: jiopeel_redis
+    restart: always
+    volumes:
+      - ./redis/redis.conf:/etc/redis/redis.conf:ro
+      - ./redis/data:/data
+    ports:
+      - 6379:6379
+    networks:
+      - appnet
+
+  mysql:
+    image: mysql:5.7
+    container_name: jiopeel_mysql
+    restart: always
+    volumes:
+      - ./mysql/my.cnf:/etc/mysql/my.cnf:ro
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    command: [
+      '--character-set-server=utf8',
+      '--collation-server=utf8_general_ci',
+      '--default-time-zone=+8:00'
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+    ports:
+      - 3306:3306
+    networks:
+      - appnet
+
+  jiopeel:
+    build: ./app
+    container_name: jiopeel
+    restart: always
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - 8088:8088
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge

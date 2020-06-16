@@ -7,11 +7,11 @@ spring:
     #数据源类型
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/lyc?useUnicode=yes&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://jiopeel_mysql:3306/lyc?useUnicode=yes&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: admin123
   redis:
-    host: localhost
+    host: jiopeel_redis
     port: 6379
     password:
     jedis:

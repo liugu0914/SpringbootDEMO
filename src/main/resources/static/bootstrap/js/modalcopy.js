@@ -237,6 +237,7 @@
       $(this._element).trigger(showEvent);
 
       if (typeof showEvent.flag === 'boolean' && !showEvent.flag) {
+        this._hideModal();
         return;
       }
 

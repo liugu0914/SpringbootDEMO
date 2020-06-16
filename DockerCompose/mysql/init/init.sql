@@ -13,7 +13,7 @@ File Encoding         : 65001
 Date: 2019-12-12 15:48:05
 */
 
-create database lyc;
+create database lyc character set utf8 collate utf8_general_ci;
 use lyc;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -38,6 +38,7 @@ CREATE TABLE t_user
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8 COMMENT ='用户表';
 
+INSERT INTO `t_user`(`id`, `username`, `email`, `account`, `password`, `type`, `imgurl`, `enable`, `ctime`, `updtime`) VALUES ('243c4dfadb614ed7b939f17aefb8d4c5', 'lyc', 'liugu0914@sina.com', 'lyc', '21232f297a57a5a743894a0e4a801fc3', NULL, NULL, '1', '2019-12-12 13:00:14', '2019-12-12 13:00:14');
 
 DROP TABLE IF EXISTS t_user_grant;
 CREATE TABLE t_user_grant
@@ -184,6 +185,10 @@ create table t_menu
 
 alter table t_menu comment '菜单t_menu';
 
+INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('1', '系统配置', 'cs cs-dasuolvetuliebiao', '', '1', '1', 1, '-1', 1, '123', '2020-02-21 14:50:23', '2020-06-02 17:14:10');
+INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('2', '菜单管理', 'cs cs-liebiao', '/admin/menu/index', '1', '0', 2, '1', 1, '123', '2020-02-21 14:51:46', '2020-06-01 11:16:10');
+INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('d808d076e748419bb4ed1315ba0d0da8', '权限管理', 'cs cs-p_info', '/admin/menu/index', '1', '0', 2, '1', 2, '123', '2020-05-25 15:42:21', '2020-05-26 14:46:49');
+
 drop table if exists t_app;
 
 /*==============================================================*/
@@ -200,4 +205,7 @@ create table t_app
     primary key (id)
 );
 
+
 alter table t_app comment '应用表t_app';
+
+INSERT INTO `t_app`(`id`, `name`, `enable`, `shortname`, `ctime`, `updtime`) VALUES ('123', 'jiopeel后台', '1', 'jiopeel', '2020-02-13 17:10:54', '2020-02-13 17:10:58');

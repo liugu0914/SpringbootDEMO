@@ -23,6 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <project.docker.jar>${project.build.directory}/DockerCompose/app</project.docker.jar>
     </properties>
 
     <dependencies>
@@ -101,6 +102,7 @@
     </dependencies>
 
     <build>
+        <finalName>jiopeel</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -116,7 +118,69 @@
                 </includes>
                 <filtering>false</filtering>
             </resource>
+<!--            <resource>-->
+<!--                <targetPath>${project.build.directory}/DockerCompose</targetPath>-->
+<!--                <directory>${project.basedir}/DockerCompose</directory>-->
+<!--                <filtering>false</filtering>-->
+<!--                <includes>-->
+<!--                    <include>app/*</include>-->
+<!--                    <include>**/*.*</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <outputDirectory>${project.build.directory}/DockerCompose</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <targetPath>${project.build.directory}/DockerCompose</targetPath>
+                                    <directory>${project.basedir}/DockerCompose</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>app/*</include>
+                                        <include>**/*.*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- 在maven进行package的时候执行-->
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <echo message="copy package to target dir"/>
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar"
+                                      tofile="${project.docker.jar}/${project.build.finalName}.jar"
+                                      overwrite="true"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 
