@@ -50,7 +50,7 @@ public class MenuLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     public Menu get(String id) {
-        MenuResult bean = new MenuResult();
+        Menu bean = new Menu();
         if (!BaseUtil.empty(id))
             bean = dao.queryOne("menu.get", id);
         return bean;

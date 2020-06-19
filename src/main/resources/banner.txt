@@ -9,4 +9,4 @@ ${AnsiColor.BRIGHT_CYAN}
  ╚════╝ ╚═╝ ╚═════╝ ╚═╝     ╚══════╝╚══════╝╚══════╝
                                       --Power by lyc
 
-Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}
+Spring Boot Version: ${spring-boot.version}

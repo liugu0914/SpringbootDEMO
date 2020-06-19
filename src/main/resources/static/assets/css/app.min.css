@@ -15341,7 +15341,7 @@ body.authentication-bg {
 .jq-toast-wrap {
     display: block;
     position: fixed;
-    width: 250px;
+    width: 300px;
     pointer-events: none !important;
     letter-spacing: normal;
     z-index: 9000 !important;
@@ -16276,7 +16276,7 @@ b {
 .jq-toast-wrap {
     display: block;
     position: fixed;
-    width: 250px;
+    width: 300px;
     pointer-events: none !important;
     letter-spacing: normal;
     z-index: 9000 !important;

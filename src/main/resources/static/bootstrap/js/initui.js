@@ -75,6 +75,7 @@
   var VERSION = '1.0.0';
   var DATA_KEY = 'lyc.init';
   var EVENT_KEY = "." + DATA_KEY;
+  var DATA_INFO = DATA_KEY + ".";
   var DATA_API_KEY = '.data-api';
   var JQUERY_NO_CONFLICT = $.fn[NAME];
   var Selector = {
@@ -86,6 +87,8 @@
     FORM: '[target="form"]',
     AJAX: '[target="ajax"]',
     HTML: '[target="html"]',
+    CLEAR: '[target="clear"]',
+    PAGE: '[target="page"]',
     TOOLTIP: '[show="tooltip"]',
     ERROR_IMG: 'img[src-error]',
     WARN: 'warn'
@@ -102,6 +105,7 @@
     QUERY_MAIN: '.query-main',
     QUERY_DATA: '.query-data',
     MODAL_CONTENT: '.modal-content',
+    PAGE_LINK: '.page-link',
     CHECK_ALL: '.chk-all',
     CHECK: '.chk'
   };
@@ -117,6 +121,9 @@
     winW: 767.98,
     winM: 1024,
     winH: 1200
+  };
+  var DataKey = {
+    QUERY: DATA_INFO + "query"
     /**
      * ------------------------------------------------------------------------
      *  初始化方法 init()
@@ -142,10 +149,12 @@
         this.select();
       }
 
+      this.clear();
       this.checkbox();
       this.query();
       this.form();
       this.ajax();
+      this.page();
     }
 
     var _proto = InitUI.prototype;
@@ -213,7 +222,7 @@
     _proto.tooltip = function tooltip() {
       if ($.fn.tooltip) {
         $(Selector.TOOLTIP, this._element).tooltip({
-          bgcolor: 'random'
+          bgcolor: 'dark'
         });
       }
     } // ----------------------------------------------------------------------
@@ -275,7 +284,7 @@
         var id = $this.data('id');
         var text = $this.data('text');
         var op = {
-          // placeholder: '请选择',
+          placeholder: '请选择',
           // allowClear : true,
           ajax: {
             url: $this.data('url'),
@@ -334,6 +343,49 @@
           minimumResultsForSearch: -1
         });
       });
+    } // ----------------------------------------------------------------------
+    //  重置form表单元素
+    // ----------------------------------------------------------------------
+    ;
+
+    _proto.clear = function clear() {
+      $(Selector.CLEAR, this._element).on(Event.CLICK_DATA_API, function (event) {
+        if (event) {
+          event.preventDefault();
+        }
+
+        var $this = $(event.currentTarget);
+        var $form;
+
+        if ($this.closest('form').length !== 0) {
+          $form = $this.closest('form');
+        } else if ($this.closest(ClassName.QUERY_MAIN).find('form').length !== 0) {
+          $form = $this.closest(ClassName.QUERY_MAIN).find('form');
+        } else if ($this.closest(ClassName.MODAL_CONTENT).find('form').length !== 0) {
+          $form = $this.closest(ClassName.MODAL_CONTENT).find('form');
+        } else {
+          return;
+        }
+
+        var attrs = $form.find('input,select,textarea');
+        attrs.each(function (index, element) {
+          var $this = $(element);
+
+          if ($this.hasClass('select2-hidden-accessible')) {
+            var target = $this.attr('target');
+
+            if (target === 'search') {
+              return $this.empty();
+            }
+
+            if (target === 'select') {
+              return  $this.select2('val', ' ');
+            }
+          }
+
+          return $this.val('');
+        });
+      });
     };
 
     _proto.checkbox = function checkbox() {
@@ -377,7 +429,7 @@
           event.preventDefault();
         }
 
-        var $this = $(event.target);
+        var $this = $(event.currentTarget);
         var $form;
 
         if ($this.closest('form').length !== 0) {
@@ -395,6 +447,8 @@
           dataType: Ajax.HTML
         });
 
+        $this.closest(ClassName.QUERY_MAIN).data(DataKey.QUERY);
+
         _this._ajaxUseful($this, config);
       });
     } // ----------------------------------------------------------------------
@@ -410,7 +464,7 @@
           event.preventDefault();
         }
 
-        var $this = $(event.target);
+        var $this = $(event.currentTarget);
         var $form;
 
         if ($this.closest('form').length !== 0) {
@@ -443,7 +497,7 @@
           event.preventDefault();
         }
 
-        var $this = $(event.target);
+        var $this = $(event.currentTarget);
         var data = $this.data();
 
         var config = _objectSpread({}, data, {
@@ -468,7 +522,7 @@
           event.preventDefault();
         }
 
-        var $this = $(event.target);
+        var $this = $(event.currentTarget);
         var data = $this.data();
 
         var config = _objectSpread({}, data, {
@@ -479,6 +533,28 @@
         });
 
         _this4._ajaxUseful($this, config);
+      });
+    } // ----------------------------------------------------------------------
+    //  分页器js处理
+    // ----------------------------------------------------------------------
+    ;
+
+    _proto.page = function page() {
+      $(Selector.PAGE, this._element).each(function (index, element) {
+        var $main = $(element).closest(ClassName.QUERY_MAIN);
+        var op = $main.data(DataKey.QUERY) || {
+          data: {}
+        };
+        $(element).find(ClassName.PAGE_LINK).on(Event.CHANGE_DATA_API, function (event) {
+          if (event) {
+            event.preventDefault();
+          }
+
+          var $this = $(event.target);
+          var pageNum = $this.data('pagenum');
+          op.data.pageNum = pageNum;
+          Ajax.send(op);
+        });
       });
     } // ----------------------------------------------------------------------
     //  ajax默认success方法

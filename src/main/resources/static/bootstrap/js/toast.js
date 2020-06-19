@@ -146,7 +146,7 @@
     _proto.setup = function setup() {
       var _toastContent = '';
       this._toastEl = this._toastEl || $('<div></div>', {
-        class: 'jq-toast-single'
+        class: 'jq-toast-single text-break'
       }); // For the loader on top
 
       _toastContent += '<span class="jq-toast-loader"></span>'; // if (this.options.allowToastClose) {

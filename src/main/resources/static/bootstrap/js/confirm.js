@@ -116,7 +116,7 @@
     backdrop: false,
     header: 'JIOPEEL',
     text: '',
-    icon: '',
+    icon: 'dark',
     position: 'mid-center',
     ok: function ok() {
       return true;
@@ -262,11 +262,14 @@
         config = _config;
       }
 
-      var random = Util.randomArray(State);
-      random = random ? random : '';
-      config = _objectSpread({}, Default, {
-        icon: random
-      }, config);
+      config = _objectSpread({}, Default, config);
+
+      if (config.icon && config.icon === 'random') {
+        var random = Util.randomArray(State);
+        random = random ? random : '';
+        config.icon = random;
+      }
+
       Util.typeCheckConfig(NAME, config, this.constructor.DefaultType);
       return config;
     };

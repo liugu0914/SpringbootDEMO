@@ -32,7 +32,10 @@ public class LogAspect {
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
-        HttpServletResponse response = attributes.getResponse();
+        String servletPath=request.getServletPath();
+        Class<?> aopClass = joinPoint.getTarget().getClass();
+        Logger log = LoggerFactory.getLogger(aopClass);
+        log.info("********** URI   : [{}] **********", servletPath);
         User user = (User) request.getAttribute("user");
         String methodName = joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName();
         //1、记录执行时间
@@ -41,15 +44,11 @@ public class LogAspect {
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
         double seconds= (double) (totalTime/1000);
-        Class<?> aopclass = joinPoint.getTarget().getClass();
-        Logger log = LoggerFactory.getLogger(aopclass);
         if (seconds>=5)
             log.warn("超时请求 : {}s",seconds);
         String username=user==null?"":user.getUsername();
         String pid=user==null?"":String.valueOf(user.getId());
-        String servletPath=request.getServletPath();
         log.info("********** User  : [{} : {}] | Method: {} | Seconds: {}s**********", username,pid,methodName, seconds);
-        log.info("********** URI   : [{}] **********", servletPath);
         log.info("********** Result: [{}] **********", result);
         return result;
     }
