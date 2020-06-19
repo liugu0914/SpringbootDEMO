@@ -29,7 +29,7 @@ public class CommonEvent extends BaseEvent {
      * @Description :模糊搜索
      * @Param: query
      * @Return: Base
-     * @auhor:lyc∏
+     * @auhor: lyc
      * @Date:2019/12/21 00:02
      */
     @ResponseBody
@@ -73,7 +73,7 @@ public class CommonEvent extends BaseEvent {
      * @Description :菜单名称模糊搜索
      * @Param: query
      * @Return: Base
-     * @auhor:lyc∏
+     * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
     @ResponseBody

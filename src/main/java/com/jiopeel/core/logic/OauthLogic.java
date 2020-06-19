@@ -1,6 +1,5 @@
 package com.jiopeel.core.logic;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.bean.User;
@@ -200,15 +199,15 @@ public class OauthLogic extends BaseLogic {
      * @Date:2019/12/12 21:49
      */
     private UserGrant boxBeanbyGitee(String result, String access_token, String granttype) {
-        JSONObject obj = (JSONObject) JSONObject.parse(result);
+        Map obj = BaseUtil.fromJson(result, Map.class);
         UserGrant userGrant = UserGrant.builder()
                 .granttype(granttype)
                 .token(access_token)
                 .build();
         try {
-            userGrant.setImgurl(obj.getString("avatar_url"));
-            userGrant.setOnlyid(obj.getString("id"));
-            userGrant.setNickname(obj.getString("name"));
+            userGrant.setImgurl(String.valueOf(obj.get("avatar_url")));
+            userGrant.setOnlyid(String.valueOf(obj.get("id")));
+            userGrant.setNickname(String.valueOf(obj.get("name")));
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -228,15 +227,15 @@ public class OauthLogic extends BaseLogic {
      * @Date:2019/12/12 21:49
      */
     private UserGrant boxBeanbyGithub(String result, String access_token, String granttype) {
-        JSONObject obj = (JSONObject) JSONObject.parse(result);
+        Map obj = BaseUtil.fromJson(result, Map.class);
         UserGrant userGrant = UserGrant.builder()
                 .granttype(granttype)
                 .token(access_token)
                 .build();
         try {
-            userGrant.setImgurl(obj.getString("avatar_url"));
-            userGrant.setOnlyid(obj.getString("id"));
-            userGrant.setNickname(obj.getString("login"));
+            userGrant.setImgurl(String.valueOf(obj.get("avatar_url")));
+            userGrant.setOnlyid(String.valueOf(obj.get("id")));
+            userGrant.setNickname(String.valueOf(obj.get("login")));
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -269,8 +268,8 @@ public class OauthLogic extends BaseLogic {
                 access_token = oauthToken.getAccess_token();
                 break;
             case UserConstant.USER_TYPE_LOCAL:
-                String host=String.format("%s:%s",request.getServerName(),request.getServerPort());
-                access_token = getTokenbyLocal(host,parameterMap);
+                String host = String.format("%s:%s", request.getServerName(), request.getServerPort());
+                access_token = getTokenbyLocal(host, parameterMap);
                 break;
             default:
                 break;
@@ -321,7 +320,7 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private String getTokenbyLocal(String host,Map<String, String[]> parameterMap) {
+    private String getTokenbyLocal(String host, Map<String, String[]> parameterMap) {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
             String code = parameterMap.get(OauthConstant.CODE)[0];
@@ -329,9 +328,9 @@ public class OauthLogic extends BaseLogic {
             params.put(OauthConstant.CLIENT_ID, OauthConstant.local_client_id);
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.local_client_secret);
             params.put(OauthConstant.CODE, code);
-            String res = HttpTool.post(String.format(OauthConstant.local_token,host), params);
-            JSONObject parse = (JSONObject) JSONObject.parse(res);
-            access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
+            String res = HttpTool.post(String.format(OauthConstant.local_token, host), params);
+            Map parse = BaseUtil.fromJson(res, Map.class);
+            access_token = String.valueOf(parse.get(OauthConstant.ACCESS_TOKEN));
         }
         return access_token;
     }
@@ -355,8 +354,8 @@ public class OauthLogic extends BaseLogic {
             params.put("grant_type", "authorization_code");
             params.put("redirect_uri", OauthConstant.REDIRECT_URI + "/" + UserConstant.USER_TYPE_GITEE);
             String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
-            JSONObject parse = (JSONObject) JSONObject.parse(res);
-            access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
+            Map parse = BaseUtil.fromJson(res, Map.class);
+            access_token = String.valueOf(parse.get(OauthConstant.ACCESS_TOKEN));
         }
         return access_token;
     }
@@ -378,8 +377,8 @@ public class OauthLogic extends BaseLogic {
             params.put(OauthConstant.CODE, code);
             String res = HttpTool.post(OauthConstant.GITHUB_TOKEN, params);
             res = BaseUtil.Url2JSON(res);
-            JSONObject parse = (JSONObject) JSONObject.parse(res);
-            access_token = parse.getString(OauthConstant.ACCESS_TOKEN);
+            Map parse = BaseUtil.fromJson(res, Map.class);
+            access_token = String.valueOf(parse.get(OauthConstant.ACCESS_TOKEN));
         }
         return access_token;
     }

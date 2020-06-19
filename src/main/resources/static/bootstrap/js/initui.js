@@ -275,7 +275,7 @@
         var id = $this.data('id');
         var text = $this.data('text');
         var op = {
-          placeholder: '请选择',
+          // placeholder: '请选择',
           // allowClear : true,
           ajax: {
             url: $this.data('url'),

@@ -1,21 +1,32 @@
 package com.jiopeel.sys.logic;
 
 
+import com.jiopeel.core.constant.Constant;
+import com.jiopeel.core.constant.RedisConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
+import com.jiopeel.core.util.SpringUtil;
 import com.jiopeel.sys.bean.Common;
 import com.jiopeel.sys.bean.result.CommonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,45 +70,41 @@ public class CommonLogic extends BaseLogic {
      * @Date :2020年05月23日18:55:14
      */
     public List<CommonResult> searchIcons(Map<String, String> map) {
-        List<CommonResult> list = getIcons();
+        List<CommonResult> list = SpringUtil.getBean(getClass()).getIcons();
         List<CommonResult> items=new ArrayList<>();
         String search="";
-        if (map.containsKey("search"))
-            search = map.get("search").trim();
+        if (!map.containsKey("search") || BaseUtil.empty(map.get("search")))
+            return list;
+        search = map.get("search").trim();
         for (CommonResult result : list) {
             String id=result.getId();
-            if (id.indexOf(search)>=0)
+            if (id.contains(search))
                 items.add(result);
         }
         return items;
     }
 
     /**
+     *  注解方法 同一个类方法内部调用无效
      * @Description :图标数据
      * @Return : List<CommonResult>
      * @auhor :lyc
      * @Date :2020年05月23日18:55:14
      */
-    private List<CommonResult> getIcons() {
+    @Cacheable(value= RedisConstant.CACHE)
+    public List<CommonResult> getIcons() {
         List<CommonResult> list = new ArrayList<>();
         //获取icontfont.css文件路径，根据正则获取类名
-        StringBuffer result = new StringBuffer();
         try {
-            InputStream realPath = BaseUtil.getRealPath(ICONFONT);
-            byte[] buf = new byte[1024]; //数据中转站 临时缓冲区
-            int length = 0;
-            while((length = realPath.read(buf)) != -1){
-                result.append(System.lineSeparator() + new String(buf, 0, length));
-            }
-            realPath.close();
-            String css = result.toString();
+            ClassLoader classLoader = getClass().getClassLoader();
+            String css = IOUtils.toString(Objects.requireNonNull(classLoader.getResourceAsStream(ICONFONT)), StandardCharsets.UTF_8);
             if (!BaseUtil.empty(css)) {
                 // 创建 Pattern 对象
                 Pattern regex = Pattern.compile(ICONFONT_REGEX);
                 // 现在创建 matcher 对象
                 Matcher matcher = regex.matcher(css);
                 while (matcher.find()) { //此处find（）每次被调用后，会偏移到下一个匹配
-                    String group = "cs " + matcher.group().replaceAll("\\.|\\:", "");
+                    String group = "cs " + matcher.group().replaceAll("[.:]", "");
                     String showValue = "<span>" + String.format(ICONFONT_SHOW_VALUE, group) + ' ' + group + "</span>";
                     CommonResult common = new CommonResult(group, showValue);
                     list.add(common);

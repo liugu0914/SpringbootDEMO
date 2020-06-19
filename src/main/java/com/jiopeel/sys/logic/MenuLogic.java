@@ -1,24 +1,25 @@
 package com.jiopeel.sys.logic;
 
 
-import com.alibaba.fastjson.JSON;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.config.exception.Assert;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.constant.Constant;
+import com.jiopeel.core.constant.RedisConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
-import com.jiopeel.sys.bean.Common;
 import com.jiopeel.sys.bean.Menu;
 import com.jiopeel.sys.bean.form.MenuForm;
 import com.jiopeel.sys.bean.query.MenuQuery;
-import com.jiopeel.sys.bean.result.CommonResult;
 import com.jiopeel.sys.bean.result.MenuResult;
 import com.jiopeel.sys.constant.SysConstant;
 import com.jiopeel.sys.dao.MenuDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,9 +50,10 @@ public class MenuLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     public Menu get(String id) {
-        id = BaseUtil.empty(id) ? "" : id;
-        Menu bean = dao.queryOne("menu.get", id);
-        return BaseUtil.empty(bean) ? new Menu() : bean;
+        MenuResult bean = new MenuResult();
+        if (!BaseUtil.empty(id))
+            bean = dao.queryOne("menu.get", id);
+        return bean;
     }
 
     /**
@@ -63,9 +65,10 @@ public class MenuLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     public MenuResult getInfo(String id) {
-        id = BaseUtil.empty(id) ? "" : id;
-        MenuResult bean = dao.queryOne("menu.getInfo", id);
-        return BaseUtil.empty(bean) ? new MenuResult() : bean;
+        MenuResult bean = new MenuResult();
+        if (!BaseUtil.empty(id))
+            bean = dao.queryOne("menu.getInfo", id);
+        return bean;
     }
 
     /**
@@ -91,6 +94,7 @@ public class MenuLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @Cacheable(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     public List<MenuResult> list(MenuQuery query) {
         List<MenuResult> list = dao.query("menu.list", query);
         if (list == null || list.isEmpty())
@@ -114,7 +118,7 @@ public class MenuLogic extends BaseLogic {
             if (map.containsKey(id))
                 item.setList(map.get(id));
         }
-        log.info(JSON.toJSONString(menus));
+        log.info(BaseUtil.toJson(menus));
         return menus;
     }
 
@@ -126,6 +130,7 @@ public class MenuLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base save(MenuForm form) {
         CheckBean(form);
@@ -147,6 +152,7 @@ public class MenuLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base upd(MenuForm form) {
         CheckBean(form);
@@ -199,6 +205,7 @@ public class MenuLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base del(String ids) {
         String[] ids_ = ids.split(",");

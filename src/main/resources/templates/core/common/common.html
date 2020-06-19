@@ -46,12 +46,12 @@
 <div class="row dataTables_wrapper">
     <div class="col-sm-12 col-md-5">
         <div class="dataTables_info">
-            显示${PageData.startRow+1}至${PageData.endRow+1}（共${PageData.total}条）
+            显示${PageData.startRow+1}至${PageData.endRow+1}条（共${PageData.total}条）
         </div>
     </div>
     <div class="col-sm-12 col-md-7">
         <div class="dataTables_paginate paging_simple_numbers">
-            <ul class="pagination pagination-rounded">
+            <ul class="pagination pagination-rounded" target="page">
                 <li class="page-item">
                     <a class="btn page-link [#if (PageData.pageNum) == 1] disabled [/#if]"
                        ata-pagenum="${PageData.pageNum-1}" href="javascript: void(0);" aria-label="Previous">
@@ -75,23 +75,6 @@
         </div>
     </div>
 </div>
-<script>
-    var PageData = {
-        init: function () {
-            var $main = $('.pagination').parents('.query-main');
-            var op = $main.data();
-            $('li.page-item a.page-link').on('click', function (e) {
-                var pagenum = $(this).data('pagenum');
-                op.data.pageNum = pagenum;
-                Ajax.send(op);
-            })
-        }
-    };
-    $(function () {
-        PageData.init();
-    });
-    //# sourceURL=PageData.js
-</script>
 [/#if]
 [#nested]
 [/#macro]

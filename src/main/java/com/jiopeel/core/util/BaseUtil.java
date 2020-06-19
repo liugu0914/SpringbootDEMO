@@ -1,15 +1,10 @@
 package com.jiopeel.core.util;
 
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.util.ClassUtils;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -24,64 +19,46 @@ import java.util.*;
 @Slf4j
 public class BaseUtil {
 
-    protected static final Logger sys = LogManager.getLogger("sys");
-
     private static EncrypAES de1 = null;
 
+    private static ObjectMapper objectMapper;
+
+
     /**
-     * 获取原始路径
+     * 解析json
      *
-     * @param name
+     * @param content
+     * @param valueType
      * @return
      */
-    public static InputStream getRealPath(String name) {
-        if (name != null && !name.startsWith("/")) {
-            name = "/" + name;
+    public static <T> T fromJson(String content, Class<T> valueType) {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
         }
-
-        if (!isJarRuning()) {
-            return BaseUtil.class.getResourceAsStream(name);
-        } else {
-            String path = getSysRootPath();
-            Object input = null;
-
-            try {
-                input = new FileInputStream(path + name);
-            } catch (FileNotFoundException var4) {
-                sys.warn("未找到:" + path + name, var4.getMessage());
-            }
-
-            if (input == null) {
-                input = BaseUtil.class.getResourceAsStream(name);
-            }
-
-            return (InputStream) input;
-        }
-    }
-
-
-    public static boolean isJarRuning() {
-        String path = null;
-
         try {
-            path = ClassUtils.getDefaultClassLoader().getResource("").getPath();
-        } catch (NullPointerException var2) {
-            throw new RuntimeException("构建失败的版本,未加入系统jar包,需要检查构建pom文件!");
+            return objectMapper.readValue(content, valueType);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        return path == null || path.indexOf(".jar") != -1;
+        return null;
     }
 
-
-    public static String getSysRootPath() {
-        String path = ClassUtils.getDefaultClassLoader().getResource("").getPath().replace("file:", "").replace("jar:", "");
-        int i;
-        if ((i = path.indexOf(".jar")) != -1) {
-            path = path.substring(0, i);
-            path = path.substring(0, path.lastIndexOf("/"));
+    /**
+     * 生成json
+     *
+     * @param object
+     * @return
+     */
+    public static String toJson(Object object) {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
         }
-
-        return path.substring(1);
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -313,7 +290,7 @@ public class BaseUtil {
      */
     public static String Url2JSON(String paramStr) {
         String[] params = paramStr.split("&");
-        JSONObject obj = new JSONObject();
+        Map<String,String> obj = new HashMap<>();
         for (int i = 0; i < params.length; i++) {
             String[] param = params[i].split("=");
             if (param.length >= 2) {
@@ -322,14 +299,10 @@ public class BaseUtil {
                 for (int j = 2; j < param.length; j++) {
                     value += "=" + param[j];
                 }
-                try {
-                    obj.put(key, value);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                obj.put(key, value);
             }
         }
-        return obj.toString();
+        return toJson(obj);
     }
 
 
