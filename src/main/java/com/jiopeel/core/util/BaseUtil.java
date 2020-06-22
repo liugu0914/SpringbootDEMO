@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLEncoder;
@@ -18,6 +20,8 @@ import java.util.*;
 
 @Slf4j
 public class BaseUtil {
+
+    private static final String serialVersionUID = "serialVersionUID";
 
     private static EncrypAES de1 = null;
 
@@ -290,7 +294,7 @@ public class BaseUtil {
      */
     public static String Url2JSON(String paramStr) {
         String[] params = paramStr.split("&");
-        Map<String,String> obj = new HashMap<>();
+        Map<String, String> obj = new HashMap<>();
         for (int i = 0; i < params.length; i++) {
             String[] param = params[i].split("=");
             if (param.length >= 2) {
@@ -419,17 +423,31 @@ public class BaseUtil {
      */
     public static Field[] getAllFields(Object object) {
         Class clazz = object.getClass();
-        List<Field> fieldList = new ArrayList<Field>();
-        while (clazz!=null){
-            fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            clazz=clazz.getSuperclass();
-        }
-        Field[] fields = new Field[fieldList.size()];
-        fieldList.toArray(fields);
-        return fields;
+        return getAllFields(clazz);
     }
 
-
+    /**
+     * 获取对象中的所有字段成员 包括父类
+     *
+     * @param clazz
+     * @return Field[]
+     */
+    public static Field[] getAllFields(Class<?> clazz) {
+        List<Field> fieldList = new ArrayList<Field>();
+        while (clazz != null) {
+            fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
+        List<Field> newFieldList = new ArrayList<Field>();
+        for (Field field : fieldList) {
+            String name = field.getName();
+            if (serialVersionUID.equals(name))
+                continue;
+            newFieldList.add(field);
+        }
+        Field[] fields = new Field[newFieldList.size()];
+        return newFieldList.toArray(fields);
+    }
 
 
     /**
@@ -495,7 +513,7 @@ public class BaseUtil {
     /**
      * 将list拆分
      *
-     * @param items    查询条件
+     * @param items 查询条件
      * @param steps 划分大小
      * @return 拆分之后的结果
      * @auhor:lyc
@@ -503,9 +521,9 @@ public class BaseUtil {
      */
     public static <E> List<List<E>> splitList(List<E> items, int steps) {
         List<List<E>> beans = new ArrayList<>(steps);
-        if (items==null || items.isEmpty())
-            return  beans;
-        if(steps<=0 || steps>=Integer.MAX_VALUE)
+        if (items == null || items.isEmpty())
+            return beans;
+        if (steps <= 0 || steps >= Integer.MAX_VALUE)
             return beans;
         int len = items.size();
         int[] nums = new int[len / steps + ((len % steps == 0) ? 0 : 1)];
@@ -524,5 +542,4 @@ public class BaseUtil {
         }
         return beans;
     }
-
 }

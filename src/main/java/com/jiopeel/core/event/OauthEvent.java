@@ -72,7 +72,7 @@ public class OauthEvent extends  BaseEvent{
     @RequestMapping(value = {"/oauth/redirect/{granttype}"}, method = RequestMethod.GET)
     public String redirect( Model model, @PathVariable("granttype") String granttype) {
         model.addAttribute("access_token",  logic.redirectType(request, response,granttype));
-        return  "redirect:/main";
+        return  "redirect:/";
     }
 
     /**

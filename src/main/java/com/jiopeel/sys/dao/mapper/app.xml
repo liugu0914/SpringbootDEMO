@@ -10,7 +10,7 @@
         select * from t_app where id=#{_paramer}
     </select>
 
-    <select id="getList" parameterType="com.jiopeel.sys.bean.query.AppQuery" resultType="com.jiopeel.sys.bean.result.AppResult">
+    <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.AppQuery" resultType="com.jiopeel.sys.bean.result.AppResult">
          select * from t_app where 1=1
     </select>
 
@@ -18,13 +18,12 @@
          select * from t_app where 1=1
     </select>
 
-    <update id="upduserGrant" parameterType="com.jiopeel.core.bean.UserGrant">
-        update t_user_grant
-        set token=#{token},
-        imgurl=#{imgurl},
-        nickname=#{nickname},
-        updtime=#{updtime}
-        where 1=1
-        and id=#{id}
-    </update>
+    <delete id="del">
+        delete t from t_app t
+        where  1=1
+        and  t.id in
+        <foreach collection="array" item="item"  open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

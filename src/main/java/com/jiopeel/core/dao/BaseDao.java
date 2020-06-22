@@ -5,6 +5,7 @@ import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.config.interceptor.PageIntercept;
 import com.jiopeel.core.util.BaseUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.ibatis.session.SqlSession;
 
 import javax.annotation.Resource;
@@ -17,16 +18,19 @@ import java.util.*;
  * @Date:2019/12/21 11:51
  */
 @Slf4j
-public abstract class BaseDao<E extends Bean> {
+public abstract class BaseDao<T extends Bean> {
 
     @Resource
     private SqlSession sqlSession;
 
-    private static final String serialVersionUID = "serialVersionUID";
 
     private static final String CORE_ADD = "core.add";
 
     private static final String CORE_UPD = "core.upd";
+
+    private static final String CORE_DEL = "core.del";
+
+    private static final String CORE_QUERY_ONE_BY_ID = "core.queryOneById";
 
     private static final String CORE_ADD_BATCH = "core.addBatch";
 
@@ -91,8 +95,6 @@ public abstract class BaseDao<E extends Bean> {
         List<Object> valueList = new ArrayList<Object>();
         for (Field field : Fields) {
             String name = field.getName();
-            if (serialVersionUID.equals(name))
-                continue;
             Object obj = BaseUtil.getFieldVal(field, bean);
             nameList.add(name);
             valueList.add(obj);
@@ -124,8 +126,6 @@ public abstract class BaseDao<E extends Bean> {
             List<Object> valueList = new ArrayList<Object>();
             for (Field field : Fields) {
                 String name = field.getName();
-                if (serialVersionUID.equals(name))
-                    continue;
                 Object obj = BaseUtil.getFieldVal(field, bean);
                 if (!nameList.contains(name))
                     nameList.add(name);
@@ -202,7 +202,7 @@ public abstract class BaseDao<E extends Bean> {
         Map<String, Object> clauseMap = new HashMap<String, Object>();
         for (Field field : Fields) {
             String name = field.getName();
-            if (serialVersionUID.equals(name) || (strlist.contains(name) && !splitfield.contains(name)))
+            if (strlist.contains(name) && !splitfield.contains(name))
                 continue;
             Object obj = BaseUtil.getFieldVal(field, bean);
             if (!splitfield.isEmpty() && splitfield.contains(name))
@@ -238,8 +238,24 @@ public abstract class BaseDao<E extends Bean> {
      * @Date:2019/12/21 11:48
      */
     public boolean del(String nameSpec) {
-        isInfoLog(nameSpec);
         return del(nameSpec, null);
+    }
+
+    /**
+     * @Description :删除
+     * @param: nameSpec  命名空间
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public boolean delByIds(Class<T> clazz, Object object) {
+        String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
+        if (!object.getClass().isArray() && !(object instanceof Collection<?>))
+            object = new Object[]{object};
+        Map<String, Object> map = new HashMap<>();
+        map.put("tableName", tableName);
+        map.put("ids", object);
+        return del(CORE_DEL, map);
     }
 
 
@@ -345,8 +361,7 @@ public abstract class BaseDao<E extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> E queryOne(String nameSpec) {
-        isInfoLog(nameSpec);
+    public <T> T queryOne(String nameSpec) {
         return queryOne(nameSpec, null);
     }
 
@@ -357,9 +372,32 @@ public abstract class BaseDao<E extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <E> E queryOne(String nameSpec, Object object) {
+    public <T> T queryOne(String nameSpec, Object object) {
         isInfoLog(nameSpec);
         return getSqlSession().selectOne(nameSpec, object);
+    }
+
+    /**
+     * @param clazz  继承bean的类
+     * @param object 传参对象
+     * @return 符合查询条件的对象
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> T queryOneById(Class<T> clazz, Object object) {
+        String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
+        Map<String, Object> map = new HashMap<>();
+        map.put("tableName", tableName);
+        map.put("id", object);
+        Map<String, Object> reMap = queryOne(CORE_QUERY_ONE_BY_ID, map);
+        try {
+            T bean = clazz.newInstance();
+            BeanUtils.populate(bean, reMap);
+            return bean;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 

@@ -52,7 +52,7 @@ public class MenuLogic extends BaseLogic {
     public Menu get(String id) {
         Menu bean = new Menu();
         if (!BaseUtil.empty(id))
-            bean = dao.queryOne("menu.get", id);
+            bean =dao.queryOneById(Menu.class, id);
         return bean;
     }
 
@@ -134,41 +134,29 @@ public class MenuLogic extends BaseLogic {
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base save(MenuForm form) {
         CheckBean(form);
+        String id = form.getId();
         Menu bean = new Menu();
-        BeanUtils.copyProperties(form, bean);
-        if (BaseUtil.empty(bean.getId()))
-            bean.createUUID();
-        bean = HandleLevel(bean);
-        bean.createTime();
-        return Base.judge(dao.add(bean));
-    }
-
-
-    /**
-     * @param form
-     * @return Base
-     * @Description: 保存数据
-     * @author lyc
-     * @version 1.0.0
-     * @date 2019年12月20日17:46:46
-     */
-    @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
-    @Transactional(rollbackFor = {Exception.class, ServerException.class})
-    public Base upd(MenuForm form) {
-        CheckBean(form);
-        Assert.isNull(form.getId(), "ID不能为空");
-        Menu bean = get(form.getId());
-        bean.setName(form.getName());
-        bean.setIcon(form.getIcon());
-        bean.setParent(form.getParent());
-        bean.setUrl(form.getUrl());
-        bean.setSuperid(form.getSuperid());
-        bean.setOrdernum(form.getOrdernum());
-        bean.setAppid(form.getAppid());
-        bean.setEnable(form.getEnable());
-        bean = HandleLevel(bean);
-        bean.updTime();
-        dao.upd(bean, "id", "id", "ctime");
+        if (BaseUtil.empty(id)) {
+            BeanUtils.copyProperties(form, bean);
+            if (BaseUtil.empty(bean.getId()))
+                bean.createUUID();
+            bean = HandleLevel(bean);
+            bean.createTime();
+            dao.add(bean);
+        } else {
+            bean = get(id);
+            bean.setName(form.getName());
+            bean.setIcon(form.getIcon());
+            bean.setParent(form.getParent());
+            bean.setUrl(form.getUrl());
+            bean.setSuperid(form.getSuperid());
+            bean.setOrdernum(form.getOrdernum());
+            bean.setAppid(form.getAppid());
+            bean.setEnable(form.getEnable());
+            bean = HandleLevel(bean);
+            bean.updTime();
+            dao.upd(bean, "id", "id", "ctime");
+        }
         return Base.suc();
     }
 
@@ -208,11 +196,12 @@ public class MenuLogic extends BaseLogic {
     @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base del(String ids) {
+        Assert.isNull(ids, "未选择不能删除");
         String[] ids_ = ids.split(",");
-        if (BaseUtil.empty(ids) || ids_ == null || ids_.length <= 0) {
-            Assert.isNull("", "未选择不能删除");
+        if (ids_.length <= 0) {
+            Assert.isNull(null, "未选择不能删除");
         }
-        dao.del("menu.del", ids_);
+        dao.delByIds(Menu.class,ids_);
         return Base.suc("删除成功");
     }
 

@@ -1,0 +1,65 @@
+[@c.html]
+<div class="row query-main">
+    <div class="col-12">
+        <div class="card mb-2 mt-2">
+            <div class="card-body pb-2">
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <form action="/admin/app/data">
+                            <div class="row align-items-end">
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-sm-4 mb-2">
+                                            <label>应用名称</label>
+                                            <select class="form-control " target="search" data-placeholder="请选择"
+                                                    data-url="/admin/common/searchApp"
+                                                    name="appid">
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4 mb-2">
+                                            <label>是否可用</label>
+                                            <select class="form-control " target="select" name="enable">
+                                                <option value="">全部</option>
+                                                <option value="1">是</option>
+                                                <option value="0">否</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="row">
+                                        <div class="col-lg-6 mb-2">
+                                            <button type="button" target="clear" class="btn btn-block btn-light ">
+                                                重置
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-6 mb-2">
+                                            <button type="button" id="query" target="query" data-target=".query-data"
+                                                    class="btn btn-block btn-primary ">
+                                                查询
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 query-data">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+[@c.js]
+<script>
+    $(function () {
+        $(document).initUI();
+        $('#query').trigger('click');
+    });
+    //# sourceURL=index.js
+</script>
+[/@c.js]
+[/@c.html]

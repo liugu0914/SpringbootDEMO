@@ -3,6 +3,7 @@ package com.jiopeel.sys.event;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.event.BaseEvent;
+import com.jiopeel.core.util.WebUtil;
 import com.jiopeel.sys.bean.form.AppForm;
 import com.jiopeel.sys.bean.query.AppQuery;
 import com.jiopeel.sys.bean.result.AppResult;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * @author ：lyc
@@ -24,6 +26,46 @@ public class AppEvent extends BaseEvent {
 
     @Resource
     private AppLogic logic;
+
+    /**
+     * @Description :获取查询主页面
+     * @Param: query
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @RequestMapping(value = "main", method = {RequestMethod.GET})
+    public String main() {
+        return "sys/app/main";
+    }
+
+    /**
+     * @Description :获取分页列表数据
+     * @Param: query
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @RequestMapping(value = "data", method = {RequestMethod.POST})
+    public String data(@ModelAttribute AppQuery query, Page<AppResult> page, Model model) {
+        Page<AppResult> PageData = logic.getListPage(query, page);
+        model.addAttribute("PageData", PageData);
+        return "sys/app/data";
+    }
+
+    /**
+     * @Description :添加或修改页面
+     * @Param: query
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @RequestMapping(value = "info", method = {RequestMethod.POST})
+    public String info(Model model) {
+        Map<String, String> map = WebUtil.getParam2Map(request);
+        model.addAttribute("bean", logic.getInfo(map.get("id")));
+        return "sys/app/info";
+    }
 
     /**
      * @Description :根据id获取数据
@@ -57,10 +99,9 @@ public class AppEvent extends BaseEvent {
      * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
-    @RequestMapping(value = "getList", method = {RequestMethod.POST})
-    public String getList(@RequestBody AppQuery appQuery, Page<AppResult> page, Model model) {
-        model.addAttribute("list",logic.getList(appQuery,page)) ;
-        return  "sys/app/index";
+    @RequestMapping(value = "getListPage", method = {RequestMethod.POST})
+    public Base getListPage(@RequestBody AppQuery appQuery, Page<AppResult> page) {
+        return Base.suc(logic.getListPage(appQuery,page));
     }
 
     /**
@@ -70,10 +111,9 @@ public class AppEvent extends BaseEvent {
      * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
-    @RequestMapping(value = "list", method = {RequestMethod.POST})
-    public String list(@RequestBody AppQuery appQuery, Model model) {
-        model.addAttribute("list",logic.list(appQuery)) ;
-        return  "sys/app/index";
+    @RequestMapping(value = "getList", method = {RequestMethod.POST})
+    public Base list(@RequestBody AppQuery appQuery) {
+        return Base.suc(logic.list(appQuery));
     }
 
     /**
@@ -85,21 +125,8 @@ public class AppEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = "save", method = {RequestMethod.POST})
-    public Base save(@RequestBody AppForm appForm) {
+    public Base save(@ModelAttribute AppForm appForm) {
         return logic.save(appForm);
-    }
-
-    /**
-     * @Description :修改
-     * @Param: appForm
-     * @Return: Base
-     * @auhor:lyc
-     * @Date:2019/12/21 00:02
-     */
-    @ResponseBody
-    @RequestMapping(value = "upd", method = {RequestMethod.POST})
-    public Base upd(@RequestBody AppForm appForm) {
-        return logic.upd(appForm);
     }
 
     /**
@@ -110,8 +137,8 @@ public class AppEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @ResponseBody
-    @RequestMapping(value = "del/{ids}", method = {RequestMethod.GET})
-    public Base del(@PathVariable("ids") String ids) {
+    @RequestMapping(value = "del", method = {RequestMethod.POST})
+    public Base del(@RequestParam("id") String ids) {
         return logic.del(ids);
     }
 }

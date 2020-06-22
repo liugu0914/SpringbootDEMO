@@ -193,8 +193,9 @@ create table t_app
 (
     id                   varchar(32) not null comment 'id',
     name                 varchar(100) comment '应用名称',
-    enable               varchar(10) comment '是否启用',
     shortname            varchar(30) comment '应用标识',
+    des                  varchar(255) comment '应用描述',
+    enable               varchar(10) comment '是否启用',
     ctime                datetime comment '创建时间',
     updtime              datetime comment '更新时间',
     primary key (id)

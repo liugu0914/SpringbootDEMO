@@ -38,4 +38,17 @@
             ${name}=#{obj}
         </foreach>
     </update>
+
+    <delete id="del" parameterType="Map">
+        delete t from ${tableName} t
+        where  1=1
+        and  t.id in
+        <foreach collection="ids" item="item"  open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="queryOneById" parameterType="Map" resultType="Map">
+        select * from ${tableName} where id=#{id} limit 0,1
+    </select>
 </mapper>

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +43,10 @@ public class AppLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     public App get(String id) {
-        return dao.queryOne("app.get", id);
+        App bean = new App();
+        if (!BaseUtil.empty(id))
+            bean = dao.queryOneById(App.class, id);
+        return bean;
     }
 
     /**
@@ -54,7 +58,10 @@ public class AppLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     public AppResult getInfo(String id) {
-        return dao.queryOne("app.getInfo", id);
+        AppResult bean = new AppResult();
+        if (!BaseUtil.empty(id))
+            bean = dao.queryOne("app.getInfo", id);
+        return bean;
     }
 
     /**
@@ -66,8 +73,8 @@ public class AppLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
-    public Page<AppResult> getList(AppQuery appQuery, Page<AppResult> page) {
-        Page<AppResult> PageList = dao.queryPageList("app.getList", appQuery, page);
+    public Page<AppResult> getListPage(AppQuery appQuery, Page<AppResult> page) {
+        Page<AppResult> PageList = dao.queryPageList("app.getListPage", appQuery, page);
         return PageList;
     }
 
@@ -96,36 +103,24 @@ public class AppLogic extends BaseLogic {
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base save(AppForm form) {
         CheckBean(form);
+        String id = form.getId();
         App bean = new App();
-        BeanUtils.copyProperties(form, bean);
-        if (BaseUtil.empty(bean.getId()))
-            bean.createUUID();
-        bean.createTime();
-        bean.setEnable(Constant.ENABLE_YES);
-        return Base.judge(dao.add(bean));
-    }
-
-
-    /**
-     * @param form
-     * @return Base
-     * @Description: 保存数据
-     * @author lyc
-     * @version 1.0.0
-     * @date 2019年12月20日17:46:46
-     */
-    @Transactional(rollbackFor = {Exception.class, ServerException.class})
-    public Base upd(AppForm form) {
-        CheckBean(form);
-        Assert.isNull(form.getId(), "ID不能为空");
-        App bean = get(form.getId());
-        bean.setName(form.getName());
-        bean.setEnable(form.getEnable());
-        bean.setShortname(form.getShortname());
-        bean.updTime();
-        dao.upd("app.upd", bean);
+        if (BaseUtil.empty(id)) {//添加
+            BeanUtils.copyProperties(form, bean);
+            if (BaseUtil.empty(bean.getId()))
+                bean.createUUID();
+            bean.createTime();
+            bean.setEnable(Constant.ENABLE_YES);
+            dao.add(bean);
+        } else {//修改
+            bean = get(id);
+            BeanUtils.copyProperties(form, bean);
+            bean.updTime();
+            dao.upd(bean, "id", "id", "ctime");
+        }
         return Base.suc();
     }
+
 
     /**
      * @param ids
@@ -137,11 +132,13 @@ public class AppLogic extends BaseLogic {
      */
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base del(String ids) {
-        String ids_[] = ids.split(",");
-        if (ids_ == null || ids_.length <= 0) {
-            Assert.isNull("", "删除不能为空");
+        Assert.isNull(ids, "未选择不能删除");
+        String[] ids_ = ids.split(",");
+        if (ids_.length <= 0) {
+            Assert.isNull("", "未选择不能删除");
         }
-        dao.del("app.del", ids_);
+
+        dao.delByIds(App.class, ids_);
         return Base.suc("删除成功");
     }
 

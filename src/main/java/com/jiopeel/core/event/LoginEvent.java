@@ -5,6 +5,7 @@ import com.jiopeel.core.bean.User;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.LoginLogic;
+import com.jiopeel.core.logic.OauthLogic;
 import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.sys.bean.result.MenuResult;
 import com.jiopeel.sys.event.MenuEvent;
@@ -29,6 +30,9 @@ public class LoginEvent extends BaseEvent {
     @Resource
     private LoginLogic logic;
 
+    @Resource
+    private OauthLogic oauthLogic;
+
     @RequestMapping(value = {"/signin"}, method = RequestMethod.GET)
     public String signin() {
         return "redirect:/oauth";
@@ -39,6 +43,9 @@ public class LoginEvent extends BaseEvent {
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
 //        logic.dosomething("ad8ed541f281482c8ee4cec1cace32a6");
+        String access_token =oauthLogic.getTokenfromCookie(request);
+        if (redisUtil.hasKey(access_token))
+            return "redirect:/";
         String host=String.format("%s:%s",request.getServerName(),request.getServerPort());
         String url=String.format(OauthConstant.REDIRECT_URI,host);
         if (BaseUtil.empty(client_id))

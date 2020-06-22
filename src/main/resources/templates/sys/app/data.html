@@ -1,0 +1,69 @@
+<div class="row mb-2">
+    <div class="col-sm-8">
+        <a href="/admin/app/info" class="btn btn-success btn-sm mb-2 mr-1" target="modal">
+            <i class="cs cs-jia"></i>添加
+        </a>
+        <a href="/admin/app/info" class="btn btn-info btn-sm mb-2 mr-1" target="modal" data-cus="Tool.checkedData('id';true)">
+            <i class="cs cs-bianji"></i>编辑
+        </a>
+        <a href="/admin/app/del" target="ajax" data-warn="确认删除选中数据?" data-cus="Tool.checkedData('id')" class="btn btn-danger btn-sm mb-2 mr-1">
+            <i class="cs cs-jian"></i>删除
+        </a>
+    </div>
+    <div class="col-sm-4">
+        <div class="text-sm-right">
+            <button type="button" class="btn btn-light btn-sm mb-2 mr-1">
+                <i class="mdi mdi-settings"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover table-centered mb-0" id="main-table">
+                <thead>
+                <tr>
+                    <th class="all" style="width: 20px;">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input chk-all" id="check_all">
+                            <label class="custom-control-label" for="check_all">&nbsp;</label>
+                        </div>
+                    </th>
+                    <th>#</th>
+                    <th>应用名称</th>
+                    <th>应用标识</th>
+                    <th>应用描述</th>
+                    <th>是否可用</th>
+                </tr>
+                </thead>
+                <tbody>
+                [#list (PageData.result)?if_exists as bean]
+                <tr>
+                    <td>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input chk" data-id="${bean.id}"
+                                   id="check_chd_${bean_index}">
+                            <label class="custom-control-label" for="check_chd_${bean_index}">&nbsp;</label>
+                        </div>
+                    </td>
+                    <td scope="row">${bean_index+1}</td>
+                    <td>${bean.name!''}</td>
+                    <td>${bean.shortname!''}</td>
+                    <td>${bean.des!''}</td>
+                    <td>
+                        <div>
+                            <input type="checkbox" id="switch${bean.id}" [#if bean.enable?? &&
+                                   bean.enable=='1']checked[/#if] data-switch="success">
+                            <label for="switch${bean.id}" data-on-label="是" data-off-label="否"
+                                   class="mb-0 d-block"></label>
+                        </div>
+                    </td>
+                </tr>
+                [/#list]
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+[@c.page PageData=PageData /]

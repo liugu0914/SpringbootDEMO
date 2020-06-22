@@ -36,9 +36,9 @@ public class MenuEvent extends BaseEvent {
      * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
-    @RequestMapping(value = "index", method = {RequestMethod.GET})
-    public String index(Model model) {
-        return "sys/menu/index";
+    @RequestMapping(value = "main", method = {RequestMethod.GET})
+    public String index() {
+        return "sys/menu/main";
     }
 
     /**
@@ -62,11 +62,11 @@ public class MenuEvent extends BaseEvent {
      * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
-    @RequestMapping(value = "addOrUpd", method = {RequestMethod.POST})
+    @RequestMapping(value = "info", method = {RequestMethod.POST})
     public String addOrUpd(Model model) {
         Map<String, String> map = WebUtil.getParam2Map(request);
         model.addAttribute("bean", logic.getInfo(map.get("id")));
-        return "sys/menu/add";
+        return "sys/menu/info";
     }
 
     /**
@@ -133,19 +133,6 @@ public class MenuEvent extends BaseEvent {
     @RequestMapping(value = "save", method = {RequestMethod.POST})
     public Base save(@ModelAttribute MenuForm form) {
         return logic.save(form);
-    }
-
-    /**
-     * @Description :修改
-     * @Param: appForm
-     * @Return: Base
-     * @auhor:lyc
-     * @Date:2019/12/21 00:02
-     */
-    @ResponseBody
-    @RequestMapping(value = "upd", method = {RequestMethod.POST})
-    public Base upd(@ModelAttribute MenuForm form) {
-        return logic.upd(form);
     }
 
     /**
