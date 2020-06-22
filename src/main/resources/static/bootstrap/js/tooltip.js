@@ -234,7 +234,7 @@
     html: true,
     bgcolor: '',
     selector: false,
-    placement: 'auto',
+    placement: 'bottom',
     offset: 0,
     container: false,
     fallbackPlacement: 'flip',
@@ -779,7 +779,7 @@
       }
 
       if (config.template) {
-        config.template = config.template.replace('{{bg}}', bg);
+        config.template = config.template.replace(/{{bg}}/g, bg);
       }
 
       if (config.sanitize) {

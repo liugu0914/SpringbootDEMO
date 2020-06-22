@@ -192,6 +192,13 @@
       };
       op = typeof op === 'object' && op ? op : {};
       var opData = typeof op.data === 'object' && op.data ? op.data : {};
+      var nData = {}
+      for (var key in opData) {
+        if (!key.toString().includes('.')) {
+          nData[key] = opData[key]
+        }
+      }
+      op.data = nData
 
       switch (op.contentType) {
         default:
@@ -202,7 +209,7 @@
           break;
 
         case APPLICATION_JSON:
-          op.data = window.JSON.stringify(opData);
+          op.data = window.JSON.stringify(op.data);
           break;
       }
 

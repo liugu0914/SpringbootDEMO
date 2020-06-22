@@ -298,11 +298,16 @@
             },
             dataType: Ajax.JSON,
             type: Ajax.POST,
-            processResults: function processResults(results) {
-              var data = $.map(results.data, function (obj) {
-                obj.text = obj.text || obj.name;
-                return obj;
-              });
+            processResults: function processResults(result) {
+              var data = [];
+
+              if (result.data) {
+                data = $.map(result.data, function (obj) {
+                  obj.text = obj.text || obj.name;
+                  return obj;
+                });
+              }
+
               return {
                 results: data
               };
@@ -340,7 +345,7 @@
     _proto.select = function select() {
       $(Selector.SELECT, this._element).each(function (index, element) {
         $(element).select2({
-          minimumResultsForSearch: -1
+          minimumResultsForSearch: Infinity
         });
       });
     } // ----------------------------------------------------------------------
@@ -379,7 +384,7 @@
             }
 
             if (target === 'select') {
-              return  $this.select2('val', ' ');
+              return $this.select2('val', ' '); // 预留空格
             }
           }
 
@@ -430,6 +435,7 @@
         }
 
         var $this = $(event.currentTarget);
+        $this.blur();
         var $form;
 
         if ($this.closest('form').length !== 0) {
@@ -465,6 +471,7 @@
         }
 
         var $this = $(event.currentTarget);
+        $this.blur();
         var $form;
 
         if ($this.closest('form').length !== 0) {
@@ -498,6 +505,7 @@
         }
 
         var $this = $(event.currentTarget);
+        $this.blur();
         var data = $this.data();
 
         var config = _objectSpread({}, data, {
@@ -523,6 +531,7 @@
         }
 
         var $this = $(event.currentTarget);
+        $this.blur();
         var data = $this.data();
 
         var config = _objectSpread({}, data, {

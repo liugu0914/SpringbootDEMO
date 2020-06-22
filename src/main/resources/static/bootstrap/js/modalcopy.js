@@ -180,6 +180,10 @@
           return;
         }
 
+        if (_this._config['bs.tooltip']) {
+          _this._config['bs.tooltip'].hide();
+        }
+
         var data = _this._config.data; // 在展示时判断Modal是否可以打开
 
         var chk = Tool.eval(_this._config[Customer.CHECK]);
@@ -224,11 +228,10 @@
 
           if (end && typeof end === 'function') {
             end($this, $target, data);
-          }
+          } // if ($this.is(':visible')) {
+          //   relatedTarget.focus()
+          // }
 
-          if ($this.is(':visible')) {
-            relatedTarget.focus();
-          }
         });
       });
       var showEvent = $.Event(Event.SHOW, {
@@ -238,6 +241,7 @@
 
       if (typeof showEvent.flag === 'boolean' && !showEvent.flag) {
         this._hideModal();
+
         return;
       }
 
@@ -753,7 +757,7 @@
       return this.each(function () {
         var data = $(this).data(DATA_KEY);
 
-        var _config = _objectSpread({}, Default, $(this).data(), typeof config === 'object' && config ? config : {});
+        var _config = _objectSpread({}, Default, typeof config === 'object' && config ? config : {});
 
         if (relatedTarget) {
           _config.url = _config.url || relatedTarget.getAttribute('href');
@@ -801,7 +805,7 @@
 
 
   $(document).on(Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (event) {
-    this.blur();
+    $(this).blur();
     var target;
     var selector = Util.createDefaultModal(NAME);
     var $this = $(this);

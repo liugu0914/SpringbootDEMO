@@ -24,7 +24,7 @@
             <table class="table table-hover table-centered mb-0" id="main-table">
                 <thead>
                 <tr>
-                    <th class="all" style="width: 20px;">
+                    <th style="width: 20px;">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input chk-all" id="check_all">
                             <label class="custom-control-label" for="check_all">&nbsp;</label>
@@ -35,6 +35,7 @@
                     <th>应用标识</th>
                     <th>应用描述</th>
                     <th>是否可用</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -58,6 +59,14 @@
                             <label for="switch${bean.id}" data-on-label="是" data-off-label="否"
                                    class="mb-0 d-block"></label>
                         </div>
+                    </td>
+                    <td>
+                        <a href="/admin/app/info" target="modal" data-id="${bean.id}" show="tooltip"  data-title="编辑">
+                            <i class="cs cs-bianji"></i>
+                        </a>
+                        <a href="/admin/app/del" target="ajax" data-id="${bean.id}" data-warn="确认删除数据?"  show="tooltip" data-title="删除">
+                            <i class="cs cs-shanchu"></i>
+                        </a>
                     </td>
                 </tr>
                 [/#list]
