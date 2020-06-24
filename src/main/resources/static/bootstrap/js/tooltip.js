@@ -849,7 +849,7 @@
 
         if (!data) {
           data = new Tooltip(this, _config);
-          $(this).data(DATA_KEY, data);
+          // $(this).data(DATA_KEY, data);
         }
 
         if (typeof config === 'string') {

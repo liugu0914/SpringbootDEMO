@@ -255,7 +255,7 @@ public class OauthLogic extends BaseLogic {
     public String redirectType(HttpServletRequest request, HttpServletResponse response, String granttype) {
         if (BaseUtil.empty(granttype))
             throw new ServerException("授权类型不能为空");
-        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, String> parameterMap =WebUtil.getParam2Map(request);
         OauthToken oauthToken = null;
         String access_token = "";
         switch (granttype) {
@@ -268,8 +268,7 @@ public class OauthLogic extends BaseLogic {
                 access_token = oauthToken.getAccess_token();
                 break;
             case UserConstant.USER_TYPE_LOCAL:
-                String host = String.format("%s:%s", request.getServerName(), request.getServerPort());
-                access_token = getTokenbyLocal(host, parameterMap);
+                access_token = getTokenbyLocal(parameterMap);
                 break;
             default:
                 break;
@@ -320,17 +319,18 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private String getTokenbyLocal(String host, Map<String, String[]> parameterMap) {
+    private String getTokenbyLocal(Map<String, String> parameterMap) {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
-            String code = parameterMap.get(OauthConstant.CODE)[0];
-            Map<String, Object> params = new HashMap<String, Object>();
+            String code = parameterMap.get(OauthConstant.CODE);
+            Map<String, String> params = new HashMap<String, String>();
             params.put(OauthConstant.CLIENT_ID, OauthConstant.local_client_id);
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.local_client_secret);
             params.put(OauthConstant.CODE, code);
-            String res = HttpTool.post(String.format(OauthConstant.local_token, host), params);
-            Map parse = BaseUtil.fromJson(res, Map.class);
-            access_token = String.valueOf(parse.get(OauthConstant.ACCESS_TOKEN));
+            OauthToken oauthToken = chkLocalOauth(params);
+            if (!BaseUtil.empty(oauthToken)) {
+                access_token = oauthToken.getAccess_token();
+            }
         }
         return access_token;
     }
@@ -343,10 +343,10 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private String getTokenbyGitee(Map<String, String[]> parameterMap) {
+    private String getTokenbyGitee(Map<String, String> parameterMap) {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
-            String code = parameterMap.get(OauthConstant.CODE)[0];
+            String code = parameterMap.get(OauthConstant.CODE);
             Map<String, Object> params = new HashMap<String, Object>();
             params.put(OauthConstant.CLIENT_ID, OauthConstant.GITEE_CLIENT_ID);
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
@@ -367,10 +367,10 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private String getTokenbyGithub(Map<String, String[]> parameterMap) {
+    private String getTokenbyGithub(Map<String, String> parameterMap) {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
-            String code = parameterMap.get(OauthConstant.CODE)[0];
+            String code = parameterMap.get(OauthConstant.CODE);
             Map<String, Object> params = new HashMap<String, Object>();
             params.put(OauthConstant.CLIENT_ID, OauthConstant.GITHUB_CLIENT_ID);
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITHUB_CLIENT_SECRET);
@@ -391,17 +391,16 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    public OauthToken chkLocalOauth(HttpServletRequest request) {
-        Map<String, String[]> parameterMap = request.getParameterMap();
+    public OauthToken chkLocalOauth(Map<String, String> parameterMap) {
         if (!parameterMap.containsKey(OauthConstant.CODE))
             throw new ServerException("授权码不能为空");
         if (!parameterMap.containsKey(OauthConstant.CLIENT_ID))
             throw new ServerException(OauthConstant.CLIENT_ID + "不能为空");
         if (!parameterMap.containsKey(OauthConstant.CLIENT_SECRET))
             throw new ServerException(OauthConstant.CLIENT_SECRET + "不能为空");
-        String code = parameterMap.get(OauthConstant.CODE)[0];
-        String client_id = parameterMap.get(OauthConstant.CLIENT_ID)[0];
-        String client_secret = parameterMap.get(OauthConstant.CLIENT_SECRET)[0];
+        String code = parameterMap.get(OauthConstant.CODE);
+        String client_id = parameterMap.get(OauthConstant.CLIENT_ID);
+        String client_secret = parameterMap.get(OauthConstant.CLIENT_SECRET);
         if (!OauthConstant.local_client_id.equals(client_id))
             throw new ServerException(OauthConstant.CLIENT_ID + "不匹配");
         if (!OauthConstant.local_client_secret.equals(client_secret))

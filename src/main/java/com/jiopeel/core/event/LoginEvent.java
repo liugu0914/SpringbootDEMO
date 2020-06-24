@@ -42,16 +42,13 @@ public class LoginEvent extends BaseEvent {
     public String home(@RequestParam(value = "client_id", required = false) String client_id,
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
-//        logic.dosomething("ad8ed541f281482c8ee4cec1cace32a6");
         String access_token =oauthLogic.getTokenfromCookie(request);
         if (redisUtil.hasKey(access_token))
             return "redirect:/";
-        String host=String.format("%s:%s",request.getServerName(),request.getServerPort());
-        String url=String.format(OauthConstant.REDIRECT_URI,host);
         if (BaseUtil.empty(client_id))
             client_id = OauthConstant.local_client_id;
         if (BaseUtil.empty(redirect_uri))
-            redirect_uri = url + "/" + UserConstant.USER_TYPE_LOCAL;
+            redirect_uri = OauthConstant.LOCAL_REDIRECT_URI + "/" + UserConstant.USER_TYPE_LOCAL;
         model.addAttribute("client_id", client_id);
         model.addAttribute("redirect_uri", redirect_uri);
         return "core/login";

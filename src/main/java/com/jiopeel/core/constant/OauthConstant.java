@@ -31,6 +31,11 @@ public class OauthConstant {
     /**
      * 本地回调地址
      */
+    public final static String LOCAL_REDIRECT_URI = "/oauth/redirect";
+
+    /**
+     * 本地回调地址
+     */
     public final static String REDIRECT_URI = "http://%s/oauth/redirect";
 
     /**

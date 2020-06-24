@@ -8,6 +8,7 @@ import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.OauthLogic;
 import com.jiopeel.core.util.BaseUtil;
+import com.jiopeel.core.util.WebUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @Description :授权登录
@@ -107,7 +109,8 @@ public class OauthEvent extends  BaseEvent{
     @ResponseBody
     @RequestMapping(value = {"/oauth/access_token"}, method = RequestMethod.POST)
     public OauthToken getOauthUserInfo() {
-        return logic.chkLocalOauth(request);
+        Map<String, String> param2Map = WebUtil.getParam2Map(request);
+        return logic.chkLocalOauth(param2Map);
     }
 
 
@@ -125,6 +128,20 @@ public class OauthEvent extends  BaseEvent{
         if (BaseUtil.empty(access_token))
             throw new ServerException("access_token不能为空");
         return logic.getUserbyToken(access_token);
+    }
+
+    /**
+     * @Description :通过access_token获取用户信息
+     * @Param: request
+     * @Param: access_token
+     * @Return: void
+     * @auhor:lyc
+     * @Date:2019/12/12 21:44
+     */
+    @ResponseBody
+    @RequestMapping(value = {"/oauth/test"}, method = RequestMethod.GET)
+    public Base test() {
+        return Base.suc("asd");
     }
 
 }

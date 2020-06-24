@@ -155,6 +155,7 @@ public class HttpTool {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+        log.info("content" + content);
         return content;
     }
 
