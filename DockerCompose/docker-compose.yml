@@ -50,6 +50,8 @@ services:
     build: ./app
     container_name: jiopeel
     restart: always
+    volumes:
+      - ./app/logs:/logs
     depends_on:
       - mysql
       - redis

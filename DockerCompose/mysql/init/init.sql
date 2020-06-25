@@ -186,8 +186,8 @@ create table t_menu
 alter table t_menu comment '菜单t_menu';
 
 INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('1', '系统配置', 'cs cs-dasuolvetuliebiao', '', '1', '1', 1, '-1', 1, '123', '2020-02-21 14:50:23', '2020-06-02 17:14:10');
-INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('2', '菜单管理', 'cs cs-liebiao', '/admin/menu/index', '1', '0', 2, '1', 1, '123', '2020-02-21 14:51:46', '2020-06-01 11:16:10');
-INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('d808d076e748419bb4ed1315ba0d0da8', '权限管理', 'cs cs-p_info', '/admin/menu/index', '1', '0', 2, '1', 2, '123', '2020-05-25 15:42:21', '2020-05-26 14:46:49');
+INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('2', '菜单管理', 'cs cs-liebiao', '/admin/menu/main', '1', '0', 2, '1', 1, '123', '2020-02-21 14:51:46', '2020-06-01 11:16:10');
+INSERT INTO `t_menu`(`id`, `name`, `icon`, `url`, `enable`, `parent`, `level`, `superid`, `ordernum`, `appid`, `ctime`, `updtime`) VALUES ('d808d076e748419bb4ed1315ba0d0da8', '权限管理', 'cs cs-p_info', '/admin/menu/main', '1', '0', 2, '1', 2, '123', '2020-05-25 15:42:21', '2020-05-26 14:46:49');
 
 drop table if exists t_app;
 
