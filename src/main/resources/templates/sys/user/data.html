@@ -1,0 +1,75 @@
+<div class="row mb-2">
+    <div class="col-sm-8">
+<!--        <a href="/admin/user/info" class="btn btn-success btn-sm mb-2 mr-1" target="modal">-->
+<!--            <i class="cs cs-jia"></i>添加-->
+<!--        </a>-->
+        <a href="/admin/user/info" class="btn btn-info btn-sm mb-2 mr-1" target="modal" data-cus="Tool.checkedData('id';true)">
+            <i class="cs cs-bianji"></i>编辑
+        </a>
+        <a href="/admin/user/del" target="ajax" data-warn="确认删除选中数据?" data-cus="Tool.checkedData('id')" class="btn btn-danger btn-sm mb-2 mr-1">
+            <i class="cs cs-jian"></i>删除
+        </a>
+    </div>
+    <div class="col-sm-4">
+        <div class="text-sm-right">
+            <button type="button" class="btn btn-light btn-sm mb-2 mr-1">
+                <i class="mdi mdi-settings"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover table-centered mb-0" id="main-table">
+                <thead>
+                <tr>
+                    <th style="width: 20px;">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input chk-all" id="check_all">
+                            <label class="custom-control-label" for="check_all">&nbsp;</label>
+                        </div>
+                    </th>
+                    <th>#</th>
+                    <th>头像</th>
+                    <th>名称</th>
+                    <th>账号</th>
+                    <th>邮箱</th>
+                    <th>类型</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                [#list (PageData.result)?if_exists as bean]
+                <tr>
+                    <td>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input chk" data-id="${bean.id}"
+                                   id="check_chd_${bean_index}">
+                            <label class="custom-control-label" for="check_chd_${bean_index}">&nbsp;</label>
+                        </div>
+                    </td>
+                    <td>${bean_index+1}</td>
+                    <td>
+                        <img src="${bean.imgurl!''}" src-error="user"  class=" d-sm-block avatar-sm rounded-circle">
+                    </td>
+                    <td>${bean.username!''}</td>
+                    <td>${bean.account!''}</td>
+                    <td>${bean.email!''}</td>
+                    <td>${bean.type!''}</td>
+                    <td>
+                        <a href="/admin/user/info" target="modal" data-id="${bean.id}" show="tooltip"  data-title="编辑">
+                            <i class="cs cs-bianji"></i>
+                        </a>
+                        <a href="/admin/user/del" target="ajax" data-id="${bean.id}" data-warn="确认删除数据?"  show="tooltip" data-title="删除">
+                            <i class="cs cs-shanchu"></i>
+                        </a>
+                    </td>
+                </tr>
+                [/#list]
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+[@c.page PageData=PageData /]

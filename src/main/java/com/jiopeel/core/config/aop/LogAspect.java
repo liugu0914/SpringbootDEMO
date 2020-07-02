@@ -1,6 +1,6 @@
 package com.jiopeel.core.config.aop;
 
-import com.jiopeel.core.bean.User;
+import com.jiopeel.sys.bean.User;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,7 +13,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Aspect
 @Slf4j

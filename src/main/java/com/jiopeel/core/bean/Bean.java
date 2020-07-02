@@ -1,10 +1,10 @@
 package com.jiopeel.core.bean;
 
+import com.jiopeel.core.util.BaseUtil;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 
 @Data
@@ -28,7 +28,7 @@ public class Bean implements Serializable {
     private Date updtime;
 
     public void createUUID() {
-        this.id = UUID.randomUUID().toString().replace("-", "");
+        this.id = BaseUtil.getSnowFlakeID();
     }
 
     public void createTime() {

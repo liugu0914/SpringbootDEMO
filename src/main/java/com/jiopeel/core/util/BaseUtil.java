@@ -2,14 +2,10 @@ package com.jiopeel.core.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URLEncoder;
@@ -23,9 +19,11 @@ public class BaseUtil {
 
     private static final String serialVersionUID = "serialVersionUID";
 
-    private static EncrypAES de1 = null;
+    private static EncrypAES de1;
 
     private static ObjectMapper objectMapper;
+
+    private static SnowFlakeUtil snowFlakeUtil;
 
 
     /**
@@ -85,7 +83,7 @@ public class BaseUtil {
         if (empty(param)) {
             return 0;
         } else {
-            return Integer.valueOf(String.valueOf(param));
+            return Integer.parseInt(String.valueOf(param));
         }
     }
 
@@ -186,11 +184,26 @@ public class BaseUtil {
 
     /**
      * 获取UUID
-     *
-     * @return string
+     * @return String
      */
     public static String getUUID() {
-        return UUID.randomUUID().toString().replace("-", "");
+        return UUID.randomUUID().toString().replace("-","");
+    }
+
+    /**
+     * 雪花算法获取ID 代替UUID
+     * @return String
+     */
+    public static String getSnowFlakeID() {
+        if (snowFlakeUtil == null)
+            snowFlakeUtil = new SnowFlakeUtil(1L,1L);
+        long id =0L;
+        try {
+            id = snowFlakeUtil.nextId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return String.valueOf(id);
     }
 
     /**

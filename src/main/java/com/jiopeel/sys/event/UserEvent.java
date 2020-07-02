@@ -5,9 +5,13 @@ import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.event.BaseEvent;
 import com.jiopeel.core.util.WebUtil;
 import com.jiopeel.sys.bean.form.AppForm;
+import com.jiopeel.sys.bean.form.UserForm;
 import com.jiopeel.sys.bean.query.AppQuery;
+import com.jiopeel.sys.bean.query.UserQuery;
 import com.jiopeel.sys.bean.result.AppResult;
+import com.jiopeel.sys.bean.result.UserResult;
 import com.jiopeel.sys.logic.AppLogic;
+import com.jiopeel.sys.logic.UserLogic;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +21,15 @@ import java.util.Map;
 
 /**
  * @author ：lyc
- * @description：应用Event层
+ * @description：用户Event层
  * @date ：2019/12/20 10:25
  */
 @Controller
-@RequestMapping("/admin/app")
-public class AppEvent extends BaseEvent {
+@RequestMapping("/admin/user")
+public class UserEvent extends BaseEvent {
 
     @Resource
-    private AppLogic logic;
+    private UserLogic logic;
 
     /**
      * @Description :获取查询主页面
@@ -36,7 +40,7 @@ public class AppEvent extends BaseEvent {
      */
     @RequestMapping(value = "main", method = {RequestMethod.GET})
     public String main() {
-        return "sys/app/main";
+        return "sys/user/main";
     }
 
     /**
@@ -47,10 +51,10 @@ public class AppEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "data", method = {RequestMethod.POST})
-    public String data(@ModelAttribute AppQuery query, Page<AppResult> page, Model model) {
-        Page<AppResult> PageData = logic.getListPage(query, page);
+    public String data(@ModelAttribute UserQuery query, Page<UserResult> page, Model model) {
+        Page<UserResult> PageData = logic.getListPage(query, page);
         model.addAttribute("PageData", PageData);
-        return "sys/app/data";
+        return "sys/user/data";
     }
 
     /**
@@ -64,7 +68,7 @@ public class AppEvent extends BaseEvent {
     public String info(Model model) {
         Map<String, String> map = WebUtil.getParam2Map(request);
         model.addAttribute("bean", logic.getInfo(map.get("id")));
-        return "sys/app/info";
+        return "sys/user/info";
     }
 
     /**
@@ -79,6 +83,7 @@ public class AppEvent extends BaseEvent {
     public Base get(@PathVariable("id") String id) {
         return Base.suc(logic.get(id));
     }
+
     /**
      * @Description :根据id获取数据
      * @Param: id
@@ -100,8 +105,8 @@ public class AppEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "getListPage", method = {RequestMethod.POST})
-    public Base getListPage(@ModelAttribute AppQuery appQuery, Page<AppResult> page) {
-        return Base.suc(logic.getListPage(appQuery,page));
+    public Base getListPage(@ModelAttribute UserQuery query, Page<UserResult> page) {
+        return Base.suc(logic.getListPage(query,page));
     }
 
     /**
@@ -112,8 +117,8 @@ public class AppEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "getList", method = {RequestMethod.POST})
-    public Base list(@ModelAttribute AppQuery appQuery) {
-        return Base.suc(logic.list(appQuery));
+    public Base list(@ModelAttribute UserQuery query) {
+        return Base.suc(logic.list(query));
     }
 
     /**
@@ -125,8 +130,8 @@ public class AppEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = "save", method = {RequestMethod.POST})
-    public Base save(@ModelAttribute AppForm appForm) {
-        return logic.save(appForm);
+    public Base save(@ModelAttribute UserForm form) {
+        return logic.save(form);
     }
 
     /**

@@ -1,27 +1,16 @@
 package com.jiopeel.sys.logic;
 
 
-import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.RedisConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.core.util.SpringUtil;
-import com.jiopeel.sys.bean.Common;
 import com.jiopeel.sys.bean.result.CommonResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 
-import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +110,7 @@ public class CommonLogic extends BaseLogic {
      * @Description :菜单名称模糊搜索
      * @Param: map
      * @Return: List<CommonResult>
-     * @auhor:lyc∏
+     * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
     public List<CommonResult> searchMenu(Map<String, String> map) {
@@ -133,11 +122,23 @@ public class CommonLogic extends BaseLogic {
      * @Description :应用模糊搜索
      * @Param: map
      * @Return: List<CommonResult>
-     * @auhor:lyc∏
+     * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
     public List<CommonResult> searchApp(Map<String, String> map) {
         List<CommonResult> list = dao.query("common.searchApp", map);
+        return list;
+    }
+
+    /**
+     * @Description :模糊搜索
+     * @Param: map
+     * @Return: List<CommonResult>
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    public List<CommonResult> searchUser(Map<String, String> map) {
+        List<CommonResult> list = dao.query("common.searchUser", map);
         return list;
     }
 }

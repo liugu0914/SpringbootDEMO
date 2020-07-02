@@ -178,7 +178,7 @@ public abstract class BaseDao<T extends Bean> {
     }
 
     /**
-     * @Description :单表更新
+     * @Description :单表更新  (strings 为不需要更新的字段)
      * @param: bean  传递参数
      * @param: clause 作为where的条件
      * @param: strings 不需要更新的字段
@@ -207,7 +207,47 @@ public abstract class BaseDao<T extends Bean> {
             Object obj = BaseUtil.getFieldVal(field, bean);
             if (!splitfield.isEmpty() && splitfield.contains(name))
                 clauseMap.put(name, obj);
-            else
+            if (strlist.contains(name))
+                fieldMap.put(name, obj);
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("tableName", tableName);
+        map.put("clauseMap", clauseMap);
+        map.put("fieldMap", fieldMap);
+        return upd(CORE_UPD, map);
+    }
+
+    /**
+     * @Description :单表更新 (strings 为需要更新的字段)
+     * @param: bean  传递参数
+     * @param: clause 作为where的条件
+     * @param: strings 不需要更新的字段
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> boolean upd4n(T bean, String whereValues, String... strings) {
+        if (BaseUtil.empty(whereValues)) {
+            whereValues = "";
+            log.warn("where的条件字段为空");
+        }
+        if (strings == null || strings.length == 0)
+            strings = new String[1];
+        List<String> splitfield = Arrays.asList(whereValues.split(","));
+        List<String> strlist = Arrays.asList(strings);
+        Class<? extends Bean> clazz = bean.getClass();
+        String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
+        Field[] Fields = BaseUtil.getAllFields(bean);
+        Map<String, Object> fieldMap = new HashMap<String, Object>();
+        Map<String, Object> clauseMap = new HashMap<String, Object>();
+        for (Field field : Fields) {
+            String name = field.getName();
+            if (!strlist.contains(name) && !splitfield.contains(name))
+                continue;
+            Object obj = BaseUtil.getFieldVal(field, bean);
+            if (!splitfield.isEmpty() && splitfield.contains(name))
+                clauseMap.put(name, obj);
+            if (strlist.contains(name))
                 fieldMap.put(name, obj);
         }
         Map<String, Object> map = new HashMap<String, Object>();

@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <scope>true</scope>
+            <scope>runtime</scope>
             <optional>true</optional> <!-- 这个需要为 true 热部署才有效 -->
         </dependency>
         <dependency>
@@ -59,7 +59,11 @@
             <artifactId>UserAgentUtils</artifactId>
             <version>1.21</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.nutz</groupId>
+            <artifactId>nutz</artifactId>
+            <version>1.r.65</version>
+        </dependency>
 
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -77,11 +81,7 @@
             <version>1.16.20</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.nutz</groupId>
-            <artifactId>nutz</artifactId>
-            <version>1.r.65</version>
-        </dependency>
+
         <!--springboot中的redis依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

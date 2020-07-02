@@ -4,14 +4,14 @@ package com.jiopeel.core.logic;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.bean.Page;
-import com.jiopeel.core.bean.User;
 import com.jiopeel.core.bean.UserGrant;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
-import com.jiopeel.core.dao.UserDao;
 import com.jiopeel.core.util.BaseUtil;
+import com.jiopeel.sys.bean.User;
+import com.jiopeel.sys.dao.UserDao;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,8 +55,7 @@ public class LoginLogic extends BaseLogic {
         user.setEnable(Constant.ENABLE_YES);
         user.setUsername(user.getAccount());
         user.setPassword(BaseUtil.MD5(user.getPassword()));
-        boolean s = dao.add("login.saveUser", user);
-        return s ? Base.suc("注册成功") : Base.fail("注册失败");
+        return dao.add( user) ? Base.suc("注册成功") : Base.fail("注册失败");
     }
 
     /**

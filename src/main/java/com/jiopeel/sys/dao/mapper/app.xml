@@ -11,7 +11,13 @@
     </select>
 
     <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.AppQuery" resultType="com.jiopeel.sys.bean.result.AppResult">
-         select * from t_app where 1=1
+         select * from t_app  t where 1=1
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(id)">
+            and t.id = #{id}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(enable)">
+            and t.enable = #{enable}
+        </if>
     </select>
 
     <select id="list" parameterType="com.jiopeel.sys.bean.query.AppQuery" resultType="com.jiopeel.sys.bean.result.AppResult">

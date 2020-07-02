@@ -42,9 +42,8 @@ public class CommonEvent extends BaseEvent {
 
     /**
      * @Description :应用模糊搜索
-     * @Param: query
      * @Return: Base
-     * @auhor:lyc∏
+     * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
     @ResponseBody
@@ -54,12 +53,25 @@ public class CommonEvent extends BaseEvent {
         return Base.suc(logic.searchApp(map));
     }
 
+    /**
+     * @Description :用户模糊搜索
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
+    @RequestMapping(value = "searchUser", method = {RequestMethod.POST})
+    public Base searchUser() {
+        Map<String,String> map= WebUtil.getParam2Map(request);
+        return Base.suc(logic.searchUser(map));
+    }
+
 
     /**
      * @Description :菜单名称模糊搜索
      * @Param: query
      * @Return: Base
-     * @auhor:lyc∏
+     * @auhor:lyc
      * @Date:2019/12/21 00:02
      */
     @ResponseBody
@@ -70,7 +82,7 @@ public class CommonEvent extends BaseEvent {
     }
 
     /**
-     * @Description :菜单名称模糊搜索
+     * @Description :icons的模糊搜索
      * @Param: query
      * @Return: Base
      * @auhor:lyc

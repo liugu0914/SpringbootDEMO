@@ -2,7 +2,6 @@ package com.jiopeel.core.logic;
 
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
-import com.jiopeel.core.bean.User;
 import com.jiopeel.core.bean.UserAgent;
 import com.jiopeel.core.bean.UserGrant;
 import com.jiopeel.core.config.exception.ServerException;
@@ -13,6 +12,7 @@ import com.jiopeel.core.dao.UserGrantDao;
 import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.core.util.HttpTool;
 import com.jiopeel.core.util.WebUtil;
+import com.jiopeel.sys.bean.User;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.Version;
@@ -71,7 +71,7 @@ public class OauthLogic extends BaseLogic {
         if (BaseUtil.empty(user_data)) {
             user = addUser(userGrant);
             userGrant.setUserid(user.getId());
-            if (!dao.add("login.saveuserGrant", userGrant))
+            if (!dao.add(userGrant))
                 throw new ServerException("信息有误，授权登陆失败！");
         } else {
             user_data.updTime();
@@ -184,7 +184,7 @@ public class OauthLogic extends BaseLogic {
                 .build();
         user.createUUID();
         user.createTime();
-        if (!dao.add("login.saveUser", user))
+        if (!dao.add(user))
             throw new ServerException("添加失败");
         return user;
     }
@@ -258,13 +258,14 @@ public class OauthLogic extends BaseLogic {
         Map<String, String> parameterMap =WebUtil.getParam2Map(request);
         OauthToken oauthToken = null;
         String access_token = "";
+        String host=request.getHeader("Host");
         switch (granttype) {
             case UserConstant.USER_TYPE_GITHUB:
                 oauthToken = addOauthUser(getTokenbyGithub(parameterMap), granttype);
                 access_token = oauthToken.getAccess_token();
                 break;
             case UserConstant.USER_TYPE_GITEE:
-                oauthToken = addOauthUser(getTokenbyGitee(parameterMap), granttype);
+                oauthToken = addOauthUser(getTokenbyGitee(host,parameterMap), granttype);
                 access_token = oauthToken.getAccess_token();
                 break;
             case UserConstant.USER_TYPE_LOCAL:
@@ -343,16 +344,17 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/12 21:49
      */
-    private String getTokenbyGitee(Map<String, String> parameterMap) {
+    private String getTokenbyGitee(String host,Map<String, String> parameterMap) {
         String access_token = null;
         if (parameterMap.containsKey(OauthConstant.CODE)) {
+            String redirect_uri=String.format(OauthConstant.REDIRECT_URI,host) + "/" + UserConstant.USER_TYPE_GITEE;
             String code = parameterMap.get(OauthConstant.CODE);
             Map<String, Object> params = new HashMap<String, Object>();
             params.put(OauthConstant.CLIENT_ID, OauthConstant.GITEE_CLIENT_ID);
             params.put(OauthConstant.CLIENT_SECRET, OauthConstant.GITEE_CLIENT_SECRET);
             params.put(OauthConstant.CODE, code);
             params.put("grant_type", "authorization_code");
-            params.put("redirect_uri", OauthConstant.REDIRECT_URI + "/" + UserConstant.USER_TYPE_GITEE);
+            params.put("redirect_uri", redirect_uri);
             String res = HttpTool.post(OauthConstant.GITEE_TOKEN, params);
             Map parse = BaseUtil.fromJson(res, Map.class);
             access_token = String.valueOf(parse.get(OauthConstant.ACCESS_TOKEN));
@@ -421,7 +423,7 @@ public class OauthLogic extends BaseLogic {
      * @Date:2019/12/12 21:49
      */
     public User getUser(String userId) {
-        return dao.queryOne("login.getUser", userId);
+        return dao.queryOneById(User.class, userId);
     }
 
     /**
@@ -506,7 +508,7 @@ public class OauthLogic extends BaseLogic {
             agent.createUUID();
             agent.createTime();
             dao.upd("login.UpdAgentNotNow", userId);
-            dao.add("login.AddUserAgent", agent);
+            dao.add(agent);
         } catch (Exception e) {
             e.printStackTrace();
         }

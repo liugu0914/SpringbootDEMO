@@ -34,4 +34,20 @@
         ORDER BY
         t.name limit 30
     </select>
+
+    <select id="searchUser" parameterType="Map" resultType="com.jiopeel.sys.bean.result.CommonResult">
+        select
+        t.id,
+        CONCAT(t.username,'(',t.account,')') as name
+        from t_user t
+        where 1=1
+        and t.enable='1'
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(search)">
+            <bind name="search" value="'%'+search+'%'"/>
+            and ( t.username like #{search}
+            OR t.account like #{search})
+        </if>
+        ORDER BY
+        t.username limit 30
+    </select>
 </mapper>

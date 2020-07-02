@@ -210,9 +210,10 @@
             src = '/img/img.png';
           }
 
-          return src;
+          return $this.attr("src",src);
         });
-        return src && src !== window.location.href ? $this.attr('src', src) : $this.trigger(Event.ERROR_IMG);
+        var error = $.Event(Event.ERROR_IMG)
+        return src && src !== window.location.href ? $this.attr('src', src) : $this.trigger(error);
       });
     } // ----------------------------------------------------------------------
     //  提示插件 需要tooltip.js

@@ -1,14 +1,13 @@
 package com.jiopeel.core.event;
 
 import com.jiopeel.core.base.Base;
-import com.jiopeel.core.bean.User;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.LoginLogic;
 import com.jiopeel.core.logic.OauthLogic;
 import com.jiopeel.core.util.BaseUtil;
+import com.jiopeel.sys.bean.User;
 import com.jiopeel.sys.bean.result.MenuResult;
-import com.jiopeel.sys.event.MenuEvent;
 import com.jiopeel.sys.logic.MenuLogic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;

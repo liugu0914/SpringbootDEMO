@@ -1,5 +1,6 @@
-package com.jiopeel.core.bean;
+package com.jiopeel.sys.bean;
 
+import com.jiopeel.core.bean.Bean;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
@@ -43,7 +44,7 @@ public class User extends Bean implements Serializable {
 
 
     /**
-     * 登陆方式 local ， github
+     * 登陆方式 local ， github ，gitee
      */
     private String type;
 

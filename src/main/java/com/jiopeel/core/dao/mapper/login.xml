@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="login">
-    <select id="getUserbyid" parameterType="int" resultType="com.jiopeel.core.bean.User">
+    <select id="getUserbyid" parameterType="int" resultType="com.jiopeel.sys.bean.User">
         select * from t_user where  t_user.id=#{_paramer}
     </select>
 
@@ -22,7 +22,7 @@
         and id=#{id}
     </update>
 
-    <update id="updUser" parameterType="com.jiopeel.core.bean.User">
+    <update id="updUser" parameterType="com.jiopeel.sys.bean.User">
         update t_user
         set
         imgurl=#{imgurl},
@@ -39,7 +39,7 @@
         and t_user_grant.granttype=#{granttype}
     </select>
 
-    <select id="getUserbyUserGrant" parameterType="com.jiopeel.core.bean.UserGrant" resultType="com.jiopeel.core.bean.User">
+    <select id="getUserbyUserGrant" parameterType="com.jiopeel.core.bean.UserGrant" resultType="com.jiopeel.sys.bean.User">
         select t.*
         from t_user t
         left join t_user_grant on t_user_grant.userid=t.id
@@ -47,28 +47,28 @@
         and t_user_grant.granttype=#{granttype}
     </select>
 
-    <insert id="saveUser" parameterType="com.jiopeel.core.bean.User">
+    <insert id="saveUser" parameterType="com.jiopeel.sys.bean.User">
         insert into t_user (id, username, email, account, password ,type, imgurl,enable ,ctime, updtime)
           values (#{id},#{username},#{email},#{account},#{password},#{type},#{imgurl},#{enable},#{ctime},#{updtime})
     </insert>
 
-    <select id="checkAccount" parameterType="com.jiopeel.core.bean.User" resultType="int">
+    <select id="checkAccount" parameterType="com.jiopeel.sys.bean.User" resultType="int">
         select count(1) from t_user
         where  t_user.account=#{account}
     </select>
 
-    <select id="getUserbyaccount" parameterType="com.jiopeel.core.bean.User" resultType="com.jiopeel.core.bean.User">
+    <select id="getUserbyaccount" parameterType="com.jiopeel.sys.bean.User" resultType="com.jiopeel.sys.bean.User">
         select * from t_user
         where  t_user.account=#{account}
     </select>
 
-    <select id="checklogin" parameterType="com.jiopeel.core.bean.User" resultType="com.jiopeel.core.bean.User">
+    <select id="checklogin" parameterType="com.jiopeel.sys.bean.User" resultType="com.jiopeel.sys.bean.User">
         select t_user.* from t_user
         where 1=1 and t_user.account=#{account}
         and  t_user.password=#{password}
     </select>
 
-    <select id="getUser" parameterType="java.lang.String" resultType="com.jiopeel.core.bean.User">
+    <select id="getUser" parameterType="java.lang.String" resultType="com.jiopeel.sys.bean.User">
         select * from t_user
         where  t_user.id=#{_paramer}
     </select>

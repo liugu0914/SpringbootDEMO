@@ -2,7 +2,6 @@ package com.jiopeel.core.event;
 
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
-import com.jiopeel.core.bean.User;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.constant.OauthConstant;
 import com.jiopeel.core.constant.UserConstant;
@@ -44,7 +43,7 @@ public class OauthEvent extends  BaseEvent{
         String url = "";
         if (BaseUtil.empty(granttype))
             granttype = UserConstant.USER_TYPE_LOCAL;
-        String host=String.format("%s:%s",request.getServerName(),request.getServerPort());
+        String host=request.getHeader("Host");
         String redirect_uri=BaseUtil.encodeURL(String.format(OauthConstant.REDIRECT_URI,host) + "/" + granttype);
         switch (granttype) {
             case UserConstant.USER_TYPE_GITHUB:

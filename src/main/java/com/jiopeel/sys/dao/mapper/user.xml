@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+    <select id="getInfo" parameterType="String" resultType="com.jiopeel.sys.bean.result.UserResult">
+        select * from t_user where id=#{_paramer}
+    </select>
+
+    <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.UserQuery" resultType="com.jiopeel.sys.bean.result.UserResult">
+         select * from t_user t where 1=1
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(id)">
+            and t.id = #{id}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(enable)">
+            and t.enable = #{enable}
+        </if>
+    </select>
+
+    <select id="list" parameterType="com.jiopeel.sys.bean.query.UserQuery" resultType="com.jiopeel.sys.bean.result.UserResult">
+         select * from t_user where 1=1
+    </select>
+</mapper>
