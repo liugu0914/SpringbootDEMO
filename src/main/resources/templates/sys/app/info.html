@@ -1,6 +1,6 @@
 <div class="modal-content" id="add">
     <div class="modal-header modal-colored-header bg-dark">
-        <h5 class="modal-title" id="staticBackdropLiveLabel">[#if bean.id??]编辑[#else]添加[/#if]</h5>
+        <h5 class="modal-title" >[#if bean.id??]编辑[#else]添加[/#if]</h5>
         <div>
             <i class="cs cs-shuaxin pointer" show="tooltip" target="modal-reflesh" data-title="刷新" ></i>
             <i class="cs cs-fangda pointer" show="tooltip" target="modal-expand"  data-title="缩放"  ></i>
@@ -14,6 +14,13 @@
                 <label>应用名称</label>
                 <input class="form-control" type="text" id="name" name="name" value="${bean.name!''}"
                        placeholder="应用名称">
+            </div>
+            <div class="form-group">
+                <label>图标</label>
+                <select class="form-control" target="search" id="icon"
+                        data-url="/admin/common/icons"
+                        name="icon"  data-id="${bean.icon!}" data-text="<span><i class='${bean.icon!}'>${bean.icon!}</i></span>">
+                </select>
             </div>
             <div class="form-group">
                 <label>应用标识</label>

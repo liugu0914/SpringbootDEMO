@@ -4,6 +4,7 @@ import com.jiopeel.core.base.StateCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * @Description : 自定义服务异常处理器
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Date:2019/10/30 23:03
  */
 @Slf4j
+@Component
 public class ServerException extends RuntimeException {
     private static final long serialVersionUID = -8892899092208135415L;
 
@@ -28,7 +30,6 @@ public class ServerException extends RuntimeException {
     @Setter
     private String message;
 
-
     public ServerException() {
         super();
     }
@@ -41,22 +42,21 @@ public class ServerException extends RuntimeException {
 
 
     public ServerException(StateCode stateCode) {
-        super(stateCode.getMessage());
         this.status = stateCode.getStatus();
         this.message = stateCode.getMessage();
-        log.error("status= {}, message= {}");
+        log.error("status = {}, message = {}", this.status, this.message);
     }
 
     public ServerException(String mes) {
         super(mes);
         this.message = mes;
-        this.status=StateCode.FAIL.getStatus();
+        this.status = StateCode.FAIL.getStatus();
         log.error(mes);
     }
 
 
     public ServerException(Throwable cause) {
         super(cause);
-        log.error(cause.getMessage(),cause);
+        log.error(cause.getMessage(), cause);
     }
 }

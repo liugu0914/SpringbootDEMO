@@ -30,7 +30,7 @@ public abstract class BaseDao<T extends Bean> {
 
     private static final String CORE_DEL = "core.del";
 
-    private static final String CORE_QUERY_ONE_BY_ID = "core.queryOneById";
+    private static final String CORE_QUERY_ONE = "core.queryOne";
 
     private static final String CORE_ADD_BATCH = "core.addBatch";
 
@@ -88,7 +88,7 @@ public abstract class BaseDao<T extends Bean> {
      * @Date:2019/12/21 11:48
      */
     public <T extends Bean> boolean add(T bean) {
-        Class<? extends Bean> clazz = bean.getClass();
+        Class<?> clazz = bean.getClass();
         String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
         Field[] Fields = BaseUtil.getAllFields(bean);
         List<String> nameList = new ArrayList<String>();
@@ -119,7 +119,7 @@ public abstract class BaseDao<T extends Bean> {
         List<String> nameList = new ArrayList<String>();
         List<List<Object>> lists = new ArrayList<List<Object>>();
         for (E bean : list) {
-            Class<? extends Bean> clazz = bean.getClass();
+            Class<?> clazz = bean.getClass();
             if (BaseUtil.empty(tableName))
                 tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
             Field[] Fields = BaseUtil.getAllFields(bean);
@@ -195,7 +195,7 @@ public abstract class BaseDao<T extends Bean> {
             strings = new String[1];
         List<String> splitfield = Arrays.asList(whereValues.split(","));
         List<String> strlist = Arrays.asList(strings);
-        Class<? extends Bean> clazz = bean.getClass();
+        Class<?> clazz = bean.getClass();
         String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
         Field[] Fields = BaseUtil.getAllFields(bean);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
@@ -207,7 +207,7 @@ public abstract class BaseDao<T extends Bean> {
             Object obj = BaseUtil.getFieldVal(field, bean);
             if (!splitfield.isEmpty() && splitfield.contains(name))
                 clauseMap.put(name, obj);
-            if (strlist.contains(name))
+            if (!strlist.contains(name))
                 fieldMap.put(name, obj);
         }
         Map<String, Object> map = new HashMap<String, Object>();
@@ -235,7 +235,7 @@ public abstract class BaseDao<T extends Bean> {
             strings = new String[1];
         List<String> splitfield = Arrays.asList(whereValues.split(","));
         List<String> strlist = Arrays.asList(strings);
-        Class<? extends Bean> clazz = bean.getClass();
+        Class<?> clazz = bean.getClass();
         String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
         Field[] Fields = BaseUtil.getAllFields(bean);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
@@ -281,6 +281,7 @@ public abstract class BaseDao<T extends Bean> {
         return del(nameSpec, null);
     }
 
+
     /**
      * @Description :删除
      * @param: nameSpec  命名空间
@@ -288,14 +289,26 @@ public abstract class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public boolean delByIds(Class<T> clazz, Object object) {
+    public <T extends Bean> boolean del(Class<T> clazz, String name, Object value) {
         String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
-        if (!object.getClass().isArray() && !(object instanceof Collection<?>))
-            object = new Object[]{object};
+        if (!value.getClass().isArray() && !(value instanceof Collection<?>))
+            value = new Object[]{value};
         Map<String, Object> map = new HashMap<>();
         map.put("tableName", tableName);
-        map.put("ids", object);
+        map.put("name", name);
+        map.put("array", value);
         return del(CORE_DEL, map);
+    }
+
+    /**
+     * @Description :删除
+     * @param: nameSpec  命名空间
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> boolean delByIds(Class<T> clazz, Object value) {
+        return del(clazz, "id", value);
     }
 
 
@@ -344,7 +357,7 @@ public abstract class BaseDao<T extends Bean> {
             if (object instanceof List && (items = (List<?>) object).size() > MAX_ROW)
                 return this.query(nameSpec, items);
         }
-        return this.getSqlSession().selectList(nameSpec, object);
+        return getSqlSession().selectList(nameSpec, object);
     }
 
     /**
@@ -418,18 +431,24 @@ public abstract class BaseDao<T extends Bean> {
     }
 
     /**
-     * @param clazz  继承bean的类
-     * @param object 传参对象
+     * @param clazz     继承bean的类
+     * @param paramsMap 传参对象
      * @return 符合查询条件的对象
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T extends Bean> T queryOneById(Class<T> clazz, Object object) {
+    public <T extends Bean> T queryOne(Class<T> clazz, Map<String, Object> paramsMap) {
+        if (paramsMap == null || paramsMap.isEmpty()) {
+            log.warn("传参对象为空");
+            return null;
+        }
         String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
         Map<String, Object> map = new HashMap<>();
         map.put("tableName", tableName);
-        map.put("id", object);
-        Map<String, Object> reMap = queryOne(CORE_QUERY_ONE_BY_ID, map);
+        map.put("paramsMap", paramsMap);
+        Map<String, Object> reMap = queryOne(CORE_QUERY_ONE, map);
+        if (reMap == null || reMap.isEmpty())
+            return null;
         try {
             T bean = clazz.newInstance();
             BeanUtils.populate(bean, reMap);
@@ -438,6 +457,35 @@ public abstract class BaseDao<T extends Bean> {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    /**
+     * @param clazz
+     * @param name  key值 字段名（与数据库一致）
+     * @param value value值 需要重新的值
+     * @return App
+     * @Description: 根据clazz, key和value查询数据库数据
+     * @author lyc
+     * @version 1.0.0
+     * @date 2020年07月14日17:11:44
+     */
+    public <T extends Bean> T queryOneByColumn(Class<T> clazz, String name, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(name, value);
+        return queryOne(clazz, map);
+    }
+
+
+    /**
+     * @param clazz  继承bean的类
+     * @param object 传参对象
+     * @return 符合查询条件的对象
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> T queryOneById(Class<T> clazz, Object object) {
+        return queryOneByColumn(clazz, "id", object);
     }
 
 

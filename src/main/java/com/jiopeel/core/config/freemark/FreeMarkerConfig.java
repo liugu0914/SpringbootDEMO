@@ -1,5 +1,6 @@
 package com.jiopeel.core.config.freemark;
 
+import com.jiopeel.core.config.exception.MyTemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
@@ -37,7 +38,7 @@ public class FreeMarkerConfig {
     public void setVariableConfiguration() {
         configuration.setClassForTemplateLoading(FreeMarkerConfig.class, TEMPLATE);
         configuration.setTagSyntax(freemarker.template.Configuration.AUTO_DETECT_TAG_SYNTAX);//自定义格式，系统会选择第一个标签作为参照；
-        configuration.setTemplateUpdateDelayMilliseconds(1000);//设置模板文件更新时间（毫秒）；
+        configuration.setTemplateUpdateDelayMilliseconds(-1);//设置模板文件更新时间（毫秒）；
         configuration.setDefaultEncoding("UTF-8");
         configuration.setURLEscapingCharset("UTF-8");
         configuration.setLocale(Locale.SIMPLIFIED_CHINESE);//国际化
@@ -46,6 +47,7 @@ public class FreeMarkerConfig {
         configuration.setDateFormat("yyyy-MM-dd");
         configuration.setNumberFormat("0.##");
         configuration.setWhitespaceStripping(true);//开启/关闭空白移除，默认为true；
+        configuration.setTemplateExceptionHandler(new MyTemplateException());
         Map<String,String> map=new HashMap<String,String>();
         map.put("c","/core/common/common.html");
         configuration.setAutoImports(map);//macro设置

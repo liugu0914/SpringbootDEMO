@@ -2,6 +2,10 @@ package com.jiopeel.core.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.CharUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.springframework.beans.BeanUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -11,6 +15,7 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -74,32 +79,247 @@ public class BaseUtil {
     }
 
     /**
-     * 转int
+     * 源信息是否在集合中存在
      *
-     * @param param
-     * @return
+     * @param param  源信息
+     * @param params 集合的信息
+     * @return true则存在
      */
-    public static int parseInt(Object param) {
-        if (empty(param)) {
-            return 0;
-        } else {
-            return Integer.parseInt(String.valueOf(param));
-        }
+    public static boolean equals(Object param, Object... params) {
+        if (params != null)
+            for (Object s : params) {
+                if (Objects.equals(param, s))
+                    return true;
+            }
+        return false;
     }
 
     /**
-     * 转long
+     * 将对象的值转换为string
      *
-     * @param param
-     * @return
+     * @param object 对象值
+     * @return 字符串
+     */
+    @SuppressWarnings("unchecked")
+    public static String str(Object object) {
+        if (empty(object))
+            return "";
+
+        Class<?> clazz = object.getClass();
+        if (clazz.equals(String.class))
+            return ((String) object).trim();
+
+        if (clazz.equals(int.class) || clazz.equals(long.class) || clazz.equals(char.class) || clazz.equals(float.class)
+                || clazz.equals(char[].class))
+            return String.valueOf(object);
+
+        if (clazz.equals(Integer.class) || clazz.equals(Long.class) || clazz.equals(Character.class)
+                || clazz.equals(Float.class))
+            return object.toString();
+
+        if (clazz.equals(double.class) || clazz.equals(Double.class)) {
+            clazz = BigDecimal.class;
+            object = new BigDecimal((Double) object);
+        }
+
+        if (clazz.equals(BigDecimal.class))
+            return new DecimalFormat("#.#####").format((BigDecimal) object);
+
+        if (clazz.equals(boolean.class) || clazz.equals(Boolean.class))
+            return ((Boolean) object) ? "1" : "0";
+
+        /*
+         * try { if (clazz.equals(oracle.sql.TIMESTAMP.class)) { object =
+         * ((oracle.sql.TIMESTAMP) object).toJdbc(); clazz = java.sql.Timestamp.class; }
+         * } catch (Exception e) { sys.warn(e); }
+         */
+        if (clazz.equals(Date.class) || clazz.equals(java.sql.Date.class) || clazz.equals(java.sql.Timestamp.class))
+            return Dateformat((Date) object);
+
+        if (clazz.equals(ArrayList.class) || clazz.equals(List.class)) {
+            StringBuilder sbd = new StringBuilder();
+            for (Object obj : (List<Object>) object) {
+                sbd.append(",").append(str(obj));
+            }
+            return sbd != null && sbd.length() > 1 ? sbd.substring(1) : null;
+        }
+
+        if (clazz.equals(Set.class) || clazz.equals(HashSet.class)) {
+            StringBuilder sbd = new StringBuilder();
+            for (Object obj : (Set<Object>) object) {
+                sbd.append(",").append(str(obj));
+            }
+            return sbd != null && sbd.length() > 1 ? sbd.substring(1) : null;
+        }
+
+        return object.getClass().getName();
+    }
+
+    /**
+     * 将字符串转换为日期 日期格式的字符串支持： yyyy.MM.dd;yyyy.MM.dd HH:mm;yyyy.MM.dd HH:mm:ss;
+     * yyyy-MM-dd;yyyy-MM-dd HH:mm;yyyy-MM-dd HH:mm:ss; yyyy/MM/dd;yyyy/MM/dd
+     * HH:mm;yyyy/MM/dd HH:mm:ss; 11,13位纯数字
+     *
+     * @param object 需要转换的对象
+     * @return java.util.Date日期
+     */
+    public static Date parseDate(Object object) {
+        if (empty(object))
+            return null;
+        if (object instanceof Date)
+            return (Date) object;
+        if (object instanceof String)
+            return parseDate((String) object);
+        return parseDate(str(object));
+    }
+
+    /**
+     * 是否是数字
+     *
+     * @param obj 任何参数
+     * @return true则为数字
+     */
+
+    public static boolean isNumber(Object obj) {
+        // 标记符号、小数点、e是否出现过
+        char[] str = obj.toString().toCharArray();
+        boolean sign = false;
+        boolean decimal = false;
+        boolean hasE = false;
+        for (int i = 0; i < str.length; i++) {
+            if (str[i] == 'e' || str[i] == 'E') {
+                if (i == str.length - 1)
+                    return false;
+                if (hasE)
+                    return false;
+                hasE = true;
+            } else if (str[i] == '+' || str[i] == '-') {
+                if (sign && str[i - 1] != 'e' && str[i - 1] != 'E')
+                    return false;
+                if (!sign && i > 0 && str[i - 1] != 'e' && str[i - 1] != 'E')
+                    return false;
+                sign = true;
+            } else if (str[i] == '.') {
+                if (hasE || decimal)
+                    return false;
+                decimal = true;
+            } else if (str[i] < '0' || str[i] > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 转化为number(支持科学计算法)
+     *
+     * @param param 任何参数
+     * @return Number 不为数字则返回空
+     */
+    public static Number parseNumber(Object param) {
+        String str;
+        if (!empty(param) && isNumber(str = param.toString())) {
+            while (str.startsWith("0") && str.length() > 1 && str.substring(1, 2).startsWith("[0-9]*")) {
+                str = str.substring(1, str.length());
+            }
+            return NumberUtils.createNumber(str);
+        }
+        return null;
+    }
+
+    /**
+     * 转化为int(支持科学计算法)
+     *
+     * @param param 任何参数
+     * @return int型数字, 为空或非法则为0
+     */
+    public static int parseInt(Object param) {
+        if (empty(param))
+            return 0;
+        if (param instanceof Integer || (param != null && param.getClass().equals(int.class)))
+            return (Integer) param;
+        Number number = parseNumber(param);
+        return empty(number) ? 0 : number.intValue();
+    }
+
+    /**
+     * 转化为long
+     *
+     * @param param 任何參數
+     * @return long型数字, 为空或非法则为0l
      */
     public static long parseLong(Object param) {
-
-        if (empty(param)) {
-            return 0;
-        } else {
+        if (param instanceof Long || (param != null && param.getClass().equals(long.class)))
             return (Long) param;
+        Number number = parseNumber(param);
+        return empty(number) ? 0l : number.longValue();
+    }
+
+    /**
+     * 转化为double
+     *
+     * @param param 任何參數
+     * @return double型数字, 为空或非法则为0d
+     */
+    public static double parseDouble(Object param) {
+        if (param instanceof Double || (param != null && param.getClass().equals(double.class)))
+            return (Double) param;
+        Number number = parseNumber(param);
+        return empty(number) ? 0d : Double.parseDouble(number.toString());// number.doubleValue()有精度丢失的风险
+    }
+
+    /**
+     * 转化为float
+     *
+     * @param param 任何參數
+     * @return float型数字, 为空或非法则为0f
+     */
+    public static float parseFloat(Object param) {
+        if (param instanceof Float || (param != null && param.getClass().equals(float.class)))
+            return (Float) param;
+        Number number = parseNumber(param);
+        return empty(number) ? 0f : Float.parseFloat(number.toString());// number.floatValue()有精度丢失的风险
+    }
+
+    /**
+     * 将单个字符串转换为char
+     *
+     * @param param 源目标
+     * @return char型, 非单个字符则为' '
+     */
+    public static char parseChar(Object param) {
+        if (param instanceof Character || (param != null && param.getClass().equals(char.class)))
+            return (Character) param;
+        String str;
+        if (!empty(param) && (str = param.toString()).length() == 1)
+            return CharUtils.toChar(str);
+        return ' ';
+    }
+
+
+    /**
+     * @Description : string转 boolean
+     * @Param: s
+     * @Return: boolean
+     * @auhor:lyc
+     * @Date:2020/7/12 17:52
+     */
+    public static boolean parseBoolean(Object param) {
+        if (empty(param))
+            return false;
+        if (param instanceof Boolean || param.getClass().equals(boolean.class)) {
+            return (Boolean) param;
         }
+        try {
+            String s = String.valueOf(param).trim();
+            if ("1".equals(s) || "'1'".equals(s))
+                s = "true";
+            return Boolean.parseBoolean(s);
+        } catch (Exception e) {
+            log.warn("解析[{}]错误;消息:{}", param, e);
+        }
+        return false;
     }
 
     /**
@@ -184,26 +404,41 @@ public class BaseUtil {
 
     /**
      * 获取UUID
+     *
      * @return String
      */
     public static String getUUID() {
-        return UUID.randomUUID().toString().replace("-","");
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     /**
-     * 雪花算法获取ID 代替UUID
-     * @return String
+     * 雪花算法获取ID
+     * @Param:  dataCenterId 数据中心名
+     * @Param:  machineId 机器名
+     * @Return: String
+     * @auhor: lyc
+     * @Date: 2020/7/19 17:07
      */
-    public static String getSnowFlakeID() {
+    public static String getSnowFlakeID(long dataCenterId, long machineId) {
         if (snowFlakeUtil == null)
-            snowFlakeUtil = new SnowFlakeUtil(1L,1L);
-        long id =0L;
+            snowFlakeUtil = new SnowFlakeUtil(dataCenterId, machineId);
+        long id = 0L;
         try {
             id = snowFlakeUtil.nextId();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return String.valueOf(id);
+    }
+
+    /**
+     * 雪花算法获取ID 数据中心名: 1 机器名:1
+     * @Return: String
+     * @auhor: lyc
+     * @Date: 2020/7/19 17:07
+     */
+    public static String getSnowFlakeID() {
+        return getSnowFlakeID(1L, 1L);
     }
 
     /**
@@ -241,7 +476,6 @@ public class BaseUtil {
         return text == null ? new String(c) : text + new String(c);
     }
 
-
     /**
      * @Description :时间格式化
      * @Param: prefix
@@ -250,7 +484,7 @@ public class BaseUtil {
      * @auhor:lyc
      * @Date:2019/11/1 22:53
      */
-    public static String Dateformat(String prefix, Date date) {
+    public static String Dateformat(Date date, String prefix) {
         if (empty(prefix))
             prefix = "yyyy-MM-dd HH:mm:ss";
         if (empty(date))
@@ -267,7 +501,7 @@ public class BaseUtil {
      * @Date:2019/11/1 22:53
      */
     public static String Dateformat(Date date) {
-        return Dateformat("", date);
+        return Dateformat(date, "");
     }
 
     /**
@@ -278,7 +512,7 @@ public class BaseUtil {
      * @Date:2019/11/1 22:53
      */
     public static String Dateformat(Long date) {
-        return Dateformat("", new Date(date));
+        return Dateformat(new Date(date), "");
     }
 
     /**
@@ -372,7 +606,7 @@ public class BaseUtil {
     public static <E> E[] arrs(List<E> data) {
         int i;
         E[] result = null;
-        if (!BaseUtil.empty(data) && (i = data.size()) > 0) {
+        if (!empty(data) && (i = data.size()) > 0) {
             result = (E[]) Array.newInstance(data.get(0).getClass(), i);
             data.toArray(result);
         }
@@ -389,7 +623,7 @@ public class BaseUtil {
     public static <E> E[] arrs(Set<E> data) {
         int i;
         E[] result = null;
-        if (!BaseUtil.empty(data) && (i = data.size()) > 0) {
+        if (!empty(data) && (i = data.size()) > 0) {
             result = (E[]) Array.newInstance(data.iterator().next().getClass(), i);
             data.toArray(result);
         }
@@ -403,7 +637,7 @@ public class BaseUtil {
      * @return List<Bean> 对象
      */
     public static <E> List<E> list(E[] data) {
-        if (BaseUtil.empty(data))
+        if (empty(data))
             return null;
         List<E> result = new ArrayList<E>(data.length);
         for (E bean : data) {
@@ -419,7 +653,7 @@ public class BaseUtil {
      * @return List<Bean> 对象
      */
     public static <E> List<E> list(Collection<E> data) {
-        if (BaseUtil.empty(data))
+        if (empty(data))
             return null;
         List<E> result = new ArrayList<E>(data.size());
         for (E bean : data) {
@@ -429,7 +663,7 @@ public class BaseUtil {
     }
 
     /**
-     * 获取对象中的所有字段成员 包括父类
+     * 获取对象中的所有字段成员 包括父类 无视private/protected修饰符
      *
      * @param object
      * @return Field[]
@@ -440,7 +674,7 @@ public class BaseUtil {
     }
 
     /**
-     * 获取对象中的所有字段成员 包括父类
+     * 获取对象中的所有字段成员 包括父类 无视private/protected修饰符
      *
      * @param clazz
      * @return Field[]
@@ -477,19 +711,82 @@ public class BaseUtil {
         if (empty(bean))
             return obj;
         try {
-            obj = field.get(bean);
-            if (obj instanceof String)
-                obj = String.valueOf(obj);
-            if (obj instanceof Integer)
-                obj = BaseUtil.parseInt(obj);
-            if (obj instanceof Date)
-                obj = BaseUtil.Dateformat((Date) obj);
-            if (obj instanceof BigDecimal)
-                obj = ((BigDecimal) obj).doubleValue();
+            obj = obj(field.get(bean));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return obj;
+    }
+
+    /**
+     * 根据属性名称找到地应的属性对象(不区分大小写)
+     *
+     * @param fields    所有属性对象
+     * @param fieldName 属性名称
+     * @return Field
+     */
+    public static Field getFieldByName(Field[] fields, String fieldName) {
+        String name = null;
+        for (Field field : fields) {
+            name = field.getName();
+            if (name.equalsIgnoreCase(fieldName))
+                return field;
+        }
+        return null;
+    }
+
+    /**
+     * 直接设置对象属性值, 无视private/protected修饰符, 不经过setter函数.
+     *
+     * @param target 当前对象
+     * @param field  字段属性对象
+     * @param value  对象的属性值
+     */
+    public static void setFieldVal(Object target, Field field, Object value) {
+        try {
+            value = obj(field.getType(), value);
+            FieldUtils.writeField(field, target, value, true);
+        } catch (IllegalAccessException e) {
+            log.warn("设置属性值失败:{}", e);
+        }
+    }
+
+    /**
+     * 将对象的值转换为对应类型的值
+     *
+     * @param value 需转换的值
+     * @return 转换后的对象
+     */
+    public static Object obj(Object value) {
+        Class<?> clazz = value.getClass();
+        return obj(clazz, value);
+    }
+
+    /**
+     * 将对象的值转换为对应类型的值
+     *
+     * @param clazz 要转换的类型
+     * @param value 需转换的值
+     * @return 转换后的对象
+     */
+    public static Object obj(Class<?> clazz, Object value) {
+        if (clazz.equals(Date.class))
+            value = parseDate(value);
+        else if (clazz.equals(int.class) || clazz.equals(Integer.class))
+            value = parseInt(value);
+        else if (clazz.equals(long.class) || clazz.equals(Long.class))
+            value = parseLong(value);
+        else if (clazz.equals(float.class) || clazz.equals(Float.class))
+            value = parseFloat(value);
+        else if (clazz.equals(double.class) || clazz.equals(Double.class))
+            value = parseDouble(value);
+        else if (clazz.equals(boolean.class) || clazz.equals(Boolean.class))
+            value = parseBoolean(value);
+        else if (clazz.equals(char.class) || clazz.equals(Character.class))
+            value = parseChar(value);
+        else if (clazz.equals(BigDecimal.class))
+            value = ((BigDecimal) value).doubleValue();
+        return value;
     }
 
     /**
@@ -554,5 +851,32 @@ public class BaseUtil {
                 break;
         }
         return beans;
+    }
+
+    /**
+     * copyProperties
+     * URI 转通配符
+     *
+     * @param uri
+     * @return String
+     */
+    public static String uri2Charm(String uri) {
+        if (empty(uri))
+            return "";
+        if (uri.startsWith("/"))
+            uri = uri.substring(1);
+        return uri.replace("/", ":");
+    }
+
+
+    /**
+     * 同copyProperties 集中管理
+     *
+     * @param source
+     * @param target
+     * @return String
+     */
+    public static void copyProperties(Object source, Object target) {
+        BeanUtils.copyProperties(source, target);
     }
 }

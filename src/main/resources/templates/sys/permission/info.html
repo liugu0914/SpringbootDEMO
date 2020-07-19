@@ -1,0 +1,87 @@
+<div class="modal-content" id="add">
+    <div class="modal-header modal-colored-header bg-dark">
+        <h5 class="modal-title">[#if bean.id??]编辑[#else]添加[/#if]</h5>
+        <div>
+            <i class="cs cs-shuaxin pointer" show="tooltip" target="modal-reflesh" data-title="刷新"></i>
+            <i class="cs cs-fangda pointer" show="tooltip" target="modal-expand" data-title="缩放"></i>
+            <i class="cs cs-close pointer" show="tooltip" target="modal-close" data-title="关闭"></i>
+        </div>
+    </div>
+    <div class="modal-body">
+        <form class="pl-3 pr-3" action="/admin/permission/save">
+            <input type="hidden" name="id" value="${bean.id!''}">
+            <div class="form-group">
+                <label>权限名称</label>
+                <input class="form-control" type="text" name="name" value="${bean.name!''}"
+                       placeholder="权限名称">
+            </div>
+            [#if bean.type == 'sys']
+            <input type="hidden" name="type" value="${(bean.type)!'sys'}">
+            [#else]
+            <div class="form-group">
+                <label>权限类型</label>
+                <select class="form-control " target="select" name="type">
+                    <option value="menu">菜单</option>
+                    <option value="fuc">功能</option>
+                    <option value="column">字段</option>
+                </select>
+            </div>
+            [/#if]
+            [#if bean.appid??]
+            <input type="hidden" name="appid" value="${bean.appid}">
+            [#else]
+            <div class="form-group">
+                <label>应用ID</label>
+                <select class="form-control " target="search" data-id="${bean.appid!}" data-text="${bean.appname!}"
+                        data-url="/admin/common/searchApp"
+                        name="appid">
+                </select>
+            </div>
+            [/#if]
+
+            <div class="form-group">
+                <label>地址</label>
+                <input class="form-control" type="text" name="target" value="${bean.target!''}"
+                       placeholder="地址">
+            </div>
+
+            <div class="form-group">
+                <label>通配符</label>
+                <input class="form-control" type="text" name="charm" value="${bean.charm!''}"
+                       placeholder="通配符">
+            </div>
+
+            <div class="form-group" style="justify-content: space-between;display: flex;align-items: center;">
+                <label class="mb-0">是否可用</label>
+                <input type="checkbox" onchange="Add.isEnable()" id="enable" [#if !bean.enable?? ||
+                       bean.enable=='1']checked[/#if]
+                       data-switch="success">
+                <label class="mb-0" for="enable" data-on-label="是" data-off-label="否"></label>
+                <input type="hidden" name="enable" value="${(bean.enable)!1}">
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" target="modal-close">关闭</button>
+        <button type="button" class="btn btn-primary" target="form" data-suc="Add.suc">保存</button>
+    </div>
+</div>
+<script>
+    var Add = {
+        isEnable: function () {
+            var $this = $('#enable');
+            var val = $this.prop('checked');
+            var $name = $('[name="enable"]', '#add');
+            $name.val(val ? '1' : '0');
+        },
+        suc: function ($this, config) {
+            if ($('#modal').length > 0) {
+                $('#modal').modal('hide')
+            }
+            if ($('.nav > li > .active').length > 0) {
+                $('.nav > li > .active').eq(0).trigger('click')
+            }
+        }
+    };
+    //# sourceURL=add.js
+</script>

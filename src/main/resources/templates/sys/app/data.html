@@ -31,6 +31,7 @@
                         </div>
                     </th>
                     <th>#</th>
+                    <th>应用图标</th>
                     <th>应用名称</th>
                     <th>应用标识</th>
                     <th>应用描述</th>
@@ -49,6 +50,9 @@
                         </div>
                     </td>
                     <td scope="row">${bean_index+1}</td>
+                    <td>
+                        <i class="${bean.icon!''}"></i>
+                    </td>
                     <td>${bean.name!''}</td>
                     <td>${bean.shortname!''}</td>
                     <td>${bean.des!''}</td>

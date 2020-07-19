@@ -112,8 +112,8 @@ public class AppEvent extends BaseEvent {
      * @Date:2019/12/21 00:02
      */
     @RequestMapping(value = "getList", method = {RequestMethod.POST})
-    public Base list(@ModelAttribute AppQuery appQuery) {
-        return Base.suc(logic.list(appQuery));
+    public Base list() {
+        return Base.suc(logic.list());
     }
 
     /**

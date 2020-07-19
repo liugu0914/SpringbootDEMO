@@ -1,4 +1,4 @@
-package com.jiopeel.core.config;
+package com.jiopeel.core.config.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

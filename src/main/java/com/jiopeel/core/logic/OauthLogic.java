@@ -13,6 +13,9 @@ import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.core.util.HttpTool;
 import com.jiopeel.core.util.WebUtil;
 import com.jiopeel.sys.bean.User;
+import com.jiopeel.sys.bean.form.UserForm;
+import com.jiopeel.sys.bean.result.UserResult;
+import com.jiopeel.sys.logic.UserLogic;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.OperatingSystem;
 import eu.bitwalker.useragentutils.Version;
@@ -34,6 +37,9 @@ public class OauthLogic extends BaseLogic {
 
     @Resource
     private UserGrantDao dao;
+
+    @Resource
+    private UserLogic userLogic;
 
 
     /**
@@ -83,7 +89,7 @@ public class OauthLogic extends BaseLogic {
             if (!dao.upd("login.upduserGrant", user_data))
                 throw new ServerException("信息有误，授权登陆失败！");
         }
-        return !BaseUtil.empty(user) ? RedisUser(user) : null;
+        return !BaseUtil.empty(user) ? RedisUser(new UserResult(user)) : null;
     }
 
     /**
@@ -92,7 +98,7 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/15 18:14
      */
-    public OauthToken RedisUser(User user) {
+    public OauthToken RedisUser(UserResult user) {
         return RedisCode(user, null);
     }
 
@@ -103,7 +109,7 @@ public class OauthLogic extends BaseLogic {
      * @auhor:lyc
      * @Date:2019/12/15 18:14
      */
-    public OauthToken RedisCode(User user, String code) {
+    public OauthToken RedisCode(UserResult user, String code) {
         if (redisUtil.hasKey(user.getId())) {
             OauthToken oldToken = (OauthToken) redisUtil.get(user.getId());
             if (redisUtil.hasKey(oldToken.getAccess_token()))
@@ -173,18 +179,13 @@ public class OauthLogic extends BaseLogic {
      * @Date:2019/12/15 18:14
      */
     private User addUser(UserGrant userGrant) {
-        User user = User.builder()
-                .enable(Constant.ENABLE_YES)
-                .account(userGrant.getNickname())
-                .imgurl(userGrant.getImgurl())
-                .password(BaseUtil.MD5(BaseUtil.getUUID()))
-                .type(userGrant.getGranttype())
-                .username(userGrant.getNickname())
-                .account(BaseUtil.getUUID())
-                .build();
-        user.createUUID();
-        user.createTime();
-        if (!dao.add(user))
+        UserForm user = new UserForm();
+        user.setAccount(BaseUtil.getUUID());
+        user.setImgurl(userGrant.getImgurl());
+        user.setPassword("123456");
+        user.setType(userGrant.getGranttype());
+        user.setUsername(userGrant.getNickname());
+        if (!userLogic.save(user))
             throw new ServerException("添加失败");
         return user;
     }
@@ -211,7 +212,7 @@ public class OauthLogic extends BaseLogic {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        userGrant.createUUID();
+        userGrant.createID();
         userGrant.createTime();
         return userGrant;
     }
@@ -239,7 +240,7 @@ public class OauthLogic extends BaseLogic {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        userGrant.createUUID();
+        userGrant.createID();
         userGrant.createTime();
         return userGrant;
     }
@@ -505,7 +506,7 @@ public class OauthLogic extends BaseLogic {
                     .system(system)
                     .version(versionName)
                     .build();
-            agent.createUUID();
+            agent.createID();
             agent.createTime();
             dao.upd("login.UpdAgentNotNow", userId);
             dao.add(agent);
@@ -519,15 +520,15 @@ public class OauthLogic extends BaseLogic {
      * @author ：lyc
      * @date ：2020/1/2 11:10
      */
-    public Base getUserbyToken(String access_token) {
+    public User getUserByToken(String access_token) {
         User user = null;
         OauthToken oauthToken = null;
         if (!redisUtil.hasKey(access_token))
-            return Base.fail("该用户未登陆");
+            return null;
         oauthToken = (OauthToken) redisUtil.get(access_token);
         String userId = oauthToken.getUserId();
         if (redisUtil.hHasKey(UserConstant.USER, userId))
             user = (User) redisUtil.hget(UserConstant.USER, userId);
-        return Base.suc(user);
+        return user;
     }
 }

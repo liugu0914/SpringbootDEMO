@@ -7,6 +7,7 @@ import com.jiopeel.core.logic.LoginLogic;
 import com.jiopeel.core.logic.OauthLogic;
 import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.sys.bean.User;
+import com.jiopeel.sys.bean.form.UserForm;
 import com.jiopeel.sys.bean.result.MenuResult;
 import com.jiopeel.sys.logic.MenuLogic;
 import lombok.extern.slf4j.Slf4j;
@@ -32,18 +33,21 @@ public class LoginEvent extends BaseEvent {
     @Resource
     private OauthLogic oauthLogic;
 
+    @Resource
+    private MenuLogic menuLogic;
+
     @RequestMapping(value = {"/signin"}, method = RequestMethod.GET)
     public String signin() {
         return "redirect:/oauth";
     }
 
-    @RequestMapping(value = {"/index"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/"}, method = RequestMethod.GET)
     public String home(@RequestParam(value = "client_id", required = false) String client_id,
                        @RequestParam(value = "redirect_uri", required = false) String redirect_uri,
                        Model model) {
-        String access_token =oauthLogic.getTokenfromCookie(request);
+        String access_token = oauthLogic.getTokenfromCookie(request);
         if (redisUtil.hasKey(access_token))
-            return "redirect:/";
+            return "redirect:/main";
         if (BaseUtil.empty(client_id))
             client_id = OauthConstant.local_client_id;
         if (BaseUtil.empty(redirect_uri))
@@ -67,7 +71,6 @@ public class LoginEvent extends BaseEvent {
         try {
             code = logic.dologin(user, request, response, client_id);
         } catch (Exception e) {
-            log.error(e.getMessage());
             return Base.fail(e.getMessage());
         }
         //回调授权地址
@@ -79,7 +82,7 @@ public class LoginEvent extends BaseEvent {
      *
      * @return
      */
-    @RequestMapping(value = {"/loginout"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/logout"}, method = RequestMethod.GET)
     public String loginOut() {
         logic.loginOut(request);
         return "redirect:/";
@@ -92,13 +95,9 @@ public class LoginEvent extends BaseEvent {
      */
     @ResponseBody
     @RequestMapping(value = {"/register"}, method = RequestMethod.POST)
-    public Base register(@ModelAttribute User user) {
-        return logic.addregister(user);
+    public Base register(@ModelAttribute UserForm form) {
+        return logic.addregister(form);
     }
-
-
-    @Resource
-    private MenuLogic menuLogic;
 
     /**
      * 登陆成功跳转main
@@ -107,7 +106,7 @@ public class LoginEvent extends BaseEvent {
      */
     @RequestMapping(value = {"/main"}, method = RequestMethod.GET)
     public String main(Model model) {
-        List<MenuResult> list = menuLogic.list(null);
+        List<MenuResult> list = menuLogic.list();
         model.addAttribute("menus", list);
         return "core/admin/main";
     }

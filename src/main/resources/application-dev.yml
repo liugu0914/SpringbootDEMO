@@ -19,7 +19,6 @@ spring:
         max-active: 100
         max-idle: 10
     timeout: 3000
-
 #mybatis配置
 mybatis:
   configuration:

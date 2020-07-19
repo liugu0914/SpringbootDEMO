@@ -33,7 +33,7 @@
         <foreach item="obj" index="name" collection="fieldMap"  separator="," >
             ${name}=#{obj}
         </foreach>
-        where
+        where 1=1 and
         <foreach item="obj" index="name" collection="clauseMap"  separator="and" >
             ${name}=#{obj}
         </foreach>
@@ -42,13 +42,18 @@
     <delete id="del" parameterType="Map">
         delete t from ${tableName} t
         where  1=1
-        and  t.id in
-        <foreach collection="ids" item="item"  open="(" close=")" separator=",">
+        and  t.${name} in
+        <foreach collection="array" item="item"  open="(" close=")" separator=",">
             #{item}
         </foreach>
     </delete>
 
-    <select id="queryOneById" parameterType="Map" resultType="Map">
-        select * from ${tableName} where id=#{id} limit 0,1
+    <select id="queryOne" parameterType="Map" resultType="Map">
+        select t.* from ${tableName}  t
+        where  1=1 and
+        <foreach item="obj" index="name" collection="paramsMap"  separator="and" >
+            ${name}=#{obj}
+        </foreach>
+        limit 0,1
     </select>
 </mapper>

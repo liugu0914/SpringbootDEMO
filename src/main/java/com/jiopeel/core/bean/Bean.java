@@ -27,7 +27,7 @@ public class Bean implements Serializable {
      */
     private Date updtime;
 
-    public void createUUID() {
+    public void createID() {
         this.id = BaseUtil.getSnowFlakeID();
     }
 

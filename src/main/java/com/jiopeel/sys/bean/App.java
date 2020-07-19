@@ -36,4 +36,9 @@ public class App extends Bean implements Serializable {
      */
     private String des;
 
+    /**
+     *  应用图标
+     */
+    private String icon;
+
 }

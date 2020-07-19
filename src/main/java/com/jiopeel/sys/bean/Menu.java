@@ -33,6 +33,11 @@ public class Menu extends Bean implements Serializable {
     private String url;
 
     /**
+     *  通配符
+     */
+    private String charm;
+
+    /**
      * 是否可用
      */
     private String enable;

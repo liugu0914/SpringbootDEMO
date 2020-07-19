@@ -118,7 +118,7 @@ public class MenuEvent extends BaseEvent {
     @ResponseBody
     @RequestMapping(value = "getList", method = {RequestMethod.POST})
     public Base getList(@ModelAttribute MenuQuery query) {
-        List<MenuResult> list = logic.list(query);
+        List<MenuResult> list = logic.list();
         return Base.suc(list);
     }
 

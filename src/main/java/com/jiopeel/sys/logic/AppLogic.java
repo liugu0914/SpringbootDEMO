@@ -6,6 +6,7 @@ import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.config.exception.Assert;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.constant.Constant;
+import com.jiopeel.core.constant.RedisConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.sys.bean.App;
@@ -14,12 +15,12 @@ import com.jiopeel.sys.bean.query.AppQuery;
 import com.jiopeel.sys.bean.result.AppResult;
 import com.jiopeel.sys.dao.AppDao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -80,16 +81,16 @@ public class AppLogic extends BaseLogic {
 
 
     /**
-     * @param appQuery 查询对象
      * @return Base
      * @Description: 根据搜索条件查询数据
      * @author lyc
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
-    public Base list(AppQuery appQuery) {
-        List<AppResult> list = dao.query("app.list", appQuery);
-        return Base.suc(list);
+    @Cacheable(value = RedisConstant.CACHE, key = "targetClass + '$App'")
+    public List<AppResult> list() {
+        List<AppResult> list = dao.query("app.list");
+        return list;
     }
 
     /**
@@ -100,21 +101,22 @@ public class AppLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$App'")
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base save(AppForm form) {
         CheckBean(form);
         String id = form.getId();
         App bean = new App();
         if (BaseUtil.empty(id)) {//添加
-            BeanUtils.copyProperties(form, bean);
+            BaseUtil.copyProperties(form, bean);
             if (BaseUtil.empty(bean.getId()))
-                bean.createUUID();
+                bean.createID();
             bean.createTime();
             bean.setEnable(Constant.ENABLE_YES);
             dao.add(bean);
         } else {//修改
             bean = get(id);
-            BeanUtils.copyProperties(form, bean);
+            BaseUtil.copyProperties(form, bean);
             bean.updTime();
             dao.upd(bean, "id", "id", "ctime");
         }
@@ -130,12 +132,13 @@ public class AppLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @CacheEvict(value = RedisConstant.CACHE, key = "targetClass + '$App'")
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
     public Base del(String ids) {
         Assert.isNull(ids, "未选择不能删除");
         String[] ids_ = ids.split(",");
         if (ids_.length <= 0) {
-            Assert.isNull("", "未选择不能删除");
+            throw new ServerException("未选择不能删除");
         }
 
         dao.delByIds(App.class, ids_);

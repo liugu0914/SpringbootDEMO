@@ -4,7 +4,7 @@ public class Constant {
     /**
      * reflesh_token超时时间 1天
      */
-    public final static Long RELESH_TOKEN_TIMEOUT =1000 * 60 * 60 * 24L;
+    public final static Long RELESH_TOKEN_TIMEOUT = 1000 * 60 * 60 * 24L;
 
     /**
      * token超时时间 2小时
@@ -13,7 +13,7 @@ public class Constant {
 
 
     /**
-     *code存在时间 5分钟
+     * code存在时间 5分钟
      */
     public final static Long CODE_TIMEOUT = 1000 * 60 * 5L;
 
@@ -21,14 +21,20 @@ public class Constant {
     /**
      * 是否可用 0否1是
      */
-    public final static String ENABLE_YES="1";
+    public final static String ENABLE_YES = "1";
 
-    public final static String ENABLE_NO="0";
+    public final static String ENABLE_NO = "0";
 
     /**
-     *  0否1是
+     * 0否1是
      */
-    public final static String YES="1";
+    public final static String YES = "1";
 
-    public final static String NO="0";
+    public final static String NO = "0";
+
+
+    /**
+     * 加盐次数
+     */
+    public final static int SALT_TIMES = 10;
 }

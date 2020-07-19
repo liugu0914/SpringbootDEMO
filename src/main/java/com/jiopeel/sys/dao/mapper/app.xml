@@ -2,10 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="app">
-    <select id="get" parameterType="String" resultType="com.jiopeel.sys.bean.App">
-        select * from t_app where id=#{_paramer}
-    </select>
-
     <select id="getInfo" parameterType="String" resultType="com.jiopeel.sys.bean.result.AppResult">
         select * from t_app where id=#{_paramer}
     </select>
@@ -23,13 +19,4 @@
     <select id="list" parameterType="com.jiopeel.sys.bean.query.AppQuery" resultType="com.jiopeel.sys.bean.result.AppResult">
          select * from t_app where 1=1
     </select>
-
-    <delete id="del">
-        delete t from t_app t
-        where  1=1
-        and  t.id in
-        <foreach collection="array" item="item"  open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-    </delete>
 </mapper>

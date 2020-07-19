@@ -189,10 +189,10 @@
         var chk = Tool.eval(_this._config[Customer.CHECK]);
 
         if (chk && typeof chk === 'function') {
-          var flag = chk($this, $target, data);
+          var _flag = chk($this, $target, data);
 
-          if (typeof flag === 'boolean' && !flag) {
-            showEvent.flag = flag;
+          if (typeof _flag === 'boolean' && !_flag) {
+            showEvent.flag = _flag;
             return;
           }
         } // 自定义函数式  用于封装数据
@@ -245,16 +245,20 @@
         return;
       }
 
-      if ($(this._element).hasClass(ClassName.FADE)) {
-        this._isTransitioning = true;
-      }
-
       if (this._isShown || showEvent.isDefaultPrevented()) {
         return;
       }
 
       this._isShown = true;
-      this.getReomteData();
+      var flag = this.getReomteData();
+
+      if (flag) {
+        return;
+      }
+
+      if ($(this._element).hasClass(ClassName.FADE)) {
+        this._isTransitioning = true;
+      }
 
       this._checkScrollbar();
 
@@ -335,31 +339,37 @@
     };
 
     _proto.getReomteData = function getReomteData() {
-      var _this3 = this;
+      var that = this; // http/https url
 
-      // http/https url
       var HttpUrlReg = /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\\.,@?^=%&:/~\\+#]*[\w\-\\@?^=%&/~\\+#])?/i; // 内部调用地址
 
       var OwnUrlReg = /([\w\-\\.,@?^=%&:/~\\+#]*[\w\-\\@?^=%&/~\\+#])?/i; // 远程地址
 
-      var url = this._config.url; // 远程地址无效 直接返回
+      var url = that._config.url; // 远程地址无效 直接返回
 
       if (!url || url && !HttpUrlReg.test(url) && !OwnUrlReg.test(url)) {
         return;
       } // 拉取远程数据
 
 
+      var flag = false;
       var op = {
         url: url,
         contentType: Ajax.APPLICATION_X_WWW_FORM_URLENCODED,
-        data: this._config.data || {},
+        data: that._config.data || {},
         type: Ajax.POST,
         dataType: Ajax.HTML,
         success: function success(res) {
-          return $(_this3._element.querySelector(Selector.DIALOG)).html(res ? res : '').find(Selector.MODAL_CONTENT).initUI();
+          return $(that._element.querySelector(Selector.DIALOG)).html(res ? res : '').find(Selector.MODAL_CONTENT).initUI();
+        },
+        error: function error() {
+          that.hide();
+          flag = true;
         }
       };
-      Ajax.send(op);
+      Ajax.send(op); // eslint-disable-next-line consistent-return
+
+      return flag;
     };
 
     _proto.expand = function expand(event) {
@@ -387,7 +397,11 @@
     _proto.reflesh = function reflesh() {
       var hideEvent = $.Event(Event.HIDE);
       $(this._element).trigger(hideEvent);
-      this.getReomteData();
+      var flag = this.getReomteData();
+
+      if (flag) {
+        return;
+      }
 
       var expend = this._dialog.querySelector(Selector.DATA_EXPAND);
 
@@ -445,7 +459,7 @@
     };
 
     _proto._showElement = function _showElement(relatedTarget) {
-      var _this4 = this;
+      var _this3 = this;
 
       var transition = $(this._element).hasClass(ClassName.FADE);
 
@@ -481,12 +495,12 @@
       });
 
       var transitionComplete = function transitionComplete() {
-        if (_this4._config.focus) {
-          _this4._element.focus();
+        if (_this3._config.focus) {
+          _this3._element.focus();
         }
 
-        _this4._isTransitioning = false;
-        $(_this4._element).trigger(shownEvent);
+        _this3._isTransitioning = false;
+        $(_this3._element).trigger(shownEvent);
       };
 
       if (transition) {
@@ -501,25 +515,25 @@
     };
 
     _proto._enforceFocus = function _enforceFocus() {
-      var _this5 = this;
+      var _this4 = this;
 
       $(document).off(Event.FOCUSIN) // Guard against infinite focus loop
       .on(Event.FOCUSIN, function (event) {
-        if (document !== event.target && _this5._element !== event.target && $(_this5._element).has(event.target).length === 0) {
-          _this5._element.focus();
+        if (document !== event.target && _this4._element !== event.target && $(_this4._element).has(event.target).length === 0) {
+          _this4._element.focus();
         }
       });
     };
 
     _proto._setEscapeEvent = function _setEscapeEvent() {
-      var _this6 = this;
+      var _this5 = this;
 
       if (this._isShown && this._config.keyboard) {
         $(this._element).on(Event.KEYDOWN_DISMISS, function (event) {
           if (event.which === ESCAPE_KEYCODE) {
             event.preventDefault();
 
-            _this6.hide();
+            _this5.hide();
           }
         });
       } else if (!this._isShown) {
@@ -528,11 +542,11 @@
     };
 
     _proto._setResizeEvent = function _setResizeEvent() {
-      var _this7 = this;
+      var _this6 = this;
 
       if (this._isShown) {
         $(window).on(Event.RESIZE, function (event) {
-          return _this7.handleUpdate(event);
+          return _this6.handleUpdate(event);
         });
       } else {
         $(window).off(Event.RESIZE);
@@ -540,7 +554,7 @@
     };
 
     _proto._hideModal = function _hideModal() {
-      var _this8 = this;
+      var _this7 = this;
 
       this._element.style.display = 'none';
 
@@ -553,12 +567,12 @@
       this._showBackdrop(function () {
         $(document.body).removeClass(ClassName.OPEN);
 
-        _this8._resetAdjustments();
+        _this7._resetAdjustments();
 
-        _this8._resetScrollbar();
+        _this7._resetScrollbar();
 
-        $(_this8._element).trigger(Event.HIDDEN);
-        $(_this8._element).remove();
+        $(_this7._element).trigger(Event.HIDDEN);
+        $(_this7._element).remove();
       });
     };
 
@@ -570,7 +584,7 @@
     };
 
     _proto._showBackdrop = function _showBackdrop(callback) {
-      var _this9 = this;
+      var _this8 = this;
 
       var animate = $(this._element).hasClass(ClassName.FADE) ? ClassName.FADE : '';
 
@@ -584,8 +598,8 @@
 
         $(this._backdrop).appendTo(document.body);
         $(this._element).on(Event.CLICK_DISMISS, function (event) {
-          if (_this9._ignoreBackdropClick) {
-            _this9._ignoreBackdropClick = false;
+          if (_this8._ignoreBackdropClick) {
+            _this8._ignoreBackdropClick = false;
             return;
           }
 
@@ -593,10 +607,10 @@
             return;
           }
 
-          if (_this9._config.backdrop === 'static') {
-            _this9._element.focus();
+          if (_this8._config.backdrop === 'static') {
+            _this8._element.focus();
           } else {
-            _this9.hide();
+            _this8.hide();
           }
         });
 
@@ -621,7 +635,7 @@
         $(this._backdrop).removeClass(ClassName.SHOW);
 
         var callbackRemove = function callbackRemove() {
-          _this9._removeBackdrop();
+          _this8._removeBackdrop();
 
           if (callback) {
             callback();
@@ -691,7 +705,7 @@
     };
 
     _proto._setScrollbar = function _setScrollbar() {
-      var _this10 = this;
+      var _this9 = this;
 
       if (this._isBodyOverflowing) {
         // Note: DOMNode.style.paddingRight returns the actual value or '' if not set
@@ -702,13 +716,13 @@
         $(fixedContent).each(function (index, element) {
           var actualPadding = element.style.paddingRight;
           var calculatedPadding = $(element).css('padding-right');
-          $(element).data('padding-right', actualPadding).css('padding-right', parseFloat(calculatedPadding) + _this10._scrollbarWidth + "px");
+          $(element).data('padding-right', actualPadding).css('padding-right', parseFloat(calculatedPadding) + _this9._scrollbarWidth + "px");
         }); // Adjust sticky content margin
 
         $(stickyContent).each(function (index, element) {
           var actualMargin = element.style.marginRight;
           var calculatedMargin = $(element).css('margin-right');
-          $(element).data('margin-right', actualMargin).css('margin-right', parseFloat(calculatedMargin) - _this10._scrollbarWidth + "px");
+          $(element).data('margin-right', actualMargin).css('margin-right', parseFloat(calculatedMargin) - _this9._scrollbarWidth + "px");
         }); // Adjust body padding
 
         var actualPadding = document.body.style.paddingRight;

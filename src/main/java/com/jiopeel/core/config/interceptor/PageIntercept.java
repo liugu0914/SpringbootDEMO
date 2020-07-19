@@ -119,11 +119,11 @@ public class PageIntercept implements Interceptor {
      */
     private String getDBType(Connection connection) throws SQLException {
         //通过driverName是否包含关键字判断
-        if (connection.getMetaData().getDriverName().toUpperCase().indexOf("MYSQL") != -1) {
+        if (connection.getMetaData().getDriverName().toUpperCase().contains("MYSQL")) {
             return "mysql";
-        } else if (connection.getMetaData().getDriverName().toUpperCase().indexOf("SQL SERVER") != -1) {
+        } else if (connection.getMetaData().getDriverName().toUpperCase().contains("SQL SERVER")) {
             return "sqlserver";
-        } else if (connection.getMetaData().getDriverName().toUpperCase().indexOf("ORACLE") != -1) {
+        } else if (connection.getMetaData().getDriverName().toUpperCase().contains("ORACLE")) {
             return "oracle";
         }
         return "mysql";

@@ -187,7 +187,7 @@ a:not([href]):not([tabindex]) {
 
 a:not([href]):not([tabindex]):focus,
 a:not([href]):not([tabindex]):hover {
-    color: inherit;
+    /*color: inherit;*/
     text-decoration: none;
 }
 
@@ -615,6 +615,8 @@ pre code {
 
 .container-fluid {
     width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
 }
@@ -11854,7 +11856,7 @@ body {
     margin-top: 100px;
     margin-left: 250px;
     overflow: hidden;
-    padding: 5px 20px;
+    padding: 5px;
     min-height: 80vh;
 }
 
@@ -12893,7 +12895,7 @@ body.boxed-layout .footer {
 }
 
 .custom-accordion a.collapsed i.accordion-arrow:before {
-    content: "\F142";
+    content: "\e67a";
 }
 
 .custom-accordion-title {

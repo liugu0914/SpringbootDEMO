@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="permission">
+    <select id="getInfo" parameterType="String" resultType="com.jiopeel.sys.bean.result.PermissionResult">
+        select t.*
+        from t_permission t
+        where t.id=#{_paramer}
+    </select>
+
+    <select id="getListPage" parameterType="Map" resultType="com.jiopeel.sys.bean.result.PermissionResult">
+         select * from t_app  t where 1=1
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(id)">
+            and t.id = #{id}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(enable)">
+            and t.enable = #{enable}
+        </if>
+    </select>
+
+    <select id="list" parameterType="Map" resultType="com.jiopeel.sys.bean.result.PermissionResult">
+         select t.*
+         from t_permission  t
+         where 1=1
+         and  t.appid =#{appid}
+         <if test="!@com.jiopeel.core.util.BaseUtil@empty(isSys)">
+         and  t.type = 'sys'
+         </if>
+        <if test="@com.jiopeel.core.util.BaseUtil@empty(isSys)">
+            and  t.type != 'sys'
+        </if>
+    </select>
+</mapper>

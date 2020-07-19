@@ -126,7 +126,7 @@ public class OauthEvent extends  BaseEvent{
     public Base getUserInfo( @RequestParam(OauthConstant.ACCESS_TOKEN) String access_token) {
         if (BaseUtil.empty(access_token))
             throw new ServerException("access_token不能为空");
-        return logic.getUserbyToken(access_token);
+        return Base.suc(logic.getUserByToken(access_token));
     }
 
     /**

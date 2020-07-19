@@ -1,0 +1,99 @@
+<div class="row">
+    <div class="col-12">
+        <div id="permission" class="custom-accordion mb-4">
+            <div class="card mb-0">
+                <div class="card-header" id="sysHeader">
+                    <h5 class="m-0">
+                        <a class="custom-accordion-title d-block pt-2 pb-2 text-danger" data-toggle="collapse"
+                           href="#sysConfig">
+                            <i class="cs cs-shezhi"></i>  系统权限
+                            <span class="float-right">
+                                <i class="cs cs-xiangxia accordion-arrow"></i>
+                            </span>
+                        </a>
+                    </h5>
+                </div>
+                <div id="sysConfig" class="collapse show" data-parent="#permission">
+                    <div class="card-body">
+                        <div class="text-sm-left">
+                            <button type="button" target="modal" data-appid="${appid}" data-type="sys" data-url="/admin/permission/info"
+                                    class="btn btn-danger btn-rounded mb-3">
+                                <i class="cs cs-jia"></i> 配置权限
+                            </button>
+                        </div>
+                        <div class="row">
+                            [#list list?if_exists as item]
+                            <div class="col-sm-4">
+                                <div class="alert [#if item.enable == '1']alert-danger text-danger[#else]alert-secondary text-secondary[/#if] bg-white alert-dismissible" role="alert">
+                                    <span>${item.name!''}</span>
+                                    <div class="close">
+                                        <a href="/admin/permission/info" data-id="${item.id!''}" class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
+                                           data-appid="${item.appid!''}" data-type="${item.appid!''}"  target="modal"
+                                           show="tooltip" data-title="编辑">
+                                            <i class="cs cs-bianji"></i>
+                                        </a>
+                                        <a href="/admin/permission/del" data-id="${item.id!''}"  class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
+                                           target="ajax" data-warn="确认删除数据?" data-suc="data.suc"
+                                           show="tooltip" data-title="删除">
+                                            <i class="cs cs-shanchu"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            [/#list]
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-0">
+                <div class="card-header" id="menuHeader">
+                    <h5 class="m-0">
+                        <a class="custom-accordion-title d-block pt-2 pb-2 text-success collapsed" data-toggle="collapse"
+                           href="#menuConfig">
+                            <i class="cs cs-shezhi"></i>  菜单权限
+                            <span class="float-right">
+                                <i class="cs cs-xiangxia accordion-arrow"></i>
+                            </span>
+                        </a>
+                    </h5>
+                </div>
+                <div id="menuConfig" class="collapse" data-parent="#permission">
+                    <div class="card-body">
+                        <div class="text-sm-left">
+                            <button type="button" target="modal" data-url="/admin/permission/selectMenu" m-hg="100%"  data-appid="${appid}" data-type="menu"
+                                    class="btn btn-success btn-rounded mb-3">
+                                <i class="cs cs-jia"></i> 配置菜单
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="alert alert-danger alert-dismissible bg-white text-danger" role="alert">
+                                    <span>登陆登陆登陆登陆登陆登陆登陆</span>
+                                    <div class="close">
+                                        <a href="/admin/app/info" class="text-danger" target="modal" show="tooltip"
+                                           data-title="编辑">
+                                            <i class="cs cs-bianji"></i>
+                                        </a>
+                                        <a href="/admin/app/del" class="text-danger" target="ajax" data-warn="确认删除数据?"
+                                           show="tooltip" data-title="删除">
+                                            <i class="cs cs-shanchu"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var data = {
+        suc: function () {
+            if ($('.nav > li > .active').length > 0) {
+                $('.nav > li > .active').eq(0).trigger('click')
+            }
+        }
+    };
+</script>

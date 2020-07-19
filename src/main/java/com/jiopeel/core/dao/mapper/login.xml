@@ -52,7 +52,7 @@
           values (#{id},#{username},#{email},#{account},#{password},#{type},#{imgurl},#{enable},#{ctime},#{updtime})
     </insert>
 
-    <select id="checkAccount" parameterType="com.jiopeel.sys.bean.User" resultType="int">
+    <select id="checkAccount" parameterType="String" resultType="int">
         select count(1) from t_user
         where  t_user.account=#{account}
     </select>

@@ -44,6 +44,10 @@ public class Base implements Serializable {
         return new Base(StateCode.SUCCESS);
     }
 
+    public static Base suc(StateCode stateCode) {
+        return new Base(stateCode.getStatus(), stateCode.getMessage());
+    }
+
     public static Base suc(String msg) {
         return new Base(StateCode.SUCCESS.getStatus(), msg);
     }
@@ -64,6 +68,12 @@ public class Base implements Serializable {
 
     public static Base fail(String msg) {
         Base base = new Base(StateCode.FAIL.getStatus(), msg);
+        base.setResult(false);
+        return base;
+    }
+
+    public static Base fail(StateCode stateCode) {
+        Base base = new Base(stateCode.getStatus(), stateCode.getMessage());
         base.setResult(false);
         return base;
     }

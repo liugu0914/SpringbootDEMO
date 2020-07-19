@@ -185,3 +185,10 @@ var Login = {
             Toast.err(res.message);
     },
 };
+$(function () {
+    Login.init({
+        login_url: '../login',
+        forgot_url: '../forgot',
+        register_url:'../register'
+    });
+});

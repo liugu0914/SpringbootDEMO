@@ -16,9 +16,7 @@ import com.jiopeel.sys.bean.result.MenuResult;
 import com.jiopeel.sys.constant.SysConstant;
 import com.jiopeel.sys.dao.MenuDao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +50,7 @@ public class MenuLogic extends BaseLogic {
     public Menu get(String id) {
         Menu bean = new Menu();
         if (!BaseUtil.empty(id))
-            bean =dao.queryOneById(Menu.class, id);
+            bean = dao.queryOneById(Menu.class, id);
         return bean;
     }
 
@@ -87,7 +85,17 @@ public class MenuLogic extends BaseLogic {
 
 
     /**
-     * @param query 查询对象
+     * @return List<MenuResult>
+     * @Description: 根据搜索条件查询数据
+     * @author lyc
+     * @version 1.0.0
+     * @date 2019年12月20日17:46:46
+     */
+    public List<MenuResult> Menulist() {
+        return  dao.query("menu.list");
+    }
+
+    /**
      * @return List<MenuResult>
      * @Description: 根据搜索条件查询数据
      * @author lyc
@@ -95,8 +103,8 @@ public class MenuLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     @Cacheable(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
-    public List<MenuResult> list(MenuQuery query) {
-        List<MenuResult> list = dao.query("menu.list", query);
+    public List<MenuResult> list() {
+        List<MenuResult> list = dao.query("menu.list");
         if (list == null || list.isEmpty())
             return list;
         List<MenuResult> menus = new ArrayList();
@@ -137,22 +145,15 @@ public class MenuLogic extends BaseLogic {
         String id = form.getId();
         Menu bean = new Menu();
         if (BaseUtil.empty(id)) {
-            BeanUtils.copyProperties(form, bean);
+            BaseUtil.copyProperties(form, bean);
             if (BaseUtil.empty(bean.getId()))
-                bean.createUUID();
+                bean.createID();
             bean = HandleLevel(bean);
             bean.createTime();
             dao.add(bean);
         } else {
             bean = get(id);
-            bean.setName(form.getName());
-            bean.setIcon(form.getIcon());
-            bean.setParent(form.getParent());
-            bean.setUrl(form.getUrl());
-            bean.setSuperid(form.getSuperid());
-            bean.setOrdernum(form.getOrdernum());
-            bean.setAppid(form.getAppid());
-            bean.setEnable(form.getEnable());
+            BaseUtil.copyProperties(form, bean);
             bean = HandleLevel(bean);
             bean.updTime();
             dao.upd(bean, "id", "id", "ctime");
@@ -176,11 +177,11 @@ public class MenuLogic extends BaseLogic {
             bean.setLevel(SysConstant.LEVEL_1);
             bean.setSuperid(SysConstant.NO_SUPER);
         }
-        if (bean.getOrdernum() == null || bean.getOrdernum() == 0) {
+        if (bean.getOrdernum() == null || bean.getOrdernum() <= 0) {
             //根据父级id查询该父级下最大的序号
             String SuperId = bean.getSuperid();
             Integer OrderNum = dao.queryOne("menu.getOrderNumBySuperId", SuperId);
-            bean.setOrdernum(OrderNum);
+            bean.setOrdernum(++OrderNum);
         }
         return bean;
     }
@@ -199,9 +200,9 @@ public class MenuLogic extends BaseLogic {
         Assert.isNull(ids, "未选择不能删除");
         String[] ids_ = ids.split(",");
         if (ids_.length <= 0) {
-            Assert.isNull(null, "未选择不能删除");
+            throw new ServerException("未选择不能删除");
         }
-        dao.delByIds(Menu.class,ids_);
+        dao.delByIds(Menu.class, ids_);
         return Base.suc("删除成功");
     }
 

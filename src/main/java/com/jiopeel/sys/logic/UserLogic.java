@@ -6,19 +6,18 @@ import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.config.exception.Assert;
 import com.jiopeel.core.config.exception.ServerException;
 import com.jiopeel.core.constant.Constant;
+import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
-import com.jiopeel.sys.bean.App;
+import com.jiopeel.sys.bean.Role;
 import com.jiopeel.sys.bean.User;
-import com.jiopeel.sys.bean.form.AppForm;
 import com.jiopeel.sys.bean.form.UserForm;
-import com.jiopeel.sys.bean.query.AppQuery;
 import com.jiopeel.sys.bean.query.UserQuery;
-import com.jiopeel.sys.bean.result.AppResult;
 import com.jiopeel.sys.bean.result.UserResult;
 import com.jiopeel.sys.dao.UserDao;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
+import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +52,23 @@ public class UserLogic extends BaseLogic {
     }
 
     /**
+     * @param account
+     * @return UserResult
+     * @Description: 根据账号获取应用信息与数据库一致
+     * @author lyc
+     * @version 1.0.0
+     * @date 2019年12月20日17:46:46
+     */
+    public UserResult getByAccount(String account) {
+        UserResult bean = null;
+        if (!BaseUtil.empty(account)) {
+            User user = dao.queryOneByColumn(User.class, "account", account);
+            bean = new UserResult(user);
+        }
+        return bean;
+    }
+
+    /**
      * @param id
      * @return AppResult
      * @Description: 根据id获取应用信息 自定义
@@ -69,7 +85,7 @@ public class UserLogic extends BaseLogic {
 
     /**
      * @param query 查询对象
-     * @param page     分页器
+     * @param page  分页器
      * @return Base
      * @Description: 获取分页列表数据
      * @author lyc
@@ -104,24 +120,33 @@ public class UserLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
-    public Base save(UserForm form) {
-        CheckBean(form);
+    public boolean save(UserForm form) {
         String id = form.getId();
         User bean = new User();
+        boolean flag = true;
         if (BaseUtil.empty(id)) {//添加
-            BeanUtils.copyProperties(form, bean);
+            BaseUtil.copyProperties(form, bean);
             if (BaseUtil.empty(bean.getId()))
-                bean.createUUID();
+                bean.createID();
             bean.createTime();
             bean.setEnable(Constant.ENABLE_YES);
-            dao.add(bean);
+            if (BaseUtil.empty(bean.getType()))
+                bean.setType(UserConstant.USER_TYPE_LOCAL);
+            if (BaseUtil.empty(bean.getUsername()))
+                bean.setUsername(bean.getAccount());
+            String salt = BaseUtil.getUUID();//用UUID加盐
+            SimpleHash simpleHash = new SimpleHash(Sha256Hash.ALGORITHM_NAME, bean.getPassword(), salt, Constant.SALT_TIMES);
+            bean.setPassword(simpleHash.toBase64());
+            bean.setSalt(salt);
+            flag = dao.add(bean);
         } else {//修改
+            CheckBean(form);
             bean = get(id);
-            BeanUtils.copyProperties(form, bean);
+            BaseUtil.copyProperties(form, bean);
             bean.updTime();
-            dao.upd4n(bean, "id", "username","email","enable","updtime");
+            dao.upd4n(bean, "id", "username", "email", "enable", "updtime");
         }
-        return Base.suc();
+        return flag;
     }
 
 
@@ -155,8 +180,8 @@ public class UserLogic extends BaseLogic {
      */
     private void CheckBean(UserForm form) {
         Assert.isNull(form, "对象不能为空");
-        Assert.isNull(form.getAccount(), "应用名称不能为空");
-        Assert.isNull(form.getUsername(), "应用标识不能为空");
+        Assert.isNull(form.getAccount(), "账号不能为空");
+        Assert.isNull(form.getUsername(), "昵称不能为空");
     }
 
 }

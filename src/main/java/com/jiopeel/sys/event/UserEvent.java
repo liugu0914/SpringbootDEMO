@@ -131,7 +131,7 @@ public class UserEvent extends BaseEvent {
     @ResponseBody
     @RequestMapping(value = "save", method = {RequestMethod.POST})
     public Base save(@ModelAttribute UserForm form) {
-        return logic.save(form);
+        return Base.judge(logic.save(form));
     }
 
     /**

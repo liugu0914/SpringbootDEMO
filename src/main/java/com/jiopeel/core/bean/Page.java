@@ -2,10 +2,13 @@ package com.jiopeel.core.bean;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class Page<E> {
+public class Page<E> implements Serializable {
+
+    private static final long serialVersionUID = -5662378359739414795L;
 
     /**
      * 每页大小

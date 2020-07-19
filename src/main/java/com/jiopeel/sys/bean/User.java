@@ -7,15 +7,15 @@ import lombok.experimental.Tolerate;
 
 import java.io.Serializable;
 
+/**
+ * @Description : 用户信息
+ * @auhor: lyc
+ * @Date: 2020/7/16 15:23
+ */
 @Data
-@Builder
 public class User extends Bean implements Serializable {
 
     private static final long serialVersionUID = -5471590656721463241L;
-
-    @Tolerate
-    public User() {
-    }
 
     /**
      * 用户名
@@ -41,6 +41,11 @@ public class User extends Bean implements Serializable {
      * 头像
      */
     private String imgurl;
+
+    /**
+     * 盐值
+     */
+    private String salt;
 
 
     /**
