@@ -29,6 +29,7 @@ public class Permission extends Bean implements Serializable {
 
     /**
      * 目标
+     * 当 type 为 menu 时  target 为菜单id
      */
     private String target;
 

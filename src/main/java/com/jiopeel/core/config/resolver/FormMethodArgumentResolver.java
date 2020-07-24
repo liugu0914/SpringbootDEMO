@@ -1,9 +1,9 @@
 package com.jiopeel.core.config.resolver;
 
-import com.jiopeel.core.bean.Bean;
 import com.jiopeel.core.bean.BindMap;
 import com.jiopeel.core.config.annotation.FormParam;
 import com.jiopeel.core.util.BaseUtil;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.WebDataBinder;
@@ -12,15 +12,16 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.BindException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * 用于绑定特殊数据的转换类(暂用于list<Bean>和Map<String,Bean>)
@@ -35,8 +36,10 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
     /**
      * 重构
      */
+    @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer viewcontainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory factory) throws Exception {
+//        String body = getRequestBody(webRequest);
         Object target = this.createAttribute(parameter, factory, webRequest);
         WebDataBinder binder = factory.createBinder(webRequest, target, null);
         if (binder.getTarget() != null) {
@@ -46,8 +49,9 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
     }
 
     /**
-     * 是否存在@EMan标识
+     * 是否存在@FormParam标识
      */
+    @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(FormParam.class);
     }
@@ -123,6 +127,12 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
                                              MethodParameter parameter, ModelAndViewContainer viewcontainer,
                                              NativeWebRequest request, WebDataBinderFactory factory) throws Exception {
         Map<String, String[]> param = request.getParameterMap(); // 客户端所获得参数
+//        Map<String, String[]> param = new HashMap<>(); // 客户端所获得参数
+//        for (String key : oldparam.keySet()) {
+//            String newkey = key.replace("[]", "");
+//            param.put(newkey, oldparam.get(key));
+//        }
+
         Class clazz = this.getBindGenericTypes(parameter)[0]; // 获得泛型类型
         String anno = this.matchNames(name); // 注解中的名称(同时对应list<K>的值)
         int annoAri = this.getArithmetic(name); // 算法规则
@@ -136,7 +146,7 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
 
         List bindParameterList = (List) binder.getTarget(); // 请求绑定的对象
         Object claoo = this.isBaseType(clazz) ? null : clazz.newInstance(); // 泛型实例化对象
-        if (claoo != null && claoo instanceof Bean) {
+        if (claoo != null) {
             Set<String> paramKeys = param.keySet(); // 所有参数的Key
             Field[] fields = BaseUtil.getAllFields(claoo); // 获得bean的所有属性
             for (int i = 0, j = annos != null ? annos.length : 0; i < j; i++) {
@@ -264,27 +274,25 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
         } // Map<String,String>绑定
 
         Object claoo = clazz[1].newInstance();
-        if (claoo instanceof Bean) { // 绑定bean
-            if (BaseUtil.empty(anno))
-                throw new BindException("请求对象[Map]中[Key]不能为空!");
-            String[] annos = param.get(anno); // 匹配注解名称对应的值数组
-            Field[] fields = BaseUtil.getAllFields(claoo); // 获得bean的所有属性
+        if (BaseUtil.empty(anno))
+            throw new BindException("请求对象[Map]中[Key]不能为空!");
+        String[] annos = param.get(anno); // 匹配注解名称对应的值数组
+        Field[] fields = BaseUtil.getAllFields(claoo); // 获得bean的所有属性
 
-            Set<String> paramKeys = param.keySet(); // 所有参数的Key
-            for (int i = 0, j = annos != null ? annos.length : 0; i < j; i++) {
-                String value = annos[i];
-                Object beans = clazz[1].newInstance();
-                for (String key : paramKeys) {
-                    String[] values = param.get(key);
-                    if (values == null || values.length <= i || BaseUtil.empty(values[i]))
-                        continue;
-                    Field field = BaseUtil.getFieldByName(fields, key);
-                    if (field != null)
-                        BaseUtil.setFieldVal(beans, field, values[i]);
-                }
-                bindParameterMap.put(value, beans);
+        Set<String> paramKeys = param.keySet(); // 所有参数的Key
+        for (int i = 0, j = annos != null ? annos.length : 0; i < j; i++) {
+            String value = annos[i];
+            Object beans = clazz[1].newInstance();
+            for (String key : paramKeys) {
+                String[] values = param.get(key);
+                if (values == null || values.length <= i || BaseUtil.empty(values[i]))
+                    continue;
+                Field field = BaseUtil.getFieldByName(fields, key);
+                if (field != null)
+                    BaseUtil.setFieldVal(beans, field, values[i]);
             }
-        } // Map<String,Bean>绑定
+            bindParameterMap.put(value, beans);
+        }
     }
 
     /**
@@ -375,5 +383,29 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
 
             }
         return false;
+    }
+
+
+    /**
+     * @Author Lux Sun
+     * @Description: 获取请求包的Body内容
+     * @Param: [nativeWebRequest]
+     * @Return: java.lang.String
+     */
+    private String getRequestBody(NativeWebRequest nativeWebRequest) {
+        HttpServletRequest servletRequest = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
+        String jsonBody = (String) servletRequest.getAttribute("JSON_REQUEST_BODY");
+        if (jsonBody == null) {
+            try {
+                ServletInputStream inputStream = servletRequest.getInputStream();
+                jsonBody = IOUtils.toString(inputStream, StandardCharsets.UTF_8); // closed stream 问题
+
+                Map o = BaseUtil.fromJson(jsonBody, Map.class);
+                servletRequest.setAttribute("JSON_REQUEST_BODY", jsonBody);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonBody;
     }
 }

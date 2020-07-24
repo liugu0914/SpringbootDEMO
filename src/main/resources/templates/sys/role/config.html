@@ -1,0 +1,50 @@
+<div class="modal-content query-main" id="config">
+    <div class="modal-header modal-colored-header bg-dark">
+        <h5 class="modal-title" >配置权限</h5>
+        <div>
+            <i class="cs cs-shuaxin pointer" show="tooltip" target="modal-reflesh" data-title="刷新" ></i>
+            <i class="cs cs-fangda pointer" show="tooltip" target="modal-expand"  data-title="缩放"  ></i>
+            <i class="cs cs-close pointer" show="tooltip" target="modal-close"  data-title="关闭"  ></i>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-pills bg-nav-pills nav-justified mb-3">
+                            [#list apps?if_exists as app]
+                            <li class="nav-item">
+                                <a href="/admin/role/configDetail"  data-appid="${app.id}" data-roleid="${roleid}" data-target=".query-data" show="tooltip" data-title="${app.name}" target="html" class="nav-link rounded-0">
+                                    <i class="${app.icon} font-18"></i>
+                                    <span class="d-none d-lg-block">${app.name}</span>
+                                </a>
+                            </li>
+                            [/#list]
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="query-data" action="/admin/role/savePes">
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" target="modal-close">关闭</button>
+        <button type="button" class="btn btn-primary" target="form">保存</button>
+    </div>
+</div>
+<script>
+    var config = {
+        init: function () {
+            setTimeout(function () {
+                $('a.nav-link','#config').eq(0).click();
+            },200);
+        }
+    };
+
+    $(function () {
+        config.init();
+    });
+    //# sourceURL=config.js
+</script>

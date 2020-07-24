@@ -289,15 +289,31 @@ public abstract class BaseDao<T extends Bean> {
      * @auhor:lyc
      * @Date:2019/12/21 11:48
      */
-    public <T extends Bean> boolean del(Class<T> clazz, String name, Object value) {
+    public <T extends Bean> boolean del(Class<T> clazz, Map<String, Object> params) {
         String tableName = TABLE_HEADER + BaseUtil.camel2under(clazz.getSimpleName());
-        if (!value.getClass().isArray() && !(value instanceof Collection<?>))
-            value = new Object[]{value};
+        for (String name : params.keySet()) {
+            Object value = params.get(name);
+            if (!value.getClass().isArray() && !(value instanceof Collection<?>))
+                value = new Object[]{value};
+            params.put(name, value);
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("tableName", tableName);
-        map.put("name", name);
-        map.put("array", value);
+        map.put("params", params);
         return del(CORE_DEL, map);
+    }
+
+    /**
+     * @Description :删除
+     * @param: nameSpec  命名空间
+     * @Return: boolean 是否执行成功
+     * @auhor:lyc
+     * @Date:2019/12/21 11:48
+     */
+    public <T extends Bean> boolean del(Class<T> clazz, String name, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(name, value);
+        return del(clazz, map);
     }
 
     /**

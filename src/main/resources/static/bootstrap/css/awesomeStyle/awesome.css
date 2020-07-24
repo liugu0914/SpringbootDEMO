@@ -23,12 +23,11 @@ website:    http://code.google.com/p/jquerytree/
 .ztree * {
     padding: 0;
     margin: 0;
-    font-family: Verdana, Arial, Helvetica, AppleGothic, sans-serif;
 }
 
 .ztree {
     margin: 0;
-    padding: 10px;
+    padding: 5px;
 }
 
 .ztree li {
@@ -48,11 +47,19 @@ website:    http://code.google.com/p/jquerytree/
 .ztree li a {
     margin-left: 4px;
     cursor: pointer;
+    color: inherit;
     background-color: transparent;
     text-decoration: none;
     vertical-align: top;
     display: inline-flex;
     align-items: baseline;
+}
+
+.ztree li a:hover {
+    background-color: #000000;
+    color: #ffffff;
+    opacity: 0.8;
+    border-radius: .25rem;
 }
 
 .ztree li a input.rename {

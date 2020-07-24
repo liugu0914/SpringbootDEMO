@@ -1,22 +1,23 @@
 <div class="row">
     <div class="col-12">
-        <div id="permission" class="custom-accordion mb-4">
-            <div class="card mb-0">
+        <div class="custom-accordion mb-4">
+            <div class="card mb-0" id="sysPermission">
                 <div class="card-header" id="sysHeader">
                     <h5 class="m-0">
                         <a class="custom-accordion-title d-block pt-2 pb-2 text-danger" data-toggle="collapse"
                            href="#sysConfig">
-                            <i class="cs cs-shezhi"></i>  系统权限
+                            <i class="cs cs-shezhi"></i> 系统权限
                             <span class="float-right">
                                 <i class="cs cs-xiangxia accordion-arrow"></i>
                             </span>
                         </a>
                     </h5>
                 </div>
-                <div id="sysConfig" class="collapse show" data-parent="#permission">
+                <div id="sysConfig" class="collapse show" data-parent="#sysPermission">
                     <div class="card-body">
                         <div class="text-sm-left">
-                            <button type="button" target="modal" data-appid="${appid}" data-type="sys" data-url="/admin/permission/info"
+                            <button type="button" target="modal" data-appid="${appid}" data-type="sys"
+                                    data-url="/admin/permission/info"
                                     class="btn btn-danger btn-rounded mb-3">
                                 <i class="cs cs-jia"></i> 配置权限
                             </button>
@@ -24,16 +25,19 @@
                         <div class="row">
                             [#list list?if_exists as item]
                             <div class="col-sm-4">
-                                <div class="alert [#if item.enable == '1']alert-danger text-danger[#else]alert-secondary text-secondary[/#if] bg-white alert-dismissible" role="alert">
+                                <div class="alert [#if item.enable == '1']alert-danger[#else]alert-secondary[/#if] alert-dismissible"
+                                     role="alert">
                                     <span>${item.name!''}</span>
                                     <div class="close">
-                                        <a href="/admin/permission/info" data-id="${item.id!''}" class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
-                                           data-appid="${item.appid!''}" data-type="${item.appid!''}"  target="modal"
+                                        <a href="/admin/permission/info" data-id="${item.id!''}"
+                                           class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
+                                           data-appid="${item.appid!''}" data-type="${item.appid!''}" target="modal"
                                            show="tooltip" data-title="编辑">
                                             <i class="cs cs-bianji"></i>
                                         </a>
-                                        <a href="/admin/permission/del" data-id="${item.id!''}"  class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
-                                           target="ajax" data-warn="确认删除数据?" data-suc="data.suc"
+                                        <a href="/admin/permission/del" data-id="${item.id!''}"
+                                           class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
+                                           target="ajax" data-warn="确认删除数据?" data-suc="data.delSuc"
                                            show="tooltip" data-title="删除">
                                             <i class="cs cs-shanchu"></i>
                                         </a>
@@ -45,40 +49,39 @@
                     </div>
                 </div>
             </div>
-            <div class="card mb-0">
+            <div class="card mb-0" id="menuPermission">
                 <div class="card-header" id="menuHeader">
                     <h5 class="m-0">
-                        <a class="custom-accordion-title d-block pt-2 pb-2 text-success collapsed" data-toggle="collapse"
+                        <a class="custom-accordion-title d-block pt-2 pb-2 text-success " data-toggle="collapse"
                            href="#menuConfig">
-                            <i class="cs cs-shezhi"></i>  菜单权限
+                            <i class="cs cs-shezhi"></i> 菜单权限
                             <span class="float-right">
                                 <i class="cs cs-xiangxia accordion-arrow"></i>
                             </span>
                         </a>
                     </h5>
                 </div>
-                <div id="menuConfig" class="collapse" data-parent="#permission">
+                <div id="menuConfig" class="collapse show" data-parent="#menuPermission">
                     <div class="card-body">
                         <div class="text-sm-left">
-                            <button type="button" target="modal" data-url="/admin/permission/selectMenu" m-hg="100%"  data-appid="${appid}" data-type="menu"
+                            <button type="button" target="modal" data-url="/admin/permission/selectMenu" m-hg="100%"
+                                    data-appid="${appid}" data-type="menu"
                                     class="btn btn-success btn-rounded mb-3">
                                 <i class="cs cs-jia"></i> 配置菜单
                             </button>
                         </div>
                         <div class="row">
                             <div class="col-sm-4">
-                                <div class="alert alert-danger alert-dismissible bg-white text-danger" role="alert">
-                                    <span>登陆登陆登陆登陆登陆登陆登陆</span>
-                                    <div class="close">
-                                        <a href="/admin/app/info" class="text-danger" target="modal" show="tooltip"
-                                           data-title="编辑">
-                                            <i class="cs cs-bianji"></i>
-                                        </a>
-                                        <a href="/admin/app/del" class="text-danger" target="ajax" data-warn="确认删除数据?"
-                                           show="tooltip" data-title="删除">
-                                            <i class="cs cs-shanchu"></i>
-                                        </a>
-                                    </div>
+                                <div class="border p-3 mt-2 mt-lg-0 rounded">
+                                    <h4 class="mb-2 ml-2">菜单</h4>
+                                    <ul id="tree" target="tree" data-appid="${appid}"
+                                        data-target=".fuc-data" data-targeturl="/admin/permission/fuc"
+                                        data-url="/admin/permission/configTree" data-suc="data.treeSuc"></ul>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class=" border p-3 mt-4 mt-lg-0 rounded fuc-data">
+                                    <h4 class="mb-2 ml-2">功能权限</h4>
                                 </div>
                             </div>
                         </div>
@@ -90,10 +93,21 @@
 </div>
 <script>
     var data = {
-        suc: function () {
+        delSuc: function () {
             if ($('.nav > li > .active').length > 0) {
                 $('.nav > li > .active').eq(0).trigger('click')
             }
+        },
+        treeSuc: function (event, treeId, treeNode, msg) {
+            if (!msg || msg.length == 0) {
+                return;
+            }
+            var zTree = $('#tree').data('tree').ztree;
+            var node = zTree.getNodes()[0];
+            if (node) {
+                $('#' + node.children[0].tId + "_a",'#tree').click();
+            }
         }
     };
+    //# sourceURL=data.js
 </script>

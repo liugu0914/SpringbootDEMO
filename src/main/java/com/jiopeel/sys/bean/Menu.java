@@ -51,7 +51,7 @@ public class Menu extends Bean implements Serializable {
     /**
      * 菜单级别
      */
-    private Integer level;
+    private int level;
 
     /**
      * 上级id
@@ -61,7 +61,7 @@ public class Menu extends Bean implements Serializable {
     /**
      * 菜单顺序
      */
-    private Integer ordernum;
+    private int ordernum;
 
     /**
      * 应用id

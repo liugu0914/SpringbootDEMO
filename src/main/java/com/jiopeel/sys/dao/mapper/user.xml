@@ -6,8 +6,9 @@
         select * from t_user where id=#{_paramer}
     </select>
 
-    <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.UserQuery" resultType="com.jiopeel.sys.bean.result.UserResult">
-         select * from t_user t where 1=1
+    <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.UserQuery"
+            resultType="com.jiopeel.sys.bean.result.UserResult">
+        select * from t_user t where 1=1
         <if test="!@com.jiopeel.core.util.BaseUtil@empty(id)">
             and t.id = #{id}
         </if>
@@ -16,7 +17,14 @@
         </if>
     </select>
 
-    <select id="list" parameterType="com.jiopeel.sys.bean.query.UserQuery" resultType="com.jiopeel.sys.bean.result.UserResult">
-         select * from t_user where 1=1
+    <select id="list" parameterType="com.jiopeel.sys.bean.query.UserQuery"
+            resultType="com.jiopeel.sys.bean.result.UserResult">
+         select t.* from t_user t where 1=1
+    </select>
+
+    <select id="getHasRoles" parameterType="String" resultType="com.jiopeel.sys.bean.result.UserRoleResult">
+         select t.*
+         from t_user_role t
+         where 1=1 and t.userid = #{_paramer}
     </select>
 </mapper>

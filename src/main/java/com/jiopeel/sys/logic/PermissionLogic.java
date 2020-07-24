@@ -4,22 +4,21 @@ import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.TreeNode;
 import com.jiopeel.core.config.exception.Assert;
 import com.jiopeel.core.config.exception.ServerException;
+import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.sys.bean.Permission;
 import com.jiopeel.sys.bean.form.PermissionForm;
 import com.jiopeel.sys.bean.result.MenuResult;
 import com.jiopeel.sys.bean.result.PermissionResult;
+import com.jiopeel.sys.constant.SysConstant;
 import com.jiopeel.sys.dao.PermissionDao;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author ：lyc
@@ -71,41 +70,22 @@ public class PermissionLogic extends BaseLogic {
     }
 
 
-    public List<PermissionResult> list(String appid, boolean isSys) {
-        Map<String ,String> map= new HashMap<String ,String>();
-        map.put("appid",appid);
-        if (isSys)
-            map.put("isSys","true");
+    /**
+     * 根据appid 和type 获取对于信息
+     * @param appid
+     * @param type
+     * @return List<PermissionResult>
+     * @author lyc
+     * @date 2020年07月14日14:15:27
+     */
+    public List<PermissionResult> list(String appid, String type) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("appid", appid);
+        map.put("type", type);
         List<PermissionResult> list = dao.query("permission.list", map);
         return list;
     }
 
-    /**
-     * @Description :返回树结构
-     * @Param:
-     * @Return:
-     * @auhor:lyc
-     * @Date:2020/7/12 17:52
-     */
-    public List<TreeNode> menuTree() {
-        //查询菜单树
-        List<MenuResult> list = menuLogic.Menulist();
-        List<TreeNode> treeNodes = new ArrayList<>();
-        for (MenuResult result : list) {
-            TreeNode node = new TreeNode();
-            node.setId(result.getId());
-            node.setPid(result.getSuperid());
-            node.setName(result.getName());
-            node.setParent(BaseUtil.parseBoolean(result.getParent()));
-            if(node.isParent())
-                node.setOpen(true);
-            node.setIconfont(result.getIcon());
-            node.setChecked(true);
-            node.setUrl(result.getUrl());
-            treeNodes.add(node);
-        }
-        return treeNodes;
-    }
 
     /**
      * @param form 表单提交对象
@@ -171,4 +151,203 @@ public class PermissionLogic extends BaseLogic {
         Assert.isNull(form.getEnable(), "是否可用不能为空");
     }
 
+    /**
+     * @Description :查询对于应用配置菜单
+     * @Param: param2Map
+     * @Return: List<TreeNode>
+     * @auhor: lyc
+     * @Date: 2020/7/12 17:52
+     */
+    public List<TreeNode> configTree(Map<String, String> param2Map) {
+        String appId = param2Map.get("appid");
+        //查询所有菜单
+        List<MenuResult> menus = menuLogic.Menulist();
+        List<MenuResult> list = new ArrayList<>();
+        for (MenuResult menu : menus) {
+            if (appId.equals(menu.getAppid()))
+                list.add(menu);
+        }
+        //查询已配置的菜单
+        Map<String, PermissionResult> map = getHasMenuPermission(appId);
+
+        List<TreeNode> treeNodes = new ArrayList<>();
+        for (MenuResult result : list) {
+            String id = result.getId();// 菜单id
+            if (!map.containsKey(id))
+                continue;
+            TreeNode node = new TreeNode();
+            node.setId(id);
+            node.setPid(result.getSuperid());
+            node.setName(result.getName());
+            node.setParent(BaseUtil.parseBoolean(result.getParent()));
+            if (node.isParent())
+                node.setOpen(true);
+            node.setIconfont(result.getIcon());
+            node.setUrl(result.getUrl());
+            treeNodes.add(node);
+        }
+        return treeNodes;
+    }
+
+
+    /**
+     * @Description :查询配置菜单
+     * @Param: param2Map
+     * @Return: List<TreeNode>
+     * @auhor: lyc
+     * @Date: 2020/7/12 17:52
+     */
+    public List<TreeNode> menuTree(Map<String, String> param2Map) {
+        String appId = param2Map.get("appid");
+        //查询所有菜单
+        List<MenuResult> menus = menuLogic.Menulist();
+        List<MenuResult> list = new ArrayList<>();
+        for (MenuResult menu : menus) {
+            if (appId.equals(menu.getAppid()))
+                list.add(menu);
+        }
+        //查询已配置的菜单
+        Map<String, PermissionResult> map = getHasMenuPermission(appId);
+
+        List<TreeNode> treeNodes = new ArrayList<>();
+        for (MenuResult result : list) {
+            String id = result.getId();// 菜单id
+            TreeNode node = new TreeNode();
+            node.setId(id);
+            node.setPid(result.getSuperid());
+            node.setName(result.getName());
+            node.setParent(BaseUtil.parseBoolean(result.getParent()));
+            if (node.isParent())
+                node.setOpen(true);
+            node.setIconfont(result.getIcon());
+            node.setUrl(result.getUrl());
+            if (map.containsKey(id)) //选中
+                node.setChecked(true);
+            treeNodes.add(node);
+        }
+        return treeNodes;
+    }
+
+
+    /**
+     * 查询已配置的菜单
+     *
+     * @Return: Map<String, PermissionResult>
+     * @auhor: lyc
+     * @Date: 2020/7/20 15:49
+     */
+    public Map<String, PermissionResult> getHasMenuPermission(String appId) {
+        //查询已配置的菜单
+        List<PermissionResult> menuPermissions = this.list(appId, SysConstant.PERMISSION_TYPE_MENU);
+        Map<String, PermissionResult> map = new LinkedHashMap<>();
+        for (PermissionResult menuPermission : menuPermissions)
+            map.put(menuPermission.getTarget(), menuPermission); // 菜单id 权限
+        return map;
+    }
+
+    /**
+     * 保存菜单树结构
+     *
+     * @Param: list
+     * @Return:
+     * @auhor: lyc
+     * @Date: 2020/7/20 15:49
+     */
+    @Transactional(rollbackFor = {Exception.class, ServerException.class})
+    public Object saveMenu(List<TreeNode> list, Map<String, String> params) {
+        if (list == null || list.isEmpty())
+            return null;
+        String appId = params.get("appid");
+        //查询已配置的菜单
+        Map<String, PermissionResult> map = getHasMenuPermission(appId);
+        //查询菜单树
+        List<Permission> menus = new ArrayList<>();
+        for (TreeNode node : list) {
+            //id 为菜单id
+            String id = node.getId();
+            //已存在的删除
+            if (map.containsKey(id)) {//已配置
+                dao.delByIds(Permission.class, map.get(id).getId());
+                dao.del(Permission.class, "menuid", id); //删除菜单下的权限配置
+                continue;
+            }
+            //不存在的添加
+            Permission permission = new Permission();
+            permission.createID();
+            permission.createTime();
+            permission.setAppid(appId);
+            permission.setType(SysConstant.PERMISSION_TYPE_MENU);
+            permission.setTarget(id);
+            permission.setName(node.getName());
+            permission.setEnable(Constant.ENABLE_YES);
+            menus.add(permission);
+        }
+        if (!menus.isEmpty())
+            dao.addBatch(menus);
+        return null;
+    }
+
+    /**
+     * 查询菜单下的功能权限
+     *
+     * @Param: id 菜单id
+     * @Return: List<PermissionResult>
+     * @auhor: lyc
+     * @Date: 2020/7/20 15:49
+     */
+    public List<PermissionResult> getFucPermission(String id) {
+        Map<String, String> map = new HashMap<>();
+        map.put("menuid", id);
+        map.put("type", SysConstant.PERMISSION_TYPE_FUC);
+        List<PermissionResult> query = dao.query("permission.getFucPermission", map);
+        return query;
+    }
+
+    /**
+     * 通过APPId查询菜单下的功能权限
+     *
+     * @Param: id 菜单id
+     * @Return: List<PermissionResult>
+     * @auhor: lyc
+     * @Date: 2020/7/20 15:49
+     */
+    public Map<String, List<PermissionResult>> getFucPermissionByAppId(String appId) {
+        Map<String, List<PermissionResult>> map = new HashMap<>();
+        List<PermissionResult> list = list(appId, SysConstant.PERMISSION_TYPE_FUC);
+        for (PermissionResult item : list) {
+            String menuId =item.getMenuid();// 菜单id
+            if(map.containsKey(menuId)){
+                map.get(menuId).add(item);
+            }else {
+                List<PermissionResult> sans =new ArrayList<>();
+                sans.add(item);
+                map.put(menuId,sans);
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 通过APPId查询菜单下的菜单权限
+     * @param appId
+     * @return List<PermissionResult>
+     * @author lyc
+     * @date 2020年07月14日14:15:27
+     */
+    public List<MenuResult> getMenuPermissionByAppId(String appId) {
+        //查询已配置的菜单
+        Map<String, PermissionResult> Map = getHasMenuPermission(appId);
+        //查询所有菜单
+        List<MenuResult> menus = menuLogic.Menulist();
+        List<MenuResult> items = new ArrayList<>();
+        for (MenuResult menu : menus) {
+            String menuId =menu.getId(); // 菜单id
+            if (Map.containsKey(menuId)) {
+                String permissionId = Map.get(menuId).getId();
+                menu.setPermissionid(permissionId);
+                items.add(menu);
+            }
+        }
+        return items;
+    }
 }

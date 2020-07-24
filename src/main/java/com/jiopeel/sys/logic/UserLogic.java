@@ -9,20 +9,26 @@ import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.UserConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
-import com.jiopeel.sys.bean.Role;
 import com.jiopeel.sys.bean.User;
+import com.jiopeel.sys.bean.UserRole;
 import com.jiopeel.sys.bean.form.UserForm;
 import com.jiopeel.sys.bean.query.UserQuery;
+import com.jiopeel.sys.bean.result.RoleResult;
 import com.jiopeel.sys.bean.result.UserResult;
+import com.jiopeel.sys.bean.result.UserRoleResult;
 import com.jiopeel.sys.dao.UserDao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ：lyc
@@ -35,6 +41,9 @@ public class UserLogic extends BaseLogic {
 
     @Resource
     private UserDao dao;
+
+    @Autowired
+    private RoleLogic roleLogic;
 
     /**
      * @param id
@@ -112,6 +121,36 @@ public class UserLogic extends BaseLogic {
     }
 
     /**
+     * 保存用户的角色配置
+     * @param sets
+     * @param userId
+     * @return Base
+     * @author lyc
+     * @date 2020年07月24日18:04:34
+     */
+    @Transactional(rollbackFor = {Exception.class, ServerException.class})
+    public boolean saveConfigRoles( Set<String> sets,String userId) {
+        if(BaseUtil.empty(userId))
+            return false;
+        dao.del(UserRole.class, "userid", userId);
+        if (sets == null || sets.isEmpty()) {
+            return true;
+        }
+        List<UserRole> items = new ArrayList<>();
+        for (String id : sets) {
+            UserRole bean = new UserRole();
+            bean.setRoleid(id);
+            bean.setUserid(userId);
+            bean.createTime();
+            bean.createID();
+            items.add(bean);
+        }
+        dao.addBatch(items);
+        return true;
+    }
+
+
+    /**
      * @param form 表单提交对象
      * @return Base
      * @Description: 保存数据
@@ -149,7 +188,6 @@ public class UserLogic extends BaseLogic {
         return flag;
     }
 
-
     /**
      * @param ids
      * @return Base
@@ -167,9 +205,32 @@ public class UserLogic extends BaseLogic {
         }
 
         dao.delByIds(User.class, ids_);
+        //删除用户对应的角色
+        dao.del(UserRole.class, "userid", ids_);
         return Base.suc("删除成功");
     }
 
+    /**
+     * 查询角色
+     * @param id 用户id
+     * @author lyc
+     * @date 2020年07月24日17:24:03
+     */
+    public List<RoleResult> getRoles(String id) {
+        //所有角色
+        List<RoleResult> roles = roleLogic.getList();
+        //查询用户id已配置的角色
+        List<UserRoleResult> list = dao.query("user.getHasRoles", id);
+        Set<String> sans =new HashSet<>();
+        for (UserRoleResult result : list) {
+            sans.add(result.getRoleid());
+        }
+        for (RoleResult item : roles) {
+            if(sans.contains(item.getId()))
+                item.setUsed(Constant.YES);
+        }
+        return roles;
+    }
 
     /**
      * @param form 表单提交对象
@@ -183,5 +244,4 @@ public class UserLogic extends BaseLogic {
         Assert.isNull(form.getAccount(), "账号不能为空");
         Assert.isNull(form.getUsername(), "昵称不能为空");
     }
-
 }

@@ -9,7 +9,7 @@
     </select>
 
     <select id="getListPage" parameterType="Map" resultType="com.jiopeel.sys.bean.result.PermissionResult">
-         select * from t_app  t where 1=1
+         select t.* from t_app  t where 1=1
         <if test="!@com.jiopeel.core.util.BaseUtil@empty(id)">
             and t.id = #{id}
         </if>
@@ -23,11 +23,18 @@
          from t_permission  t
          where 1=1
          and  t.appid =#{appid}
-         <if test="!@com.jiopeel.core.util.BaseUtil@empty(isSys)">
-         and  t.type = 'sys'
+         <if test="!@com.jiopeel.core.util.BaseUtil@empty(type)">
+         and  t.type = #{type}
          </if>
-        <if test="@com.jiopeel.core.util.BaseUtil@empty(isSys)">
-            and  t.type != 'sys'
+    </select>
+
+    <select id="getFucPermission" parameterType="Map" resultType="com.jiopeel.sys.bean.result.PermissionResult">
+        select t.*
+        from t_permission  t
+        where 1=1
+        and  t.menuid =#{menuid}
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(type)">
+            and  t.type = #{type}
         </if>
     </select>
 </mapper>

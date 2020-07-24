@@ -1,12 +1,12 @@
 <div class="row mb-2">
     <div class="col-sm-8">
-<!--        <a href="/admin/user/info" class="btn btn-success btn-sm mb-2 mr-1" target="modal">-->
-<!--            <i class="cs cs-jia"></i>添加-->
-<!--        </a>-->
-        <a href="/admin/user/info" class="btn btn-info btn-sm mb-2 mr-1" target="modal" data-cus="Tool.checkedData('id';true)">
+        <a href="/admin/role/info" class="btn btn-success btn-sm mb-2 mr-1" target="modal">
+            <i class="cs cs-jia"></i>添加
+        </a>
+        <a href="/admin/role/info" class="btn btn-info btn-sm mb-2 mr-1" target="modal" data-cus="Tool.checkedData('id';true)">
             <i class="cs cs-bianji"></i>编辑
         </a>
-        <a href="/admin/user/del" target="ajax" data-warn="确认删除选中数据?" data-cus="Tool.checkedData('id')" class="btn btn-danger btn-sm mb-2 mr-1">
+        <a href="/admin/role/del" target="ajax" data-warn="确认删除选中数据?" data-cus="Tool.checkedData('id')" class="btn btn-danger btn-sm mb-2 mr-1">
             <i class="cs cs-jian"></i>删除
         </a>
     </div>
@@ -31,11 +31,10 @@
                         </div>
                     </th>
                     <th>#</th>
-                    <th>头像</th>
                     <th>名称</th>
-                    <th>账号</th>
-                    <th>邮箱</th>
-                    <th>类型</th>
+                    <th>权重</th>
+                    <th>描述</th>
+                    <th>是否可用</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -50,21 +49,25 @@
                         </div>
                     </td>
                     <td>${bean_index+1}</td>
+                    <td>${bean.name!''}</td>
+                    <td>${bean.weight!'0'}</td>
+                    <td>${bean.remark!''}</td>
                     <td>
-                        <img src="${bean.imgurl!''}" src-error="user"  class=" d-sm-block avatar-sm rounded-circle">
+                        <div>
+                            <input type="checkbox" id="switch${bean.id}" [#if bean.enable?? &&
+                                   bean.enable=='1']checked[/#if] data-switch="success">
+                            <label for="switch${bean.id}" data-on-label="是" data-off-label="否"
+                                   class="mb-0 d-block"></label>
+                        </div>
                     </td>
-                    <td>${bean.username!''}</td>
-                    <td>${bean.account!''}</td>
-                    <td>${bean.email!''}</td>
-                    <td>${bean.type!''}</td>
-                    <td>
-                        <a href="/admin/user/configRoles" target="modal"  data-id="${bean.id}" show="tooltip" data-title="配置角色">
-                            <i class="cs cs cs-jiaoseguanli"></i>
+                    <td class="text-secondary">
+                        <a href="/admin/role/config" target="modal" m-wd="calc(100% - 1rem)" m-hg="100%"  data-id="${bean.id}" show="tooltip" data-title="配置权限">
+                            <i class="cs cs-config-permission"></i>
                         </a>
-                        <a href="/admin/user/info" target="modal" data-id="${bean.id}" show="tooltip"  data-title="编辑">
+                        <a href="/admin/role/info" target="modal" data-id="${bean.id}" show="tooltip"  data-title="编辑">
                             <i class="cs cs-bianji"></i>
                         </a>
-                        <a href="/admin/user/del" target="ajax" data-id="${bean.id}" data-warn="确认删除数据?"  show="tooltip" data-title="删除">
+                        <a href="/admin/role/del" target="ajax" data-id="${bean.id}" data-warn="确认删除数据?"  show="tooltip" data-title="删除">
                             <i class="cs cs-shanchu"></i>
                         </a>
                     </td>

@@ -191,35 +191,41 @@
         error: this.error(op.error)
       };
 
-      if (op.error) {
+      if (op) {
         delete op.error;
       }
 
       op = typeof op === 'object' && op ? op : {};
       var opData = typeof op.data === 'object' && op.data ? op.data : {};
-      var nData = {};
+      var nData;
 
-      for (var key in opData) {
-        if (!key.toString().includes('.')) {
-          nData[key] = opData[key];
+      if (opData instanceof Object) {
+        nData = {};
+
+        for (var key in opData) {
+          if (!key.toString().includes('.')) {
+            nData[key] = opData[key];
+          }
         }
+      } else {
+        nData = opData;
       }
-
-      op.data = nData;
 
       switch (op.contentType) {
         default:
         case APPLICATION_X_WWW_FORM_URLENCODED:
+          nData = Tool.toSerialize(nData);
           break;
 
         case MULTIPART_FORM_DATA:
           break;
 
         case APPLICATION_JSON:
-          op.data = window.JSON.stringify(op.data);
+          nData = window.JSON.stringify(nData);
           break;
       }
 
+      op.data = nData;
       op = _objectSpread({}, settings, op);
       $.ajax(op);
     };

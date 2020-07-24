@@ -43,11 +43,95 @@
         }
 
         var name = array[index].name;
-        var value = array[index].value || '';
-        data[name] = data[name] ? [value].concat($.isArray(data[name]) ? data[name] : [data[name]]) : value;
+        var value = array[index].value;
+        data[name] = data[name] ? [].concat($.isArray(data[name]) ? data[name] : [data[name]], [value]) : value;
       }
 
       return data;
+    } // ----------------------------------------------------------------------
+    // Object序列化
+    // ----------------------------------------------------------------------
+    ;
+
+    Tool.toSerialize = function toSerialize(obj) {
+      var serialize = '';
+
+      if (!obj || !(obj instanceof Object)) {
+        return serialize;
+      }
+
+      for (var key in obj) {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+          continue;
+        }
+
+        var data = obj[key];
+
+        if (data instanceof Array) {
+          for (var index in data) {
+            if (!Object.prototype.hasOwnProperty.call(data, index)) {
+              continue;
+            }
+
+            var value = data[index];
+            serialize = serialize ? serialize.concat("&" + key + "=" + value) : key + "=" + value;
+          }
+        } else if (data instanceof Object) {
+          continue;
+        } else {
+          serialize = serialize ? serialize.concat("&" + key + "=" + data) : key + "=" + data;
+        }
+      }
+
+      return serialize;
+    } // ----------------------------------------------------------------------
+    // 数组数据转为Object
+    // ----------------------------------------------------------------------
+    ;
+
+    Tool.toObject = function toObject(target) {
+      if (!target) {
+        return {};
+      }
+
+      if (!(target instanceof Array)) {
+        return target;
+      }
+
+      var data = {};
+      var flag = false;
+
+      for (var _len = arguments.length, needs = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        needs[_key - 1] = arguments[_key];
+      }
+
+      for (var index in target) {
+        if (!Object.prototype.hasOwnProperty.call(target, index)) {
+          continue;
+        }
+
+        var targetData = target[index];
+
+        if (typeof targetData !== 'object') {
+          flag = true;
+          break;
+        }
+
+        for (var key in targetData) {
+          if (!Object.prototype.hasOwnProperty.call(targetData, key)) {
+            continue;
+          }
+
+          if (needs && needs.length > 0 && !needs.includes(key)) {
+            continue;
+          }
+
+          var value = targetData[key];
+          data[key] = data[key] ? [].concat($.isArray(data[key]) ? data[key] : [data[key]], [value]) : value;
+        }
+      }
+
+      return flag ? target : data;
     } // ----------------------------------------------------------------------
     // 字符串转function
     // ----------------------------------------------------------------------

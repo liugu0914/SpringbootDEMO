@@ -15,8 +15,11 @@
                 <input class="form-control" type="text" name="name" value="${bean.name!''}"
                        placeholder="权限名称">
             </div>
-            [#if bean.type == 'sys']
-            <input type="hidden" name="type" value="${(bean.type)!'sys'}">
+            [#if bean.menuid??]
+            <input type="hidden" name="menuid" value="${(bean.menuid)!''}">
+            [/#if]
+            [#if bean.type??]
+            <input type="hidden" name="type" value="${(bean.type)!''}">
             [#else]
             <div class="form-group">
                 <label>权限类型</label>
@@ -28,7 +31,7 @@
             </div>
             [/#if]
             [#if bean.appid??]
-            <input type="hidden" name="appid" value="${bean.appid}">
+            <input type="hidden" name="appid" value="${bean.appid!''}">
             [#else]
             <div class="form-group">
                 <label>应用ID</label>
@@ -41,7 +44,7 @@
 
             <div class="form-group">
                 <label>地址</label>
-                <input class="form-control" type="text" name="target" value="${bean.target!''}"
+                <input class="form-control" type="text" onchange="Add.getCharm()" name="target" value="${bean.target!''}"
                        placeholder="地址">
             </div>
 
@@ -68,6 +71,12 @@
 </div>
 <script>
     var Add = {
+        init: function () {
+            var $charm = $('[name=charm]', '#add');
+            if($charm.val())
+                return;
+            this.getCharm();
+        },
         isEnable: function () {
             var $this = $('#enable');
             var val = $this.prop('checked');
@@ -78,10 +87,37 @@
             if ($('#modal').length > 0) {
                 $('#modal').modal('hide')
             }
-            if ($('.nav > li > .active').length > 0) {
-                $('.nav > li > .active').eq(0).trigger('click')
+            var $type = $('[name=type]', '#add').val();
+            if ($type === 'fuc') { //为功能权限
+                var zTree =$('#tree').data('tree').ztree;
+                var nodes = zTree.getSelectedNodes();
+                if (nodes.length>0) {
+                    $('#'+nodes[0].tId +"_a").click();
+                }
+            }else{
+                if ($('.nav > li > .active').length > 0) {
+                    $('.nav > li > .active').eq(0).trigger('click')
+                }
             }
+
+        },
+        getCharm: function () {
+            var $charm = $('[name=charm]', '#add');
+            var $this = $('[name=target]', '#add');
+            var uri = $this.val();
+            if (uri) {
+                uri = uri.trim();
+                $this.val(uri);
+            } else
+                $charm.val('');
+            if (uri.startsWith("/"))
+                uri = uri.substring(1);
+            return $charm.val(uri.replace(/\//g, ":"));
         }
     };
+
+    $(function () {
+        Add.init();
+    });
     //# sourceURL=add.js
 </script>

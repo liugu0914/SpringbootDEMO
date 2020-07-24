@@ -42,9 +42,11 @@
     <delete id="del" parameterType="Map">
         delete t from ${tableName} t
         where  1=1
-        and  t.${name} in
-        <foreach collection="array" item="item"  open="(" close=")" separator=",">
-            #{item}
+        <foreach collection="params" index="name" item="value"  open="" close="" separator="">
+           and t.${name} in
+            <foreach collection="value" item="item"  open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </foreach>
     </delete>
 

@@ -1,6 +1,9 @@
 package com.jiopeel.core.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jiopeel.sys.bean.result.PermissionResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -32,6 +35,18 @@ public class BaseUtil {
 
 
     /**
+     * 获取泛型的Map Type
+     *
+     * @param main
+     * @param elementClasses 元素类
+     * @return JavaType Java类型
+     */
+    public static JavaType getJavaType(Class<?> main, Class<?>... elementClasses) {
+        return objectMapper.getTypeFactory().constructParametricType(main, elementClasses);
+    }
+
+
+    /**
      * 解析json
      *
      * @param content
@@ -44,6 +59,45 @@ public class BaseUtil {
         }
         try {
             return objectMapper.readValue(content, valueType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /**
+     * 解析json
+     *
+     * @param content
+     * @param TypeReference
+     * @return
+     */
+    public static <T> T fromJson(String content, TypeReference<T> TypeReference) {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+        }
+        try {
+            return objectMapper.readValue(content, TypeReference);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 解析json
+     *
+     * @param content
+     * @param valueType
+     * @return
+     */
+    public static Object fromJson(String content, Class<?> main, Class<?>... valueType) {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+        }
+        try {
+            return objectMapper.readValue(content, getJavaType(main, valueType));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -413,8 +467,9 @@ public class BaseUtil {
 
     /**
      * 雪花算法获取ID
-     * @Param:  dataCenterId 数据中心名
-     * @Param:  machineId 机器名
+     *
+     * @Param: dataCenterId 数据中心名
+     * @Param: machineId 机器名
      * @Return: String
      * @auhor: lyc
      * @Date: 2020/7/19 17:07
@@ -433,6 +488,7 @@ public class BaseUtil {
 
     /**
      * 雪花算法获取ID 数据中心名: 1 机器名:1
+     *
      * @Return: String
      * @auhor: lyc
      * @Date: 2020/7/19 17:07
@@ -758,6 +814,8 @@ public class BaseUtil {
      * @return 转换后的对象
      */
     public static Object obj(Object value) {
+        if (empty(value))
+            return value;
         Class<?> clazz = value.getClass();
         return obj(clazz, value);
     }

@@ -18,19 +18,8 @@ public class MyTemplateException implements TemplateExceptionHandler {
 
     @Override
     public void handleTemplateException(TemplateException te, Environment env, Writer out) throws TemplateException {
-        log.warn("[Freemarker Error: " + te.getMessage() + "]");
-        String missingVariable = "undefined";
         try {
-            String[] tmp = te.getMessageWithoutStackTop().split("\n");
-            if (tmp.length > 1)
-                tmp = tmp[1].split(" ");
-            if (tmp.length > 1)
-                missingVariable = tmp[1];
-
-            out.write("[出错了，请联系网站管理员：${ " + missingVariable
-                    + "}]");
-            log.error("[出错了，请联系网站管理员]", te);
-            throw new ServerException(te.getMessage());
+            throw new ServerException("模版出错了，请联系网站管理员");
         } catch (Exception e) {
             throw new TemplateException(
                     "Failed to print error message. Cause: " + e, env);

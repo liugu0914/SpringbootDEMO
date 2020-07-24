@@ -32,4 +32,9 @@ public class MenuResult extends Menu {
      * 应用名称
      */
     private String appname;
+
+    /**
+     * 权限id
+     */
+    private String permissionid;
 }

@@ -9,6 +9,7 @@ import com.jiopeel.core.constant.Constant;
 import com.jiopeel.core.constant.RedisConstant;
 import com.jiopeel.core.logic.BaseLogic;
 import com.jiopeel.core.util.BaseUtil;
+import com.jiopeel.core.util.SpringUtil;
 import com.jiopeel.sys.bean.Menu;
 import com.jiopeel.sys.bean.form.MenuForm;
 import com.jiopeel.sys.bean.query.MenuQuery;
@@ -91,8 +92,9 @@ public class MenuLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
+    @Cacheable(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     public List<MenuResult> Menulist() {
-        return  dao.query("menu.list");
+        return dao.query("menu.list");
     }
 
     /**
@@ -102,19 +104,18 @@ public class MenuLogic extends BaseLogic {
      * @version 1.0.0
      * @date 2019年12月20日17:46:46
      */
-    @Cacheable(value = RedisConstant.CACHE, key = "targetClass + '$Menus'")
     public List<MenuResult> list() {
-        List<MenuResult> list = dao.query("menu.list");
+        List<MenuResult> list = SpringUtil.getBean(getClass()).Menulist();
         if (list == null || list.isEmpty())
             return list;
-        List<MenuResult> menus = new ArrayList();
-        Map<String, List<MenuResult>> map = new HashMap();
+        List<MenuResult> menus = new ArrayList<>();
+        Map<String, List<MenuResult>> map = new HashMap<>();
         for (MenuResult item : list) {
             String superId = item.getSuperid();//上级id
             if (map.containsKey(superId)) {
                 map.get(superId).add(item);
             } else {
-                List<MenuResult> results = new ArrayList();
+                List<MenuResult> results = new ArrayList<>();
                 results.add(item);
                 map.put(superId, results);
             }
@@ -177,7 +178,7 @@ public class MenuLogic extends BaseLogic {
             bean.setLevel(SysConstant.LEVEL_1);
             bean.setSuperid(SysConstant.NO_SUPER);
         }
-        if (bean.getOrdernum() == null || bean.getOrdernum() <= 0) {
+        if (bean.getOrdernum() <= 0) {
             //根据父级id查询该父级下最大的序号
             String SuperId = bean.getSuperid();
             Integer OrderNum = dao.queryOne("menu.getOrderNumBySuperId", SuperId);

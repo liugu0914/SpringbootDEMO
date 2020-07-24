@@ -1,0 +1,52 @@
+<div class="row">
+    <div class="col-sm-6">
+        <h4 class="mb-2"><i class="${map.iconfont!''}"></i>   ${(map.name)!'功能权限'}</h4>
+    </div>
+    <div class="col-sm-6">
+        <div class="text-sm-right">
+            <button type="button" target="modal" data-appid="${map.appid!''}" data-type="fuc" data-menuid="${map.id!''}"
+                    data-url="/admin/permission/info"
+                    class="btn btn-success btn-rounded mb-3">
+                <i class="cs cs-jia"></i> 配置权限
+            </button>
+        </div>
+    </div>
+</div>
+<div class="row">
+    [#list list?if_exists as item]
+    <div class="col-sm-4">
+        <div class="alert [#if item.enable == '1']alert-warning[#else]alert-secondary[/#if] alert-dismissible"
+             role="alert">
+            <span>${item.name!''}</span>
+            <div class="close">
+                <a href="/admin/permission/info" data-id="${item.id!''}"
+                   class="[#if item.enable == '1']text-warning[#else]text-secondary[/#if]"
+                   data-appid="${item.appid!''}" data-type="${item.appid!''}" target="modal"
+                   show="tooltip" data-title="编辑">
+                    <i class="cs cs-bianji"></i>
+                </a>
+                <a href="/admin/permission/del" data-id="${item.id!''}"
+                   class="[#if item.enable == '1']text-warning[#else]text-secondary[/#if]"
+                   target="ajax" data-warn="确认删除数据?" data-suc="fuc.suc"
+                   show="tooltip" data-title="删除">
+                    <i class="cs cs-shanchu"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    [/#list]
+</div>
+<script>
+    var fuc = {
+        suc: function () {
+            if ($('#modal').length > 0) {
+                $('#modal').modal('hide')
+            }
+            var zTree = $('#tree').data('tree').ztree;
+            var nodes = zTree.getSelectedNodes();
+            if (nodes.length > 0) {
+                $('#' + nodes[0].tId + "_a",'#tree').click();
+            }
+        }
+    };
+</script>

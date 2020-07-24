@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ：lyc
@@ -69,6 +70,21 @@ public class UserEvent extends BaseEvent {
         Map<String, String> map = WebUtil.getParam2Map(request);
         model.addAttribute("bean", logic.getInfo(map.get("id")));
         return "sys/user/info";
+    }
+
+    /**
+     * @Description :添加或修改页面
+     * @Param: query
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @RequestMapping(value = "configRoles", method = {RequestMethod.POST})
+    public String configRoles(Model model) {
+        Map<String, String> map = WebUtil.getParam2Map(request);
+        model.addAttribute("userId", map.get("id"));
+        model.addAttribute("roles", logic.getRoles(map.get("id")));
+        return "sys/user/configRoles";
     }
 
     /**
@@ -132,6 +148,21 @@ public class UserEvent extends BaseEvent {
     @RequestMapping(value = "save", method = {RequestMethod.POST})
     public Base save(@ModelAttribute UserForm form) {
         return Base.judge(logic.save(form));
+    }
+
+
+    /**
+     * @Description :保存用户的角色配置
+     * @Param: form
+     * @Return: Base
+     * @auhor:lyc
+     * @Date:2019/12/21 00:02
+     */
+    @ResponseBody
+    @RequestMapping(value = "saveConfigRoles", method = {RequestMethod.POST})
+    public Base saveConfigRoles(@RequestParam(value = "roleid" ,required = false) Set<String> sets,
+                                @RequestParam("userId") String userId) {
+        return Base.judge(logic.saveConfigRoles(sets,userId));
     }
 
     /**

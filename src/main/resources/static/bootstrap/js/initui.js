@@ -4,16 +4,17 @@
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./ajax.js'), require('./confirm.js'), require('./toast.js'), require('./tool.js')) :
-  typeof define === 'function' && define.amd ? define(['jquery', './ajax.js', './confirm.js', './toast.js', './tool.js'], factory) :
-  (global = global || self, global.InitUI = factory(global.jQuery, global.Ajax, global.Confirm, global.Toast, global.Tool));
-}(this, function ($, Ajax, Confirm, Toast, Tool) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('./ajax.js'), require('./confirm.js'), require('./toast.js'), require('./tool.js'), require('./tree.js')) :
+  typeof define === 'function' && define.amd ? define(['jquery', './ajax.js', './confirm.js', './toast.js', './tool.js', './tree.js'], factory) :
+  (global = global || self, global.InitUI = factory(global.jQuery, global.Ajax, global.Confirm, global.Toast, global.Tool, global.Tree));
+}(this, function ($, Ajax, Confirm, Toast, Tool, Tree) { 'use strict';
 
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
   Ajax = Ajax && Ajax.hasOwnProperty('default') ? Ajax['default'] : Ajax;
   Confirm = Confirm && Confirm.hasOwnProperty('default') ? Confirm['default'] : Confirm;
   Toast = Toast && Toast.hasOwnProperty('default') ? Toast['default'] : Toast;
   Tool = Tool && Tool.hasOwnProperty('default') ? Tool['default'] : Tool;
+  Tree = Tree && Tree.hasOwnProperty('default') ? Tree['default'] : Tree;
 
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -129,16 +130,17 @@
     winH: 1200
   };
   var DataKey = {
-    QUERY: DATA_INFO + "query"
+    QUERY: DATA_INFO + "query",
+    TREE: 'tree'
+    /**
+     * ------------------------------------------------------------------------
+     *  初始化方法 init()
+     *  @author lyc
+     *  @date 2020年06月04日17:48:50
+     * ------------------------------------------------------------------------
+     */
+
   };
-  var JSON = window.JSON;
-  /**
-   * ------------------------------------------------------------------------
-   *  初始化方法 init()
-   *  @author lyc
-   *  @date 2020年06月04日17:48:50
-   * ------------------------------------------------------------------------
-   */
 
   var InitUI =
   /*#__PURE__*/
@@ -591,86 +593,8 @@
       var _this5 = this;
 
       $(Selector.TREE, this._element).each(function (index, element) {
-        if (!element.classList.contains(ClassName.ZTREE)) {
-          element.classList.add(ClassName.ZTREE);
-        }
-
-        var $this = $(element);
-        var check = element.hasAttribute('check');
-        var edit = element.hasAttribute('edit');
-        var autoParam = element.getAttribute('auto');
-        autoParam = autoParam && typeof autoParam !== 'string' ? JSON.parse(autoParam) : ['id', 'pid'];
-        var url = $this.data('url');
-        var params = $(_this5).data();
-
-        if (params && params.url) {
-          delete params.url;
-        }
-
-        var setting = {
-          // ztree config
-          view: _objectSpread({}, edit ? {
-            addHoverDom: addHoverDom,
-            removeHoverDom: removeHoverDom
-          } : {}, {
-            selectedMulti: false
-          }),
-          check: {
-            enable: check
-          },
-          edit: {
-            enable: edit
-          },
-          data: {
-            simpleData: {
-              enable: true,
-              idKey: 'id',
-              pIdKey: 'pid',
-              rootPId: 0
-            }
-          },
-          asyc: {
-            enable: true,
-            otherParam: params,
-            autoParam: autoParam,
-            type: Ajax.POST,
-            url: url,
-            dataType: Ajax.JSON
-          },
-          callback: {}
-        };
-        var newCount = 1;
-
-        function addHoverDom(treeId, treeNode) {
-          var sObj = $("#" + treeNode.tId + "_span");
-
-          if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) {
-            return;
-          }
-
-          var addStr = "<span class='button add' id='addBtn_" + treeNode.tId + "' title='add node' onfocus='this.blur();'></span>";
-          sObj.after(addStr);
-          var btn = $("#addBtn_" + treeNode.tId);
-          var h = 100;
-
-          if (btn) {
-            btn.on('click', function () {
-              var zTree = $.fn.zTree.getZTreeObj('treeDemo');
-              zTree.addNodes(treeNode, {
-                id: h + newCount,
-                pId: treeNode.id,
-                name: "new node" + newCount++
-              });
-              return false;
-            });
-          }
-        }
-
-        function removeHoverDom(treeId, treeNode) {
-          $("#addBtn_" + treeNode.tId).off().remove();
-        }
-
-        $.fn.zTree.init($this, setting);
+        var tree = new Tree(element);
+        $(element).data(DataKey.TREE, tree);
       });
     } // ----------------------------------------------------------------------
     //  ajax默认success方法
@@ -701,7 +625,9 @@
 
         var flag = result.result;
 
-        if (flag) {
+        if (callback && typeof callback === 'function') {
+          callback($this, config);
+        } else if (flag) {
           if ($('#modal').length > 0) {
             $('#modal').modal('hide');
           }
@@ -709,10 +635,6 @@
           if ($('#query').length > 0) {
             $('#query').trigger('click');
           }
-        }
-
-        if (callback && typeof callback === 'function') {
-          callback($this, config);
         }
 
         return Toast[flag ? 'suc' : 'err'](result.message);
@@ -726,6 +648,23 @@
     _proto._ajaxUseful = function _ajaxUseful($this, config) {
       var _this6 = this;
 
+      var warn = config[ClassName.WARN];
+
+      if (warn) {
+        var confirm = new Confirm(warn);
+        confirm.ok(function () {
+          return _this6._ajaxUsefulMain($this, config);
+        }).show();
+      } else {
+        this._ajaxUsefulMain($this, config);
+      }
+    } // ----------------------------------------------------------------------
+    //  通用处理Customer中的事件
+    //  事件顺序:[chk , cus, bef ,suc]
+    // ----------------------------------------------------------------------
+    ;
+
+    _proto._ajaxUsefulMain = function _ajaxUsefulMain($this, config) {
       var chk = Tool.eval(config[Customer.CHECK]);
 
       if (typeof chk === 'function') {
@@ -748,30 +687,20 @@
           config.data = _objectSpread({}, config.data, rescus);
         } else if (typeof rescus === 'boolean' && !rescus) {
           return;
+        } else {
+          return;
         }
       }
 
-      var warn = config[ClassName.WARN];
-
-      if (warn) {
-        var confirm = new Confirm(warn);
-        confirm.ok(function () {
-          return _this6._ajaxUsefulMain($this, config);
-        }).show();
-      } else {
-        this._ajaxUsefulMain($this, config);
-      }
-    } // ----------------------------------------------------------------------
-    //  通用处理Customer中的事件
-    //  事件顺序:[chk , cus, bef ,suc]
-    // ----------------------------------------------------------------------
-    ;
-
-    _proto._ajaxUsefulMain = function _ajaxUsefulMain($this, config) {
       var bef = Tool.eval(config[Customer.BEFORE]);
 
       if (typeof bef === 'function') {
         var obj = bef($this, config.data);
+
+        if (!bef) {
+          return;
+        }
+
         config.data = _objectSpread({}, config.data, typeof obj === 'object' && obj ? obj : {});
       }
 
@@ -785,12 +714,7 @@
 
     InitUI._init = function _init() {
       return this.each(function () {
-        var data = $(this).data(DATA_KEY);
-
-        if (!data) {
-          data = new InitUI(this);
-          $(this).data(DATA_KEY, data);
-        }
+        $(this).data(DATA_KEY, new InitUI(this));
       });
     };
 

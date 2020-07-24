@@ -2,6 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="role">
+    <select id="getInfo" parameterType="String" resultType="com.jiopeel.sys.bean.result.RoleResult">
+        SELECT
+            t.*
+        FROM
+            t_role t
+        WHERE
+        1 = 1
+        AND t.id=#{_paramer}
+    </select>
+
+    <select id="getListPage" parameterType="com.jiopeel.sys.bean.query.RoleQuery" resultType="com.jiopeel.sys.bean.result.RoleResult">
+        select t.* from t_role  t where 1=1
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(name)">
+            <bind name="name" value="'%'+name+'%'"/>
+            and t.name like #{name}
+        </if>
+        <if test="!@com.jiopeel.core.util.BaseUtil@empty(enable)">
+            and t.enable = #{enable}
+        </if>
+    </select>
+
+    <select id="getList"  resultType="com.jiopeel.sys.bean.result.RoleResult">
+        select t.*
+        from t_role  t
+        where 1=1
+        and t.enable = '1'
+    </select>
+
     <select id="getListById" parameterType="String" resultType="com.jiopeel.sys.bean.result.RoleResult">
         SELECT
             r.*
@@ -45,5 +73,15 @@
         <foreach item="item" index="index" collection="collection" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+
+    <select id="getPermissionById" parameterType="String" resultType="com.jiopeel.sys.bean.result.RolePermissionResult">
+        SELECT
+            t.*
+        FROM
+            t_role_permission t
+        WHERE
+        1 = 1
+        AND t.roleid=#{_paramer}
     </select>
 </mapper>

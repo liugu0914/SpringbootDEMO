@@ -1,0 +1,114 @@
+<div class="row" id="configDetail">
+    <input name="roleid" type="hidden" value="${roleid}">
+    <div class="col-12">
+        <div class="card p-3 mt-lg-0">
+            <div class="check-all">
+                <div class="card-header">
+                    <h4>系统权限
+                        <div class="float-right">
+                            <input type="checkbox" id="syses"
+                                   data-switch="success" onchange="configDetail.check(this,true)">
+                            <label for="syses" data-on-label="是" data-off-label="否"
+                                   class="mb-0 d-block"></label>
+                        </div>
+                        <div class="float-right mr-1">
+                            <span class="badge badge-success-lighten">全选 :</span>
+                        </div>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        [#list sys! as item]
+                            <div class="col-sm-3">
+                                <div class="alert alert-dismissible alert-danger">
+                                    <span>${item.name!''}</span>
+                                    <div class="close" style="opacity: 1">
+                                        <input type="checkbox" id="${item.id}"  onchange="configDetail.check(this)" name="permissionid"
+                                               data-switch="success" [#if pes[item.id]??] checked value="${item.id}"  [/#if] />
+                                        <label for="${item.id}" data-on-label="是" data-off-label="否"
+                                               class="mb-0 d-block"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        [/#list]
+                    </div>
+                </div>
+            </div>
+            <div class="check-all">
+                <div class="card-header">
+                    <h4>菜单权限
+                        <div class="float-right">
+                            <input type="checkbox" id="menus"
+                                   data-switch="success" onchange="configDetail.check(this,true)">
+                            <label for="menus" data-on-label="是" data-off-label="否"
+                                   class="mb-0 d-block"></label>
+                        </div>
+                        <div class="float-right mr-1">
+                            <span class="badge badge-success-lighten">全选 :</span>
+                        </div>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            [#list menus! as item]
+                                <div class="border p-3 mb-3 rounded check-all">
+                                    <h4 class="mb-3 ml-2">
+                                        <i class="${item.icon!''}"></i> ${item.name!''}
+                                        <div class="float-right">
+                                            <input type="checkbox" id="${item.id}" [#if pes[item.id]??] checked value="${item.id}" [/#if]
+                                                   data-switch="success" onchange="configDetail.check(this,true)" name="permissionid">
+                                            <label for="${item.id}" data-on-label="是" data-off-label="否"
+                                                   class="mb-0 d-block"></label>
+                                        </div>
+                                    </h4>
+
+                                    [#list fucs[item.id]! as fuc]
+                                        <div class="col-sm-3">
+                                            <div class="alert alert-dismissible alert-warning">
+                                                <span>${fuc.name!''}</span>
+                                                <div class="close" style="opacity: 1">
+                                                    <input type="checkbox"  onchange="configDetail.check(this)" name="permissionid"
+                                                           id="${fuc.id}" [#if pes[fuc.id]??] checked value="${fuc.id}"[/#if]
+                                                           data-switch="success">
+                                                    <label for="${fuc.id}" data-on-label="是" data-off-label="否"
+                                                           class="mb-0 d-block"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    [/#list]
+                                </div>
+                            [/#list]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var configDetail = {
+        init: function () {
+        },
+        check: function (ele, checkAll) {
+            var $this = $(ele);
+            var flag = $this.prop('checked');
+            if (checkAll) {
+                $this.closest('.check-all').find('input[type=checkbox]').each(function () {
+                   $(this).prop('checked',flag);
+                    if($(this).attr('name') === 'permissionid')
+                        $(this).val(flag ? $(this).attr('id') : '');
+                });
+            }else{
+                var id = $this.attr('id');
+                if($this.attr('name') === 'permissionid')
+                    $this.val(flag ? id : '');
+            }
+        }
+    };
+
+    $(function () {
+        configDetail.init();
+    });
+    //# sourceURL=add.js
+</script>

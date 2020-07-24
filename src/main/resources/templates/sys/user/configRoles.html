@@ -1,0 +1,55 @@
+<div class="modal-content" id="configRoles">
+    <div class="modal-header modal-colored-header bg-dark">
+        <h5 class="modal-title">配置角色</h5>
+        <div>
+            <i class="cs cs-shuaxin pointer" show="tooltip" target="modal-reflesh" data-title="刷新"></i>
+            <i class="cs cs-fangda pointer" show="tooltip" target="modal-expand" data-title="缩放"></i>
+            <i class="cs cs-close pointer" show="tooltip" target="modal-close" data-title="关闭"></i>
+        </div>
+    </div>
+    <div class="modal-body">
+        <form class="pl-3 pr-3" action="/admin/user/saveConfigRoles">
+            <input type="hidden" name="userId" value="${userId!''}">
+            <div class="p-2 rounded">
+                <div class="table-responsive">
+                    <table class="table table-hover table-centered mb-0">
+                        <tbody>
+                        <tr>
+                            <th>角色名称</th>
+                            <th>是否开启</th>
+                        </tr>
+                        [#list roles! as role]
+                            <tr>
+                                <td>${role.name!''}</td>
+                                <td class="role">
+                                    <input type="checkbox" onchange="configRoles.check(this)" id="${role.id}"
+                                           [#if role.used?? && role.used=='1']checked value="${role.id}" [/#if]
+                                           data-switch="success" name="roleid">
+                                    <label class="mb-0" for="${role.id}" data-on-label="是"
+                                           data-off-label="否"></label>
+                                </td>
+                            </tr>
+                        [/#list]
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" target="modal-close">关闭</button>
+        <button type="button" class="btn btn-primary" target="form">保存</button>
+    </div>
+</div>
+<script>
+    var configRoles = {
+        check: function (ele) {
+            var $this = $(ele);
+            var flag = $this.prop('checked');
+            var id = $this.attr('id');
+            if($this.attr('name') === 'roleid')
+                $this.val(flag ? id : '');
+        }
+    };
+    //# sourceURL=add.js
+</script>
