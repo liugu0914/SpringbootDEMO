@@ -114,7 +114,7 @@ public class LoginLogic extends BaseLogic {
         boolean permitted = subject.isPermitted(charm);
         if (!permitted) {
             loginOut(request);
-            throw new ServerException("用户没有登陆权限!");
+            throw new ServerException("用户没有登陆权限,请联系管理员获取权限!");
         }
         oauthLogic.BoxuserAgent(user.getId(), request);
         //code
@@ -137,6 +137,10 @@ public class LoginLogic extends BaseLogic {
         List<PermissionResult> permissionList = roleLogic.getPermissionByRoles(roles);
         Set<String> permissions = roleLogic.getPermissions(permissionList);
         List<MenuResult> menus = roleLogic.getMenuByRoles(roles);
+        for (MenuResult menu : menus) {
+            if (!BaseUtil.empty(menu.getCharm()))
+                permissions.add(menu.getCharm());
+        }
         user.setMenus(menus);
         user.setPermissionList(permissionList);
         user.setPermissions(permissions);

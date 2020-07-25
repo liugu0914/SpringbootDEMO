@@ -414,7 +414,7 @@
         heading: '错误',
         text: text,
         position: 'top-center',
-        hideAfter: 1500,
+        hideAfter: 3000,
         stack: false,
         icon: 'error'
       };

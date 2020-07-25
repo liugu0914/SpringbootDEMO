@@ -590,8 +590,6 @@
     ;
 
     _proto.tree = function tree() {
-      var _this5 = this;
-
       $(Selector.TREE, this._element).each(function (index, element) {
         var tree = new Tree(element);
         $(element).data(DataKey.TREE, tree);
@@ -609,6 +607,7 @@
           }
 
           var $target = ($this.closest(ClassName.QUERY_MAIN) || document).find(config.target + ":first");
+          $target.html(result);
           $target.data(DATA_KEY, new InitUI($target.html(result)[0]));
 
           if (callback && typeof callback === 'function') {
@@ -646,25 +645,8 @@
     ;
 
     _proto._ajaxUseful = function _ajaxUseful($this, config) {
-      var _this6 = this;
+      var _this5 = this;
 
-      var warn = config[ClassName.WARN];
-
-      if (warn) {
-        var confirm = new Confirm(warn);
-        confirm.ok(function () {
-          return _this6._ajaxUsefulMain($this, config);
-        }).show();
-      } else {
-        this._ajaxUsefulMain($this, config);
-      }
-    } // ----------------------------------------------------------------------
-    //  通用处理Customer中的事件
-    //  事件顺序:[chk , cus, bef ,suc]
-    // ----------------------------------------------------------------------
-    ;
-
-    _proto._ajaxUsefulMain = function _ajaxUsefulMain($this, config) {
       var chk = Tool.eval(config[Customer.CHECK]);
 
       if (typeof chk === 'function') {
@@ -692,6 +674,23 @@
         }
       }
 
+      var warn = config[ClassName.WARN];
+
+      if (warn) {
+        var confirm = new Confirm(warn);
+        confirm.ok(function () {
+          return _this5._ajaxUsefulMain($this, config);
+        }).show();
+      } else {
+        this._ajaxUsefulMain($this, config);
+      }
+    } // ----------------------------------------------------------------------
+    //  通用处理Customer中的事件
+    //  事件顺序:[chk , cus, bef ,suc]
+    // ----------------------------------------------------------------------
+    ;
+
+    _proto._ajaxUsefulMain = function _ajaxUsefulMain($this, config) {
       var bef = Tool.eval(config[Customer.BEFORE]);
 
       if (typeof bef === 'function') {

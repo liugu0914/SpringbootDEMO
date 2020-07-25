@@ -54,7 +54,7 @@ var Login = {
             Login.vars.password_group.style.height = 0;
             Login.vars.password_group.style.margin = 0;
         }, 100);
-        Login.vars.login_btn.innerText = 'Forgot Password';
+        Login.vars.login_btn.innerText = '找回密码';
         Login.setHeight(Login.vars.lowin_wrapper_height - Login.vars.password_group_height);
         Login.vars.lowin_login.querySelector('form').setAttribute('action', Login.vars.option.forgot_url);
         if (e)
@@ -73,7 +73,7 @@ var Login = {
             Login.vars.login_back_link.style.display = 'none';
             Login.vars.password_group.classList.remove('lowin-animated-back');
         }, 1000);
-        Login.vars.login_btn.innerText = 'Sign In';
+        Login.vars.login_btn.innerText = '登陆';
         Login.vars.lowin_login.querySelector('form').setAttribute('action', Login.vars.option.login_url);
         Login.setHeight(Login.vars.lowin_wrapper_height);
         if (e)

@@ -1,18 +1,23 @@
 body {
     margin: 0;
-    background-color: #fbfbfb;
     text-align: center
 }
 
 .lowin {
-    --color-primary: #44a0b3;
+    --color-primary: #006dc9;
     --color-grey: rgba(68, 160, 179, .06);
     --color-dark: rgba(68, 160, 179, .5);
-    --color-semidark: rgba(68, 160, 179, .5);
+    --color-semidark: rgb(7 208 232);
     text-align: center;
     margin: 60px 0 0;
     font-family: segoe ui;
-    font-size: 14px
+    font-size: 14px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: calc( 100% - 60px);
+    z-index: 10;
 }
 
 .lowin .lowin-wrapper {
@@ -22,7 +27,7 @@ body {
     -webkit-perspective: 1000px;
     perspective: 1000px;
     position: relative;
-    height: 100%;
+    height: calc(100% - 160px);
     width: 360px;
     margin: 0 auto
 }
@@ -76,7 +81,7 @@ body {
     border-radius: 50%;
     -webkit-box-shadow: 0 4px 40px rgba(0, 0, 0, .07);
     box-shadow: 0 4px 40px rgba(0, 0, 0, .07);
-    padding: 10px;
+    padding: 20px;
     background-color: #fff;
     z-index: 1;
     position: relative
@@ -98,7 +103,7 @@ body {
     box-shadow: 0 7px 25px rgba(0, 0, 0, .08);
     padding: 60px 25px 25px;
     text-align: left;
-    border-radius: 3px
+    border-radius: .5rem
 }
 
 .lowin .lowin-box::after {
@@ -108,7 +113,7 @@ body {
     -webkit-transform: translate(0, -92.6%) scale(.88);
     -ms-transform: translate(0, -92.6%) scale(.88);
     transform: translate(0, -92.6%) scale(.88);
-    border-radius: 3px;
+    border-radius: .5rem;
     position: absolute;
     top: 100%;
     left: 0;
@@ -544,3 +549,4 @@ body {
     height: 0px;
     display: block;
 }
+

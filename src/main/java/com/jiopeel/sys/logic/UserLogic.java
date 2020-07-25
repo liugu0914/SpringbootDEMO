@@ -72,6 +72,8 @@ public class UserLogic extends BaseLogic {
         UserResult bean = null;
         if (!BaseUtil.empty(account)) {
             User user = dao.queryOneByColumn(User.class, "account", account);
+            if (user == null)
+                return null;
             bean = new UserResult(user);
         }
         return bean;
@@ -122,6 +124,7 @@ public class UserLogic extends BaseLogic {
 
     /**
      * 保存用户的角色配置
+     *
      * @param sets
      * @param userId
      * @return Base
@@ -129,8 +132,8 @@ public class UserLogic extends BaseLogic {
      * @date 2020年07月24日18:04:34
      */
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
-    public boolean saveConfigRoles( Set<String> sets,String userId) {
-        if(BaseUtil.empty(userId))
+    public boolean saveConfigRoles(Set<String> sets, String userId) {
+        if (BaseUtil.empty(userId))
             return false;
         dao.del(UserRole.class, "userid", userId);
         if (sets == null || sets.isEmpty()) {
@@ -212,6 +215,7 @@ public class UserLogic extends BaseLogic {
 
     /**
      * 查询角色
+     *
      * @param id 用户id
      * @author lyc
      * @date 2020年07月24日17:24:03
@@ -221,12 +225,12 @@ public class UserLogic extends BaseLogic {
         List<RoleResult> roles = roleLogic.getList();
         //查询用户id已配置的角色
         List<UserRoleResult> list = dao.query("user.getHasRoles", id);
-        Set<String> sans =new HashSet<>();
+        Set<String> sans = new HashSet<>();
         for (UserRoleResult result : list) {
             sans.add(result.getRoleid());
         }
         for (RoleResult item : roles) {
-            if(sans.contains(item.getId()))
+            if (sans.contains(item.getId()))
                 item.setUsed(Constant.YES);
         }
         return roles;

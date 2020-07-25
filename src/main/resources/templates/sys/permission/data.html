@@ -28,7 +28,7 @@
                                 <div class="alert [#if item.enable == '1']alert-danger[#else]alert-secondary[/#if] alert-dismissible"
                                      role="alert">
                                     <span>${item.name!''}</span>
-                                    <div class="close">
+                                    <div class="close" style="opacity: 1;">
                                         <a href="/admin/permission/info" data-id="${item.id!''}"
                                            class="[#if item.enable == '1']text-danger[#else]text-secondary[/#if]"
                                            data-appid="${item.appid!''}" data-type="${item.appid!''}" target="modal"

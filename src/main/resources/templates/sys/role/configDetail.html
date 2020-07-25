@@ -56,13 +56,13 @@
                                     <h4 class="mb-3 ml-2">
                                         <i class="${item.icon!''}"></i> ${item.name!''}
                                         <div class="float-right">
-                                            <input type="checkbox" id="${item.id}" [#if pes[item.id]??] checked value="${item.id}" [/#if]
-                                                   data-switch="success" onchange="configDetail.check(this,true)" name="permissionid">
-                                            <label for="${item.id}" data-on-label="是" data-off-label="否"
+                                            <input type="checkbox" id="${item.permissionid}" [#if pes[item.permissionid]??] checked value="${item.permissionid}" [/#if]
+                                                   data-switch="success" onchange="configDetail.check(this)" name="permissionid">
+                                            <label for="${item.permissionid}" data-on-label="是" data-off-label="否"
                                                    class="mb-0 d-block"></label>
                                         </div>
                                     </h4>
-
+                                    <div class="row">
                                     [#list fucs[item.id]! as fuc]
                                         <div class="col-sm-3">
                                             <div class="alert alert-dismissible alert-warning">
@@ -77,6 +77,7 @@
                                             </div>
                                         </div>
                                     [/#list]
+                                    </div>
                                 </div>
                             [/#list]
                         </div>

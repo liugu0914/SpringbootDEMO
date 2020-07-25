@@ -1,0 +1,63 @@
+.more-pens {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 10;
+    font-size: 12px;
+}
+
+a.white-mode, a.white-mode:link, a.white-mode:visited, a.white-mode:active {
+    font-size: 12px;
+    text-decoration: none;
+    background: #212121;
+    padding: 4px 8px;
+    color: #f7f7f7;
+}
+a.white-mode:hover, a.white-mode:link:hover, a.white-mode:visited:hover, a.white-mode:active:hover {
+    background: #edf3f8;
+    color: #212121;
+}
+
+.blue-fill {
+    fill:  #07d0e8;
+}
+
+.sheBlue-fill {
+    fill:  #006dc9;
+}
+
+.primary-fill {
+    fill:  #727cf5;
+}
+.info-fill {
+    fill:  #39afd1;
+}
+
+.danger-fill {
+    fill:  #fa5c7c;
+}
+
+.warning-fill {
+    fill:  #ffbc00;
+}
+
+.success-fill {
+    fill:  #0acf97;
+}
+
+.dark-fill {
+    fill:  #313a46;
+}
+
+.secondary-fill {
+    fill:  #6c757d;
+}
+
+
+svg {
+    display: block;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    transform: translateZ(0px);
+}

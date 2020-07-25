@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Hyper - Responsive Bootstrap 4 Admin Dashboard</title>
+    <title>Jiopeel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
     <meta content="Coderthemes" name="author" />
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <link rel="shortcut icon" href="/img/login.svg">
     <link href="assets/css/vendor/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/tabstyle-min.css" rel="stylesheet" type="text/css" />
@@ -24,10 +24,10 @@
             <div class="slimscroll-menu" id="left-side-menu-container">
                 <a href="/" class="logo text-center">
                     <span class="logo-lg">
-                        <img src="assets/images/logo.png" alt="" height="16">
+                        <img src="/img/jiopeel.svg" alt="" height="30">
                     </span>
                     <span class="logo-sm">
-                        <img src="assets/images/logo_sm.png" alt="" height="16">
+                        <img src="/img/login.svg" alt="" height="20">
                     </span>
                 </a>
                 <ul class="metismenu side-nav">
@@ -36,7 +36,7 @@
                         <a href="javascript: void(0);" class="side-nav-link">
                             <i class="${menu.icon!}"></i>
                             <span> ${menu.name} </span>
-                            <span class="menu-arrow"></span>
+                            <span class="cs cs-xiangyou menu-arrow"> </span>
                         </a>
                         <ul class="side-nav-second-level collapse" aria-expanded="false">
                             [#list (menu.list)?if_exists as item]
@@ -173,7 +173,7 @@
                                 </span>
                                 <span>
                                     <span class="account-user-name">${user.username!''}</span>
-                                    <span class="account-position">Founder</span>
+                                    <span class="account-position">[#if user.roles??]${user.roleList[0].name!''}[/#if]</span>
                                 </span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
@@ -182,41 +182,41 @@
                                     <h6 class="text-overflow m-0">Welcome !</h6>
                                 </div>
 
-                                <a href="#" class="dropdown-item notify-item">
-                                    <i class="mdi mdi-account-circle mr-1"></i>
-                                    <span>My Account</span>
-                                </a>
+[#--                                <a href="#" class="dropdown-item notify-item">--]
+[#--                                    <i class="mdi mdi-account-circle mr-1"></i>--]
+[#--                                    <span>My Account</span>--]
+[#--                                </a>--]
 
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                    <i class="mdi mdi-account-edit mr-1"></i>
-                                    <span>Settings</span>
-                                </a>
+[#--                                <a href="javascript:void(0);" class="dropdown-item notify-item">--]
+[#--                                    <i class="mdi mdi-account-edit mr-1"></i>--]
+[#--                                    <span>Settings</span>--]
+[#--                                </a>--]
 
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                    <i class="mdi mdi-lifebuoy mr-1"></i>
-                                    <span>Support</span>
-                                </a>
+[#--                                <a href="javascript:void(0);" class="dropdown-item notify-item">--]
+[#--                                    <i class="mdi mdi-lifebuoy mr-1"></i>--]
+[#--                                    <span>Support</span>--]
+[#--                                </a>--]
 
-                                <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                    <i class="mdi mdi-lock-outline mr-1"></i>
-                                    <span>Lock Screen</span>
-                                </a>
+[#--                                <a href="javascript:void(0);" class="dropdown-item notify-item">--]
+[#--                                    <i class="mdi mdi-lock-outline mr-1"></i>--]
+[#--                                    <span>Lock Screen</span>--]
+[#--                                </a>--]
 
                                 <a href="/logout" class="dropdown-item notify-item">
-                                    <i class="mdi mdi-logout mr-1"></i>
+                                    <i class="cs cs-ai-out mr-1"></i>
                                     <span>Logout</span>
                                 </a>
                             </div>
                         </li>
                     </ul>
                     <button class="button-menu-mobile open-left disable-btn">
-                        <i class="mdi mdi-menu"></i>
+                        <i class="cs cs-icon-bars" style="font-size: 1.3rem;"></i>
                     </button>
                     <div class="app-search">
                         <form>
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Search...">
-                                <span class="mdi mdi-magnify"></span>
+                                <span class="cs cs-search_s"></span>
                                 <div class="input-group-append">
                                     <button class="btn btn-primary" type="submit">Search</button>
                                 </div>
@@ -379,11 +379,11 @@
 
 
 <!--    <script src="assets/js/app.min.js"></script>-->
-    <script src="bootstrap/js/jquery.js"></script>
-    <script src="assets/js/initUI.js"></script>
-    <script src="assets/js/popper.min.js"></script>
-    <script src="assets/js/bootstrap.js"></script>
-    <script src="assets/js/tab-min.js"></script>
+    <script src="/bootstrap/js/jquery.js"></script>
+    <script src="/assets/js/initUI.js"></script>
+    <script src="/assets/js/popper.min.js"></script>
+    <script src="/assets/js/bootstrap.js"></script>
+    <script src="/assets/js/tab-min.js"></script>
 </body>
 
 </html>

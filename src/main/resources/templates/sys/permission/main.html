@@ -1,38 +1,32 @@
 [@c.html]
-<div class="container-fluid query-main">
-    <div class="row">
+    <div class="container-fluid query-main">
+        <div class="row">
             <div class="col-12">
-                <div class="page-title-box">
-                    <h4 class="page-title">权限管理</h4>
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-pills bg-nav-pills nav-justified mb-3">
+                            [#list apps?if_exists as app]
+                                <li class="nav-item">
+                                    <a href="/admin/permission/data" data-appid="${app.id}" data-target=".query-data"
+                                       show="tooltip" data-title="${app.name}" target="html" class="nav-link rounded-0">
+                                        <i class="${app.icon} font-18"></i>
+                                        <span class="d-none d-lg-block">${app.name}</span>
+                                    </a>
+                                </li>
+                            [/#list]
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <ul class="nav nav-pills bg-nav-pills nav-justified mb-3">
-                        [#list apps?if_exists as app]
-                        <li class="nav-item">
-                            <a href="/admin/permission/data"  data-appid="${app.id}" data-target=".query-data" show="tooltip" data-title="${app.name}" target="html" class="nav-link rounded-0">
-                                <i class="${app.icon} font-18"></i>
-                                <span class="d-none d-lg-block">${app.name}</span>
-                            </a>
-                        </li>
-                        [/#list]
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <div class="query-data"></div>
     </div>
-    <div class="query-data"></div>
-</div>
-[@c.js]
-<SCRIPT type="text/javascript">
-    $(function () {
-        $(document).initUI();
-        $('a.nav-link').eq(0).trigger('click');
-    });
-</SCRIPT>
-[/@c.js]
+    [@c.js]
+        <SCRIPT type="text/javascript">
+            $(function () {
+                $(document).initUI();
+                $('a.nav-link').eq(0).trigger('click');
+            });
+        </SCRIPT>
+    [/@c.js]
 [/@c.html]

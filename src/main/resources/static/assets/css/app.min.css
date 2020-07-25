@@ -11921,10 +11921,6 @@ body {
     transform: translate(0, 0);
 }
 
-.side-nav .menu-arrow:before {
-    content: "\F142";
-}
-
 .side-nav .badge {
     margin-top: 3px;
 }

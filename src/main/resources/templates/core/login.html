@@ -3,15 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>lyc</title>
+    <title>Jiopeel</title>
+    <link rel="shortcut icon" href="/img/login.svg">
     <link rel="stylesheet" href="/login/css/login.css">
     <link rel="stylesheet" href="/assets/css/app.min.css">
-<!--    <link rel="stylesheet" href="/bootstrap/css/message.css">-->
+    <link rel="stylesheet" href="/login/css/flow.css">
 </head>
 <body>
 <div class="lowin">
     <div class="lowin-brand">
-        <img src="img/kodinger.jpg" alt="logo">
+        <img src="/img/login.svg" alt="logo" height="60" width="60">
     </div>
     <div class="lowin-wrapper">
         <div class="lowin-box lowin-login">
@@ -19,30 +20,26 @@
                 <form>
                     <input type="hidden"  name="client_id" value="${client_id!''}">
                     <input type="hidden"  name="redirect_uri" value="${redirect_uri!''}">
-                    <p>Sign in to continue</p>
+                    <p>欢迎来到Jiopeel</p>
                     <div class="lowin-group">
-                        <label><b>Account</b><a href="#" class="login-back-link">Sign in?</a></label>
-                        <input type="text" autocomplete="on" name="account" value="lyc" class="lowin-input">
+                        <label><b>账号</b><a href="#" class="login-back-link">登陆?</a></label>
+                        <input type="text" autocomplete="on" name="account" value="test" class="lowin-input">
                     </div>
-                    <!--<div class="lowin-group">-->
-                        <!--<label>Email <a href="#" class="login-back-link">Sign in?</a></label>-->
-                        <!--<input type="email" autocomplete="email" name="email" value="admin@qq.com" class="lowin-input">-->
-                    <!--</div>-->
                     <div class="lowin-group password-group">
-                        <label><b>Password</b><a href="#" class="forgot-link">Forgot Password?</a></label>
-                        <input type="password" name="password" autocomplete="current-password" class="lowin-input">
+                        <label><b>密码</b><a href="#" class="forgot-link">忘记密码?</a></label>
+                        <input type="password" name="password" value="test" autocomplete="current-password" class="lowin-input">
                     </div>
                     <button class="lowin-btn login-btn">
-                        Sign In
+                        登陆
                     </button>
                     <div class="text-foot">
-                        Don't have an account? <a href="" class="register-link">Register</a>
+                        没有账号？点击 <a href="" class="register-link">注册</a>
                     </div>
                     <div class="text-foot">
-                        <a href="/oauth?granttype=github" > GitHub Sign in ?</a>
+                        <a href="/oauth?granttype=github" > GitHub 登陆</a>
                     </div>
                     <div class="text-foot">
-                        <a href="/oauth?granttype=gitee" > Gitee Sign in ?</a>
+                        <a href="/oauth?granttype=gitee" > Gitee 登陆</a>
                     </div>
                 </form>
             </div>
@@ -50,24 +47,24 @@
         <div class="lowin-box lowin-register">
             <div class="lowin-box-inner">
                 <form>
-                    <p>Let's create your account</p>
+                    <p>创建账号</p>
                     <div class="lowin-group">
-                        <label><b>Account</b></label>
-                        <input type="text" name="account"  value="lyc"  autocomplete="name" class="lowin-input">
+                        <label><b>账号</b></label>
+                        <input type="text" name="account"  value=""  autocomplete="name" class="lowin-input">
                     </div>
                     <div class="lowin-group">
-                        <label><b>Email</b></label>
-                        <input type="email" autocomplete="email" value="liugu0914@sina.com" name="email" class="lowin-input">
+                        <label><b>邮箱</b></label>
+                        <input type="email" autocomplete="email" value="" name="email" class="lowin-input">
                     </div>
                     <div class="lowin-group">
-                        <label><b>Password</b></label>
-                        <input type="password" name="password" value="admin" autocomplete="current-password" class="lowin-input">
+                        <label><b>密码</b></label>
+                        <input type="password" name="password" value="" autocomplete="current-password" class="lowin-input">
                     </div>
                     <button class="lowin-btn lowin-sign-up">
-                        Sign Up
+                        注册
                     </button>
                     <div class="text-foot">
-                        Already have an account? <a href="" class="login-link">Login</a>
+                        已有账号?点击 <a href="" class="login-link">登陆</a>
                     </div>
                 </form>
             </div>
@@ -80,7 +77,7 @@
 <script src="/bootstrap/js/toast.js"></script>
 <script src="/bootstrap/js/tool.js"></script>
 <script src="/bootstrap/js/ajax.js"></script>
-<!--<script src="/bootstrap/js/message.js"></script>-->
 <script src="/login/js/login.js"></script>
+<script src="/login/js/flow.js"></script>
 </body>
 </html>
