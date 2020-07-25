@@ -1,6 +1,5 @@
 package com.jiopeel.core.logic;
 
-import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.OauthToken;
 import com.jiopeel.core.bean.UserAgent;
 import com.jiopeel.core.bean.UserGrant;
@@ -28,7 +27,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -40,6 +41,9 @@ public class OauthLogic extends BaseLogic {
 
     @Resource
     private UserLogic userLogic;
+
+    @Resource
+    private LoginLogic loginLogic;
 
 
     /**
@@ -89,7 +93,13 @@ public class OauthLogic extends BaseLogic {
             if (!dao.upd("login.upduserGrant", user_data))
                 throw new ServerException("信息有误，授权登陆失败！");
         }
-        return !BaseUtil.empty(user) ? RedisUser(new UserResult(user)) : null;
+        Set<String> sets =new HashSet<String>();
+        sets.add("9051411736301568");//默认为游客id
+        userLogic.saveConfigRoles(sets,user.getId());
+        //附加角色和权限
+        UserResult userResult = new UserResult(user);
+        loginLogic.handelRoleAndPes(userResult);
+        return !BaseUtil.empty(user) ? RedisUser(userResult) : null;
     }
 
     /**
@@ -162,8 +172,11 @@ public class OauthLogic extends BaseLogic {
      */
     private User updUser(UserGrant user_data) {
         User user = dao.queryOne("login.getUserbyUserGrant", user_data);
-        if (BaseUtil.empty(user))
-            return addUser(user_data);
+        if (BaseUtil.empty(user)) {
+            user = addUser(user_data);
+            user_data.setUserid(user.getId());
+            dao.upd4n(user_data,"id","userid");
+        }
 //        user.setImgurl(user_data.getImgurl());
 //        user.setUsername(user_data.getNickname());
 //        user.updTime();
@@ -185,9 +198,10 @@ public class OauthLogic extends BaseLogic {
         user.setPassword("123456");
         user.setType(userGrant.getGranttype());
         user.setUsername(userGrant.getNickname());
-        if (!userLogic.save(user))
+        User saveUser = userLogic.save(user);
+        if (BaseUtil.empty(saveUser))
             throw new ServerException("添加失败");
-        return user;
+        return saveUser;
     }
 
     /**

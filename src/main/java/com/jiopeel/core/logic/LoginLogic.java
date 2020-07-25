@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +65,11 @@ public class LoginLogic extends BaseLogic {
         User userDB = userLogic.getByAccount(form.getAccount());
         if (userDB != null)
             throw new ServerException("该账号已存在");
-        return userLogic.save(form) ? Base.suc("注册成功") : Base.fail("注册失败");
+        User user = userLogic.save(form);
+        Set<String> sets =new HashSet<String>();
+        sets.add("9051411736301568");//默认为游客id
+        userLogic.saveConfigRoles(sets,user.getId());
+        return BaseUtil.empty(user) ? Base.suc("注册成功") : Base.fail("注册失败");
     }
 
     /**
@@ -131,7 +136,7 @@ public class LoginLogic extends BaseLogic {
      * @auhor :lyc
      * @Date: 2020/7/14 23:33
      */
-    private void handelRoleAndPes(UserResult user) {
+    public void handelRoleAndPes(UserResult user) {
         List<RoleResult> roleList = roleLogic.getRoles(user.getId());
         Set<String> roles = roleLogic.getRoles(roleList);
         List<PermissionResult> permissionList = roleLogic.getPermissionByRoles(roles);

@@ -12,11 +12,14 @@ public class UserResult extends User {
 
     private static final long serialVersionUID = -7338291404537479306L;
 
-    public  UserResult(){
+    public UserResult() {
     }
 
-    public  UserResult(User user){
-        BaseUtil.copyProperties(user,this);
+    public UserResult(User user) {
+        if (user == null)
+            user = new User();
+        BaseUtil.copyProperties(user, this);
+
     }
 
 

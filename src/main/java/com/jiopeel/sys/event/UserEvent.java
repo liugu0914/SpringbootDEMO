@@ -3,7 +3,9 @@ package com.jiopeel.sys.event;
 import com.jiopeel.core.base.Base;
 import com.jiopeel.core.bean.Page;
 import com.jiopeel.core.event.BaseEvent;
+import com.jiopeel.core.util.BaseUtil;
 import com.jiopeel.core.util.WebUtil;
+import com.jiopeel.sys.bean.User;
 import com.jiopeel.sys.bean.form.AppForm;
 import com.jiopeel.sys.bean.form.UserForm;
 import com.jiopeel.sys.bean.query.AppQuery;
@@ -147,7 +149,8 @@ public class UserEvent extends BaseEvent {
     @ResponseBody
     @RequestMapping(value = "save", method = {RequestMethod.POST})
     public Base save(@ModelAttribute UserForm form) {
-        return Base.judge(logic.save(form));
+        User user = logic.save(form);
+        return Base.judge(BaseUtil.empty(user));
     }
 
 

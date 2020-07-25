@@ -162,7 +162,7 @@ public class UserLogic extends BaseLogic {
      * @date 2019年12月20日17:46:46
      */
     @Transactional(rollbackFor = {Exception.class, ServerException.class})
-    public boolean save(UserForm form) {
+    public User save(UserForm form) {
         String id = form.getId();
         User bean = new User();
         boolean flag = true;
@@ -188,7 +188,7 @@ public class UserLogic extends BaseLogic {
             bean.updTime();
             dao.upd4n(bean, "id", "username", "email", "enable", "updtime");
         }
-        return flag;
+        return bean;
     }
 
     /**
