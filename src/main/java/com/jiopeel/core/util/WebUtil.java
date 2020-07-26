@@ -46,29 +46,34 @@ public class WebUtil implements Serializable {
     }
 
     public static String getIpAddr(HttpServletRequest request) {
+
         String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        log.info("x-forwarded-for : {}",ip);
+        String unknown = "unknown";
+        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+            log.info("X-Real-IP : {}",ip);
+        }
+        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
+            log.info("Proxy-Client-IP : {}",ip);
         }
-
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
+            log.info("WL-Proxy-Client-IP : {}",ip);
         }
-
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+            log.info("HTTP_CLIENT_IP : {}",ip);
+        }
+        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            log.info("HTTP_X_FORWARDED_FOR : {}",ip);
+        }
+        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
+            log.info("request.getRemoteAddr() : {}",ip);
         }
-
-        if ("127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
-            InetAddress inet = null;
-            try {
-                inet = InetAddress.getLocalHost();
-                ip = inet.getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-
         return ip;
     }
 
