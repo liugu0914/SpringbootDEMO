@@ -139,7 +139,7 @@ setInterval(function () {
         particles.push(
             new Particle(svg, {
                     "x": Math.random() * $(window).width(),
-                    "y": $(window).height()
+                    "y": $(window).height()-50
                 },
                 1 + Math.random() * 3));
 
