@@ -39,7 +39,6 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer viewcontainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory factory) throws Exception {
-//        String body = getRequestBody(webRequest);
         Object target = this.createAttribute(parameter, factory, webRequest);
         WebDataBinder binder = factory.createBinder(webRequest, target, null);
         if (binder.getTarget() != null) {
@@ -383,29 +382,5 @@ public class FormMethodArgumentResolver implements HandlerMethodArgumentResolver
 
             }
         return false;
-    }
-
-
-    /**
-     * @Author Lux Sun
-     * @Description: 获取请求包的Body内容
-     * @Param: [nativeWebRequest]
-     * @Return: java.lang.String
-     */
-    private String getRequestBody(NativeWebRequest nativeWebRequest) {
-        HttpServletRequest servletRequest = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        String jsonBody = (String) servletRequest.getAttribute("JSON_REQUEST_BODY");
-        if (jsonBody == null) {
-            try {
-                ServletInputStream inputStream = servletRequest.getInputStream();
-                jsonBody = IOUtils.toString(inputStream, StandardCharsets.UTF_8); // closed stream 问题
-
-                Map o = BaseUtil.fromJson(jsonBody, Map.class);
-                servletRequest.setAttribute("JSON_REQUEST_BODY", jsonBody);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return jsonBody;
     }
 }

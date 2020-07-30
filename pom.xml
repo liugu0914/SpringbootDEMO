@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.jiopeel</groupId>
-    <artifactId>SpringboootDemo</artifactId>
+    <artifactId>Jiopeel</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>SpringboootDemo</name>
+    <name>Jiopeel</name>
     <description>http://www.jiopeel.com</description>
 
     <!-- Spring Boot 启动父依赖 -->
@@ -145,6 +145,16 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>eot</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>svg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
