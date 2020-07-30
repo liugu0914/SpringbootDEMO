@@ -165,7 +165,6 @@ public class UserLogic extends BaseLogic {
     public User save(UserForm form) {
         String id = form.getId();
         User bean = new User();
-        boolean flag = true;
         if (BaseUtil.empty(id)) {//添加
             BaseUtil.copyProperties(form, bean);
             if (BaseUtil.empty(bean.getId()))
@@ -180,7 +179,7 @@ public class UserLogic extends BaseLogic {
             SimpleHash simpleHash = new SimpleHash(Sha256Hash.ALGORITHM_NAME, bean.getPassword(), salt, Constant.SALT_TIMES);
             bean.setPassword(simpleHash.toBase64());
             bean.setSalt(salt);
-            flag = dao.add(bean);
+            dao.add(bean);
         } else {//修改
             CheckBean(form);
             bean = get(id);
